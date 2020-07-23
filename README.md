@@ -1,0 +1,1 @@
+# strapi-plugin-content-search
