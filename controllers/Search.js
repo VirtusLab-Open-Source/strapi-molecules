@@ -1,23 +1,15 @@
-const getAsyncSearchableData = async (contentType, searchQuery) => {
-  const result = await strapi.query(contentType).search({ _q: searchQuery });
-  return result.map(item => ({ ...item, __contentType: contentType }));
-};
-
-const fetchAsyncSearchableData = async (contentTypes, searchQuery) => {
-  const requests = contentTypes.map(contentType => {
-    return getAsyncSearchableData(contentType, searchQuery);
-  });
-  return Promise.all(requests);
-};
-
 module.exports = {
   async search(ctx) {
-    const body = JSON.parse(ctx.request.body);
-    const searchQuery = body.searchQuery;
+    const { searchQuery } = JSON.parse(ctx.request.body);
     const searchableContentTypes = Object.entries(strapi.contentTypes)
       .filter(([_key, value]) => value.options.searchable)
       .map(([_key, value]) => value.info.name);
-
-    return fetchAsyncSearchableData(searchableContentTypes, searchQuery);
+    return strapi.plugins[
+      "content-search"
+    ].services.searchabledata.fetchAsyncSearchableData(
+      searchableContentTypes,
+      searchQuery
+    );
   }
 };
+
