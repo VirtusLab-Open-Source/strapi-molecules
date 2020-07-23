@@ -12,7 +12,6 @@ const fetchAsyncSearchableData = async (contentTypes, searchQuery) => {
 
 module.exports = {
   async search(ctx) {
-    console.log(strapi.contentTypes)
     const body = JSON.parse(ctx.request.body);
     const searchQuery = body.searchQuery;
     const searchableContentTypes = Object.entries(strapi.contentTypes)
