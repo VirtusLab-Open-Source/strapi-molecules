@@ -1,0 +1,28 @@
+{
+  "name": "strapi-plugin-content-search",
+  "version": "0.0.1",
+  "description": "This is the description of the plugin.",
+  "strapi": {
+    "name": "content-search",
+    "icon": "plug",
+    "description": "Search api for searchable models"
+  },
+  "dependencies": {},
+  "author": {
+    "name": "VirtusLab // Filip Lukasik",
+    "email": "flukasik@virtuslab.com",
+    "url": "https://virtuslab.com"
+  },
+  "maintainers": [
+    {
+      "name": "VirtusLab // Filip Lukasik",
+      "email": "flukasik@virtuslab.com",
+      "url": "https://virtuslab.com"
+    }
+  ],
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}
