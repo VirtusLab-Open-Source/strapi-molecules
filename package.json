@@ -1,0 +1,27 @@
+{
+  "private": true,
+  "name": "strapi-plugin-content-search",
+  "version": "0.0.1",
+  "description": "Set of molecules which speed up Strapi development.",
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "lerna": "^3.20.2"
+  },
+    "repository": {
+    "type": "git",
+    "url": "git://https://github.com/VirtusLab/strapi-molecules.git"
+  },
+  "scripts": {
+    "setup": "yarn && yarn build",
+    "watch": "lerna run --stream watch --no-private",
+    "build": "lerna run --stream build --no-private"
+  },
+    "workspaces": [
+    "packages/*",
+    "examples/*"
+  ]
+}
