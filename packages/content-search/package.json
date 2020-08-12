@@ -1,7 +1,7 @@
 {
   "name": "strapi-plugin-content-search",
   "version": "0.0.1",
-  "description": "This is the description of the plugin.",
+  "description": "Strapi search plugin provides /search endpoint that can be used to find content type fields which contain search string",
   "strapi": {
     "name": "content-search",
     "icon": "plug",
