@@ -7,11 +7,12 @@
     "bootstrap": "yarn install --frozen-lockfile && lerna bootstrap",
     "watch": "lerna run --stream watch --no-private",
     "build": "lerna run --stream build --no-private",
-    "test:unit": "jest --verbose --coverage",
+    "test:unit": "jest --coverage",
+    "test": "jest",
     "lint-branch-commit-msg": "commitlint --from=$(git merge-base master $(git rev-parse --abbrev-ref HEAD)) --to=HEAD",
     "run-lint-staged": "lint-staged",
     "version-and-publish": "lerna publish",
-    "on-pre-commit": "yarn run-lint-staged ",
+    "on-pre-commit": "yarn run-lint-staged",
     "on-pre-push": "yarn lint-branch-commit-msg"
   },
   "dependencies": {
@@ -19,6 +20,8 @@
   "devDependencies": {
     "@commitlint/cli": "^9.1.1",
     "@commitlint/config-conventional": "^9.1.1",
+    "@types/jest": "^26.0.9",
+    "@types/node": "12.12.54",
     "codecov": "^3.7.2",
     "commitizen": "^4.1.2",
     "cz-conventional-changelog": "^3.2.0",
@@ -27,7 +30,9 @@
     "jest-cli": "^26.4.0",
     "lerna": "^3.20.2",
     "lint-staged": "^10.2.11",
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "ts-jest": "^26.2.0",
+    "typescript": "^3.9.7"
   },
   "engines": {
     "node": "12.13.x",

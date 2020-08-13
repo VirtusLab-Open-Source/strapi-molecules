@@ -1,0 +1,46 @@
+{
+  "name": "@strapi-molecules/strapi-types",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Strapi service for deep search using bookshelf (search by components)",
+  "main": "services/deepsearch.js",
+  "scripts": {
+    "test": "echo \"no tests yet\""
+  },
+  "dependencies": {
+    "lodash": "^4.17.12",
+    "strapi-utils": "^3.0.6"
+  },
+  "author": {
+    "name": "VirtusLab",
+    "email": "strapi@virtuslab.com",
+    "url": "https://virtuslab.com"
+  },
+  "maintainers": [
+    {
+      "name": "VirtusLab",
+      "email": "strapi@virtuslab.com",
+      "url": "https://virtuslab.com"
+    }
+  ],
+  "homepage": "https://github.com/VirtusLab/strapi-molecules",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VirtusLab/strapi-molecules"
+  },
+  "bugs": {
+    "url": "https://github.com/VirtusLab/strapi-molecules/issues",
+    "email": "strapi@virtuslab.com"
+  },
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
+  "keywords": [
+    "strapi",
+    "utilities",
+    "utils",
+    "deep search",
+    "search"
+  ]
+}
