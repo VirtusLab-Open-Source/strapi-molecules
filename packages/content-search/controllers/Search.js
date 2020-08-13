@@ -2,13 +2,12 @@ const { parseMultipartData } = require("strapi-utils");
 
 module.exports = {
   async search(ctx) {
-    const generateRequestBodyCtx =
-      strapi.plugins["content-search"].services.requestbodyctx
-        .generateRequestBodyCtx;
-
     const { _q } = ctx.is("multipart")
       ? parseMultipartData(ctx)
-      : generateRequestBodyCtx(ctx, "_q");
+      : ctx.request.body;
+    if (!_q) {
+      return ctx.throw(400, "Malformed request body");
+    }
 
     const fetchAsyncSearchableData =
       strapi.plugins["content-search"].services.searchabledata
