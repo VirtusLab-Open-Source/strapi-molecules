@@ -1,0 +1,20 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/deep-search/:modelName",
+      "handler": "deepSearch.find",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/deep-search/:modelName/count",
+      "handler": "deepSearch.count",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
