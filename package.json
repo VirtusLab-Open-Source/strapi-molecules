@@ -7,19 +7,63 @@
     "bootstrap": "yarn install --frozen-lockfile && lerna bootstrap",
     "watch": "lerna run --stream watch --no-private",
     "build": "lerna run --stream build --no-private",
-    "test:unit": "jest --verbose --coverage"
+    "test:unit": "jest --verbose --coverage",
+    "lint-branch-commit-msg": "commitlint --from=$(git merge-base master $(git rev-parse --abbrev-ref HEAD)) --to=HEAD",
+    "run-lint-staged": "lint-staged",
+    "version-and-publish": "lerna publish",
+    "on-pre-commit": "yarn run-lint-staged ",
+    "on-pre-push": "yarn lint-branch-commit-msg"
   },
   "dependencies": {
   },
   "devDependencies": {
+    "@commitlint/cli": "^9.1.1",
+    "@commitlint/config-conventional": "^9.1.1",
     "codecov": "^3.7.2",
+    "commitizen": "^4.1.2",
+    "cz-conventional-changelog": "^3.2.0",
+    "husky": "^4.2.5",
     "jest": "^26.4.0",
     "jest-cli": "^26.4.0",
-    "lerna": "^3.20.2"
+    "lerna": "^3.20.2",
+    "lint-staged": "^10.2.11",
+    "prettier": "^2.0.5"
   },
   "engines": {
     "node": "12.13.x",
     "yarn": "1.22.x"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "yarn on-pre-commit",
+      "pre-push": "yarn on-pre-push"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "jest --bail --findRelatedTests",
+      "prettier --write"
+    ],
+    "*.{md,css,scss}": [
+      "prettier --write"
+    ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "rules": {
+      "header-max-length": [
+        2,
+        "always",
+        200
+      ]
+    }
   },
   "author": {
     "name": "VirtusLab",
