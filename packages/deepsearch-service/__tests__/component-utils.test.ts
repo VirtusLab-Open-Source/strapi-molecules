@@ -1,0 +1,76 @@
+const {
+  isModelComponent,
+  isModelComponentSearchable,
+  getComponentByModel,
+} = require("../services/utils/component-utils.js");
+
+describe("Test Deep search component utils functions", () => {
+  global.strapi = {
+    components: {
+      "group1.component1": {
+        allAttributes: {},
+        options: {
+          searchable: true,
+        },
+      },
+      "group2.component1": {
+        allAttributes: {},
+        options: {
+          searchable: false,
+        },
+      },
+    },
+  };
+  const contentTypeModel = {
+    allAttributes: {
+      searchableComponent: {
+        type: "component",
+        repeatable: false,
+        component: "group1.component1",
+      },
+      nonSearchableComponent: {
+        type: "component",
+        repeatable: false,
+        component: "group2.component1",
+      },
+    },
+  };
+
+  test("isModelComponent: Should return true if model is a component", () => {
+    expect(isModelComponent(contentTypeModel, "searchableComponent")).toBe(
+      true,
+    );
+
+    expect(isModelComponent(contentTypeModel, "nonExistingComponent")).toBe(
+      false,
+    );
+  });
+
+  test("isModelComponentSearchable: Should return true if model is a searchable component", () => {
+    expect(
+      isModelComponentSearchable(contentTypeModel, "searchableComponent"),
+    ).toBe(true);
+
+    expect(
+      isModelComponentSearchable(contentTypeModel, "nonSearchableComponent"),
+    ).toBe(false);
+
+    expect(
+      isModelComponentSearchable(contentTypeModel, "nonExistingComponent"),
+    ).toBe(false);
+  });
+
+  test("getComponentByModel: Should return model if existing", () => {
+    expect(
+      getComponentByModel(contentTypeModel, "searchableComponent"),
+    ).toEqual({
+      allAttributes: {},
+      options: {
+        searchable: true,
+      },
+    });
+    expect(getComponentByModel(contentTypeModel, "nonExistingComponent")).toBe(
+      undefined,
+    );
+  });
+});

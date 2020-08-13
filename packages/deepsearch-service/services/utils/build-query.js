@@ -1,0 +1,141 @@
+const _ = require('lodash');
+const { parseType } = require('strapi-utils');
+const { bookshelfBuildQuery } = require("./bookshelf-build-query");
+const { getComponentByModel, isModelComponentSearchable } = require("./component-utils");
+
+const findModelByAssoc = assoc => {
+  const { models } = assoc.plugin ? strapi.plugins[assoc.plugin] : strapi;
+  return models[assoc.collection || assoc.model];
+};
+
+const isAttribute = (model, field) =>
+  _.has(model.allAttributes, field) || model.primaryKey === field || field === 'id';
+
+/**
+ * Returns the model, attribute name and association from a path of relation
+ * @param {Object} options - Options
+ * @param {string} options.model - Strapi model
+ * @param {string} options.field - path of relation / attribute
+ */
+const getAssociationFromFieldKey = ({ model, field }) => {
+  const fieldParts = field.split('.');
+  let tmpModel = model;
+  let association;
+  let attribute;
+  for (let i = 0; i < fieldParts.length; i++) {
+    const part = fieldParts[i];
+    attribute = part;
+
+    const assoc = tmpModel.associations.find(ast => ast.alias === part);
+    if (assoc) {
+      association = assoc;
+      tmpModel = findModelByAssoc(assoc);
+      continue;
+    }
+    if (isModelComponentSearchable(tmpModel, part)) {
+      tmpModel = getComponentByModel(tmpModel, part)
+      continue;
+    }
+    if (!assoc && (!isAttribute(tmpModel, part) || i !== fieldParts.length - 1)) {
+      const err = new Error(
+        `Your filters contain a field '${field}' that doesn't appear on your model definition nor it's relations nor it's searchable`
+      );
+
+      err.status = 400;
+      throw err;
+    }
+  }
+
+  return {
+    association,
+    model: tmpModel,
+    attribute,
+  };
+};
+
+/**
+ * Cast an input value
+ * @param {Object} options - Options
+ * @param {string} options.type - type of the atribute
+ * @param {*} options.value - value tu cast
+ * @param {string} options.operator - name of operator
+ */
+const castInput = ({ type, value, operator }) => {
+  return Array.isArray(value)
+    ? value.map(val => castValue({ type, operator, value: val }))
+    : castValue({ type, operator, value: value });
+};
+
+/**
+ * Cast basic values based on attribute type
+ * @param {Object} options - Options
+ * @param {string} options.type - type of the atribute
+ * @param {*} options.value - value tu cast
+ * @param {string} options.operator - name of operator
+ */
+const castValue = ({ type, value, operator }) => {
+  if (operator === 'null') return parseType({ type: 'boolean', value });
+  return parseType({ type, value });
+};
+
+/**
+ *
+ * @param {Object} options - Options
+ * @param {string} options.model - The model
+ * @param {string} options.field - path of relation / attribute
+ */
+const normalizeFieldName = ({ model, field }) => {
+  const fieldPath = field.split('.');
+  return _.last(fieldPath) === 'id'
+    ? _.initial(fieldPath)
+      .concat(model.primaryKey)
+      .join('.')
+    : fieldPath.join('.');
+};
+
+/**
+ *
+ * @param {Object} options - Options
+ * @param {Object} options.model - The model for which the query will be built
+ * @param {Object} options.filters - The filters for the query (start, sort, limit, and where clauses)
+ * @param {Boolean} options.shouldJoinComponents - if combined with _q should not building joins for components
+ * @param {Object} options.rest - In case the database layer requires any other params pass them
+ * @returns {function(...[*]=)}
+ */
+const buildQuery = ({ model, filters = {}, shouldJoinComponents = true, ...rest }) => {
+  // Validate query clauses
+  if (filters.where && Array.isArray(filters.where)) {
+    const deepFilters = filters.where.filter(({ field }) => field.split('.').length > 1);
+    if (deepFilters.length > 0) {
+      strapi.log.warn(
+        'Deep filtering queries should be used carefully (e.g Can cause performance issues).\nWhen possible build custom routes which will in most case be more optimised.'
+      );
+    }
+
+    // cast where clauses to match the inner types
+    filters.where = filters.where
+      .filter(({ value }) => !_.isNil(value))
+      .map(({ field, operator, value }) => {
+        const { model: assocModel, attribute } = getAssociationFromFieldKey({
+          model,
+          field,
+        });
+
+        const { type } = _.get(assocModel, ['allAttributes', attribute], {});
+
+        // cast value or array of values
+        const castedValue = castInput({ type, operator, value });
+        return {
+          field: normalizeFieldName({ model, field }),
+          operator,
+          value: castedValue,
+        };
+      });
+  }
+
+  return bookshelfBuildQuery({ model, filters, shouldJoinComponents, ...rest });
+};
+
+module.exports = {
+  buildQuery,
+};
