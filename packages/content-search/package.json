@@ -1,0 +1,38 @@
+{
+  "name": "@strapi-molecules/content-search-service",
+  "version": "0.1.0",
+  "description": "Strapi search plugin provides /search endpoint that can be used to find content type fields which contain search string",
+  "strapi": {
+    "name": "content-search",
+    "icon": "plug",
+    "description": "Search api for searchable models"
+  },
+  "dependencies": {},
+  "author": {
+    "name": "VirtusLab",
+    "email": "strapi@virtuslab.com",
+    "url": "https://virtuslab.com"
+  },
+  "maintainers": [
+    {
+      "name": "VirtusLab",
+      "email": "strapi@virtuslab.com",
+      "url": "https://virtuslab.com"
+    }
+  ],
+  "homepage": "https://github.com/VirtusLab/strapi-molecules",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/VirtusLab/strapi-molecules"
+  },
+  "bugs": {
+    "url": "https://github.com/VirtusLab/strapi-molecules/issues",
+    "email": "strapi@virtuslab.com"
+  },
+
+  "engines": {
+    "node": ">=10.0.0",
+    "npm": ">=6.0.0"
+  },
+  "license": "MIT"
+}
