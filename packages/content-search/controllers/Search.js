@@ -9,14 +9,13 @@ module.exports = {
       return ctx.throw(400, "Malformed request body");
     }
 
-    const fetchAsyncSearchableData =
-      strapi.plugins["content-search"].services.searchabledata
-        .fetchAsyncSearchableData;
+    const fetchAsyncData =
+      strapi.plugins["content-search"].services.searchabledata.fetchAsyncData;
 
     const searchableContentTypes = Object.entries(strapi.contentTypes)
       .filter(([_key, value]) => value.options.searchable)
       .map(([_key, value]) => _key);
-    return fetchAsyncSearchableData(searchableContentTypes, _q);
-  }
-};
 
+    return fetchAsyncData(searchableContentTypes, _q);
+  },
+};
