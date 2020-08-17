@@ -6,7 +6,8 @@
   "scripts": {
     "test": "jest --coverage",
     "build": "tsc",
-    "clean": "rimraf dist coverage"
+    "clean": "rimraf dist coverage",
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "lodash": "^4.17.12",
