@@ -1,7 +1,7 @@
 {
   "name": "@strapi-molecules/strapi-types",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Strapi service for deep search using bookshelf (search by components)",
   "main": "services/deepsearch.js",
   "scripts": {
