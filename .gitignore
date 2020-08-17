@@ -114,3 +114,9 @@ coverage
 exports
 .cache
 build
+
+
+############################
+# TypeScript
+############################
+dist

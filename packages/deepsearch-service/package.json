@@ -2,9 +2,11 @@
   "name": "@strapi-molecules/deepsearch-service",
   "version": "0.1.0",
   "description": "Strapi service for deep search using bookshelf (search by components)",
-  "main": "services/deepsearch.js",
+  "main": "dist/services/deepsearch.js",
   "scripts": {
-    "test": "echo \"no tests yet\""
+    "test": "jest --coverage",
+    "build": "tsc",
+    "clean": "rimraf dist coverage"
   },
   "dependencies": {
     "lodash": "^4.17.12",

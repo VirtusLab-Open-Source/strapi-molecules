@@ -20,7 +20,8 @@
     "downlevelIteration": true,
     "incremental": true,
     "allowJs": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true
   },
   "include": [
     "external-types/*",

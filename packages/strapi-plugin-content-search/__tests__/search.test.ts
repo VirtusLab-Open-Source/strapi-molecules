@@ -1,4 +1,4 @@
-const { search } = require("../controllers/Search");
+const { search } = require("../src/controllers/Search");
 
 describe("content search test", () => {
   const fetchAsyncData = jest.fn();

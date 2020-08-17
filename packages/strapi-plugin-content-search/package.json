@@ -1,11 +1,20 @@
 {
-  "name": "@strapi-molecules/content-search-service",
+  "name": "strapi-plugin-content-search",
   "version": "0.1.0",
   "description": "Strapi search plugin provides /search endpoint that can be used to find content type fields which contain search string",
   "strapi": {
     "name": "content-search",
     "icon": "plug",
     "description": "Search api for searchable models"
+  },
+  "scripts": {
+    "test": "jest --coverage",
+    "build": "tsc",
+    "clean": "rimraf dist coverage",
+    "extract-dist-to-root": "ts-node ../../scripts/extract-dist-to-root.ts",
+    "clean-dist-from-root": "ts-node ../../scripts/clean-dist-from-root.ts",
+    "prepublishOnly": "yarn build && yarn extract-dist-to-root",
+    "postpublish": "yarn clean-dist-from-root"
   },
   "dependencies": {},
   "author": {
@@ -29,7 +38,6 @@
     "url": "https://github.com/VirtusLab/strapi-molecules/issues",
     "email": "strapi@virtuslab.com"
   },
-
   "engines": {
     "node": ">=10.0.0",
     "npm": ">=6.0.0"
