@@ -1,9 +1,22 @@
 {
+  "version": "independent",
   "packages": [
     "packages/*",
     "examples/*"
   ],
   "npmClient": "yarn",
   "useWorkspaces": true,
-  "version": "0.2.2"
+  "ignoreChanges": ["**/*.spec.{ts,tsx}", "**/*.md"],
+  "command": {
+    "publish": {
+      "allowBranch": ["master"],
+      "conventionalCommits": true,
+      "message": "chore(release): publish",
+      "exact": true,
+      "push": true,
+      "verifyAccess": false,
+      "yes": true,
+      "logLevel": "verbose"
+    }
+  }
 }
