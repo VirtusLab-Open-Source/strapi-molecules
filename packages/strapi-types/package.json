@@ -1,7 +1,7 @@
 {
   "name": "@strapi-molecules/strapi-types",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Strapi typings for internal use only",
   "main": "index.ts",
   "scripts": {

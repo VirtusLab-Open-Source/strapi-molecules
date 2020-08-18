@@ -1,6 +1,6 @@
 {
   "name": "@strapi-molecules/deepsearch-service",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Strapi service for deep search using bookshelf (search by components)",
   "main": "src/index.ts",
   "scripts": {
