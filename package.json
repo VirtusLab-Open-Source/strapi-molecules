@@ -15,6 +15,7 @@
     "test:unit": "jest --coverage",
     "lint-branch-commit-msg": "commitlint --from=$(git merge-base master $(git rev-parse --abbrev-ref HEAD)) --to=HEAD",
     "run-lint-staged": "lint-staged",
+    "version-only": "lerna version",
     "version-and-publish": "lerna publish",
     "on-pre-commit": "yarn run-lint-staged",
     "on-pre-push": "yarn lint-branch-commit-msg"
