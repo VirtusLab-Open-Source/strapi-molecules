@@ -41,10 +41,18 @@ jobs:
           flags: unittest
           file:
       - run:
-          name: Bump version
+          name: Create .npmrc
           command: |
-            yarn version-only
+            ./scripts/create-npmrc.sh
+      - run:
+          name: Publish
+          command: |
+            yarn version-and-publish
 workflows:
+  version: 2
   build-and-test:
     jobs:
-      - build-and-test
+      - build-and-test:
+          filters:
+            branches:
+              only: master
