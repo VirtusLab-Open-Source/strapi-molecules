@@ -24,4 +24,11 @@ export type Strapi = {
   components: {
     [key: string]: ComponentModel;
   };
+  plugins: {
+    [key: string]: any;
+  };
+  contentTypes: {
+    [key: string]: any;
+  };
+  query: (s: string) => any;
 };

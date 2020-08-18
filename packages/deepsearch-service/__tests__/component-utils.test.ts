@@ -2,7 +2,7 @@ const {
   isModelComponent,
   isModelComponentSearchable,
   getComponentByModel,
-} = require("../services/utils/component-utils.js");
+} = require("../src/services/utils/component-utils.js");
 
 describe("Test Deep search component utils functions", () => {
   global.strapi = {
@@ -20,6 +20,9 @@ describe("Test Deep search component utils functions", () => {
         },
       },
     },
+    contentTypes: {},
+    plugins: {},
+    query: (s: string) => s,
   };
   const contentTypeModel = {
     allAttributes: {

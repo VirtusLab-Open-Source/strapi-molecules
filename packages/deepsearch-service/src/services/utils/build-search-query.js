@@ -1,5 +1,5 @@
-const _ = require('lodash');
-const { escapeQuery } = require('strapi-utils');
+const _ = require("lodash");
+const { escapeQuery } = require("strapi-utils");
 
 /**
  * util to build search query
@@ -11,17 +11,28 @@ const { escapeQuery } = require('strapi-utils');
 const buildSearchQuery = ({ model, params, qb }) => {
   const query = params._q;
 
-  const associations = model.associations.map(x => x.alias);
-  const stringTypes = ['string', 'text', 'uid', 'email', 'enumeration', 'richtext'];
-  const numberTypes = ['biginteger', 'integer', 'decimal', 'float'];
+  const associations = model.associations.map((x) => x.alias);
+  const stringTypes = [
+    "string",
+    "text",
+    "uid",
+    "email",
+    "enumeration",
+    "richtext",
+  ];
+  const numberTypes = ["biginteger", "integer", "decimal", "float"];
 
   const searchColumns = Object.keys(model._attributes)
-    .filter(attribute => !associations.includes(attribute))
-    .filter(attribute => stringTypes.includes(model._attributes[attribute].type));
+    .filter((attribute) => !associations.includes(attribute))
+    .filter((attribute) =>
+      stringTypes.includes(model._attributes[attribute].type),
+    );
   if (!_.isNaN(_.toNumber(query))) {
     const numberColumns = Object.keys(model._attributes)
-      .filter(attribute => !associations.includes(attribute))
-      .filter(attribute => numberTypes.includes(model._attributes[attribute].type));
+      .filter((attribute) => !associations.includes(attribute))
+      .filter((attribute) =>
+        numberTypes.includes(model._attributes[attribute].type),
+      );
     searchColumns.push(...numberColumns);
   }
 
@@ -30,28 +41,28 @@ const buildSearchQuery = ({ model, params, qb }) => {
   }
   // Search in columns with text using index.
   switch (model.client) {
-    case 'pg':
-      searchColumns.forEach(attr =>
+    case "pg":
+      searchColumns.forEach((attr) =>
         qb.orWhereRaw(
           `"${model.collectionName}"."${attr}"::text ILIKE ?`,
-          `%${escapeQuery(query, '*%\\')}%`
-        )
+          `%${escapeQuery(query, "*%\\")}%`,
+        ),
       );
       break;
-    case 'sqlite3':
-      searchColumns.forEach(attr =>
+    case "sqlite3":
+      searchColumns.forEach((attr) =>
         qb.orWhereRaw(
           `"${model.collectionName}"."${attr}" LIKE ? ESCAPE '\\'`,
-          `%${escapeQuery(query, '*%\\')}%`
-        )
+          `%${escapeQuery(query, "*%\\")}%`,
+        ),
       );
       break;
-    case 'mysql':
-      searchColumns.forEach(attr =>
+    case "mysql":
+      searchColumns.forEach((attr) =>
         qb.orWhereRaw(
           `\`${model.collectionName}\`.\`${attr}\` LIKE ?`,
-          `%${escapeQuery(query, '*%\\')}%`
-        )
+          `%${escapeQuery(query, "*%\\")}%`,
+        ),
       );
       break;
   }
@@ -59,4 +70,4 @@ const buildSearchQuery = ({ model, params, qb }) => {
 
 module.exports = {
   buildSearchQuery,
-}
+};

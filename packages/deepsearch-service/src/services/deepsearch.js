@@ -1,6 +1,9 @@
-const _ = require('lodash');
-const { convertRestQueryParams } = require('strapi-utils');
-const { buildDeepSearchCount, buildDeepSearch } = require("./utils/build-deep-query");
+const _ = require("lodash");
+const { convertRestQueryParams } = require("strapi-utils");
+const {
+  buildDeepSearchCount,
+  buildDeepSearch,
+} = require("./utils/build-deep-query");
 const { buildQuery } = require("./utils/build-query");
 
 module.exports = {
@@ -21,7 +24,7 @@ module.exports = {
         withRelated: populate,
         transacting,
       })
-      .then(results => results.toJSON());
+      .then((results) => results.toJSON());
   },
   /**
    * Count entries based on filters
@@ -32,10 +35,7 @@ module.exports = {
   count: async (model, params = {}) => {
     const filters = convertRestQueryParams(params);
 
-    return model
-      .query(buildQuery({ model, filters }))
-      .count()
-      .then(Number);
+    return model.query(buildQuery({ model, filters })).count().then(Number);
   },
   /**
    * Find multiple entries based on filters including querySearch (_q)
@@ -45,18 +45,18 @@ module.exports = {
    * @returns {Promise<any>}
    */
   search: async (model, params, populate) => {
-    const filters = convertRestQueryParams(_.omit(params, '_q'));
+    const filters = convertRestQueryParams(_.omit(params, "_q"));
 
     return model
-      .query(qb => {
+      .query((qb) => {
         qb.distinct();
-        qb.select(`${model.collectionName}.*`)
+        qb.select(`${model.collectionName}.*`);
       })
       .query(buildDeepSearch({ model, params }))
       .query(buildQuery({ model, filters, shouldJoinComponents: false }))
-      .query(qb => console.log(qb.toString()))
+      .query((qb) => console.log(qb.toString()))
       .fetchAll({ withRelated: populate })
-      .then(results => results.toJSON());
+      .then((results) => results.toJSON());
   },
   /**
    * Count entries based on filters including querySearch (_q)
@@ -65,12 +65,12 @@ module.exports = {
    * @returns {Promise<number>}
    */
   countSearch: async (model, params) => {
-    const filters = convertRestQueryParams(_.omit(params, '_q'));
+    const filters = convertRestQueryParams(_.omit(params, "_q"));
     return model
       .query(buildDeepSearchCount({ model }))
       .query(buildDeepSearch({ model, params }))
       .query(buildQuery({ model, filters, shouldJoinComponents: false }))
       .fetch()
-      .then(r => Number(r.toJSON().count))
-  }
+      .then((r) => Number(r.toJSON().count));
+  },
 };

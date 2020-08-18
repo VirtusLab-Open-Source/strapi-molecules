@@ -2,8 +2,8 @@
   "name": "@strapi-molecules/strapi-types",
   "private": true,
   "version": "0.1.0",
-  "description": "Strapi service for deep search using bookshelf (search by components)",
-  "main": "services/deepsearch.js",
+  "description": "Strapi typings for internal use only",
+  "main": "index.ts",
   "scripts": {
     "test": "echo \"no tests yet\""
   },
@@ -41,6 +41,7 @@
     "utilities",
     "utils",
     "deep search",
-    "search"
+    "search",
+    "TypeScript"
   ]
 }

@@ -1,7 +1,7 @@
 const { parseMultipartData } = require("strapi-utils");
 
 module.exports = {
-  async search(ctx) {
+  async search(ctx: any) {
     const { _q } = ctx.is("multipart")
       ? parseMultipartData(ctx)
       : ctx.request.body;
@@ -10,11 +10,12 @@ module.exports = {
     }
 
     const fetchAsyncData =
-      strapi.plugins["content-search"].services.searchabledata.fetchAsyncData;
+      global.strapi.plugins["content-search"].services.searchabledata
+        .fetchAsyncData;
 
-    const searchableContentTypes = Object.entries(strapi.contentTypes)
+    const searchableContentTypes = Object.entries(global.strapi.contentTypes)
       .filter(([_key, value]) => value.options.searchable)
-      .map(([_key, value]) => _key);
+      .map(([_key]) => _key);
 
     return fetchAsyncData(searchableContentTypes, _q);
   },

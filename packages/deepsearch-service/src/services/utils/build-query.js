@@ -1,15 +1,20 @@
-const _ = require('lodash');
-const { parseType } = require('strapi-utils');
+const _ = require("lodash");
+const { parseType } = require("strapi-utils");
 const { bookshelfBuildQuery } = require("./bookshelf-build-query");
-const { getComponentByModel, isModelComponentSearchable } = require("./component-utils");
+const {
+  getComponentByModel,
+  isModelComponentSearchable,
+} = require("./component-utils");
 
-const findModelByAssoc = assoc => {
+const findModelByAssoc = (assoc) => {
   const { models } = assoc.plugin ? strapi.plugins[assoc.plugin] : strapi;
   return models[assoc.collection || assoc.model];
 };
 
 const isAttribute = (model, field) =>
-  _.has(model.allAttributes, field) || model.primaryKey === field || field === 'id';
+  _.has(model.allAttributes, field) ||
+  model.primaryKey === field ||
+  field === "id";
 
 /**
  * Returns the model, attribute name and association from a path of relation
@@ -18,7 +23,7 @@ const isAttribute = (model, field) =>
  * @param {string} options.field - path of relation / attribute
  */
 const getAssociationFromFieldKey = ({ model, field }) => {
-  const fieldParts = field.split('.');
+  const fieldParts = field.split(".");
   let tmpModel = model;
   let association;
   let attribute;
@@ -26,19 +31,22 @@ const getAssociationFromFieldKey = ({ model, field }) => {
     const part = fieldParts[i];
     attribute = part;
 
-    const assoc = tmpModel.associations.find(ast => ast.alias === part);
+    const assoc = tmpModel.associations.find((ast) => ast.alias === part);
     if (assoc) {
       association = assoc;
       tmpModel = findModelByAssoc(assoc);
       continue;
     }
     if (isModelComponentSearchable(tmpModel, part)) {
-      tmpModel = getComponentByModel(tmpModel, part)
+      tmpModel = getComponentByModel(tmpModel, part);
       continue;
     }
-    if (!assoc && (!isAttribute(tmpModel, part) || i !== fieldParts.length - 1)) {
+    if (
+      !assoc &&
+      (!isAttribute(tmpModel, part) || i !== fieldParts.length - 1)
+    ) {
       const err = new Error(
-        `Your filters contain a field '${field}' that doesn't appear on your model definition nor it's relations nor it's searchable`
+        `Your filters contain a field '${field}' that doesn't appear on your model definition nor it's relations nor it's searchable`,
       );
 
       err.status = 400;
@@ -62,7 +70,7 @@ const getAssociationFromFieldKey = ({ model, field }) => {
  */
 const castInput = ({ type, value, operator }) => {
   return Array.isArray(value)
-    ? value.map(val => castValue({ type, operator, value: val }))
+    ? value.map((val) => castValue({ type, operator, value: val }))
     : castValue({ type, operator, value: value });
 };
 
@@ -74,7 +82,7 @@ const castInput = ({ type, value, operator }) => {
  * @param {string} options.operator - name of operator
  */
 const castValue = ({ type, value, operator }) => {
-  if (operator === 'null') return parseType({ type: 'boolean', value });
+  if (operator === "null") return parseType({ type: "boolean", value });
   return parseType({ type, value });
 };
 
@@ -85,12 +93,10 @@ const castValue = ({ type, value, operator }) => {
  * @param {string} options.field - path of relation / attribute
  */
 const normalizeFieldName = ({ model, field }) => {
-  const fieldPath = field.split('.');
-  return _.last(fieldPath) === 'id'
-    ? _.initial(fieldPath)
-      .concat(model.primaryKey)
-      .join('.')
-    : fieldPath.join('.');
+  const fieldPath = field.split(".");
+  return _.last(fieldPath) === "id"
+    ? _.initial(fieldPath).concat(model.primaryKey).join(".")
+    : fieldPath.join(".");
 };
 
 /**
@@ -102,13 +108,20 @@ const normalizeFieldName = ({ model, field }) => {
  * @param {Object} options.rest - In case the database layer requires any other params pass them
  * @returns {function(...[*]=)}
  */
-const buildQuery = ({ model, filters = {}, shouldJoinComponents = true, ...rest }) => {
+const buildQuery = ({
+  model,
+  filters = {},
+  shouldJoinComponents = true,
+  ...rest
+}) => {
   // Validate query clauses
   if (filters.where && Array.isArray(filters.where)) {
-    const deepFilters = filters.where.filter(({ field }) => field.split('.').length > 1);
+    const deepFilters = filters.where.filter(
+      ({ field }) => field.split(".").length > 1,
+    );
     if (deepFilters.length > 0) {
       strapi.log.warn(
-        'Deep filtering queries should be used carefully (e.g Can cause performance issues).\nWhen possible build custom routes which will in most case be more optimised.'
+        "Deep filtering queries should be used carefully (e.g Can cause performance issues).\nWhen possible build custom routes which will in most case be more optimised.",
       );
     }
 
@@ -121,7 +134,7 @@ const buildQuery = ({ model, filters = {}, shouldJoinComponents = true, ...rest 
           field,
         });
 
-        const { type } = _.get(assocModel, ['allAttributes', attribute], {});
+        const { type } = _.get(assocModel, ["allAttributes", attribute], {});
 
         // cast value or array of values
         const castedValue = castInput({ type, operator, value });

@@ -1,4 +1,4 @@
-const { search } = require("../controllers/Search");
+const { search } = require("../src/controllers/Search");
 
 describe("content search test", () => {
   const fetchAsyncData = jest.fn();
@@ -13,6 +13,9 @@ describe("content search test", () => {
         },
       },
     },
+    components: {},
+    contentTypes: {},
+    query: (s) => s,
   };
 
   test("search: should trigger fetchAsyncData function with [searchableComponent] and first string arguments", async () => {
