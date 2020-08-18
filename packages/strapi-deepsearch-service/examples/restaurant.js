@@ -1,13 +1,13 @@
-const { find } = require('@strapi-molecules/deepsearch-service')
+const { find } = require("@strapi-molecules/deepsearch-service");
 
 // api/restaurant/controllers/restaurant.js
-const { sanitizeEntity } = require('strapi-utils');
+const { sanitizeEntity } = require("strapi-utils");
 const {
   find,
   count,
   search,
   countSearch,
-} = require('@strapi-molecules/deepsearch-service')
+} = require("@strapi-molecules/deepsearch-service");
 
 module.exports = {
   async find(ctx) {
@@ -20,7 +20,7 @@ module.exports = {
       entities = find(model, ctx.query);
     }
 
-    return entities.map(entity => sanitizeEntity(entity, { model }));
+    return entities.map((entity) => sanitizeEntity(entity, { model }));
   },
   count(ctx) {
     const model = strapi.models.restaurant;
@@ -28,5 +28,5 @@ module.exports = {
       return countSearch(model, ctx.query);
     }
     return count(model, ctx.query);
-  }
+  },
 };

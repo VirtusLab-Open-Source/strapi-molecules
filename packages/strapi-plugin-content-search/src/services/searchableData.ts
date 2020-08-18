@@ -1,4 +1,4 @@
-import deepsearch from "@strapi-molecules/deepsearch-service";
+import deepsearch from "strapi-deepsearch-service";
 
 const getAsyncData = async (contentType: string, _q: string) => {
   const model = global.strapi.query(contentType);
