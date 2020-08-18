@@ -2,12 +2,16 @@
   "name": "@strapi-molecules/deepsearch-service",
   "version": "0.1.0",
   "description": "Strapi service for deep search using bookshelf (search by components)",
-  "main": "dist/services/deepsearch.js",
+  "main": "src/index.ts",
   "scripts": {
     "test": "jest --coverage",
     "build": "tsc",
     "clean": "rimraf dist coverage",
-    "prepublishOnly": "yarn build"
+    "clean-all": "rimraf dist coverage node_modules",
+    "set-development-package-json": "ts-node ../../scripts/set-development-package-json.ts",
+    "set-publish-package-json": "ts-node ../../scripts/set-publish-package-json.ts",
+    "prepublishOnly": "yarn build && yarn set-publish-package-json",
+    "postpublish": "yarn set-development-package-json"
   },
   "dependencies": {
     "lodash": "^4.17.12",

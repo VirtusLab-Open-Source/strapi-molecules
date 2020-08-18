@@ -13,6 +13,9 @@ describe("content search test", () => {
         },
       },
     },
+    components: {},
+    contentTypes: {},
+    query: (s) => s,
   };
 
   test("search: should trigger fetchAsyncData function with [searchableComponent] and first string arguments", async () => {

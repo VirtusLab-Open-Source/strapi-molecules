@@ -20,6 +20,9 @@ describe("Test Deep search component utils functions", () => {
         },
       },
     },
+    contentTypes: {},
+    plugins: {},
+    query: (s: string) => s,
   };
   const contentTypeModel = {
     allAttributes: {

@@ -4,6 +4,7 @@
     "outDir": "dist"
   },
   "include": [
+    "../../external-types/*",
     "src/**/*",
     "src/**/*.json"
   ]

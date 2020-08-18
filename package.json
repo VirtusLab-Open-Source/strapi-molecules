@@ -6,7 +6,8 @@
   "scripts": {
     "bootstrap": "yarn install --frozen-lockfile && lerna bootstrap",
     "watch": "lerna run --stream watch --no-private",
-    "clean": "lerna run --parallel clean",
+    "clean": "lerna run --parallel clean && rimraf coverage dist",
+    "clean-all": "lerna run --parallel clean-all && rimraf coverage node_modules",
     "build": "lerna run --parallel build",
     "test": "lerna run --parallel test",
     "extract-dist-to-root": "lerna run --parallel extract-dist-to-root",
