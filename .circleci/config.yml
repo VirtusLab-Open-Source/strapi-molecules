@@ -9,11 +9,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Set node & yarn versions
-          command: |
-            nvm use
-            yvm use
-      - run:
           name: Echo versions
           command: |
             node --version

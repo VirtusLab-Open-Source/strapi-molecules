@@ -43,10 +43,6 @@
     "ts-node": "^8.10.2",
     "typescript": "^3.9.7"
   },
-  "engines": {
-    "node": "12.13.x",
-    "yarn": "1.22.x"
-  },
   "husky": {
     "hooks": {
       "pre-commit": "yarn on-pre-commit",
@@ -99,5 +95,9 @@
     "packages/*",
     "examples/*"
   ],
+  "engines": {
+    "node": ">=10.16.0",
+    "npm": ">=6.0.0"
+  },
   "license": "MIT"
 }
