@@ -1,4 +1,4 @@
-import type { Strapi } from "@strapi-molecules/strapi-types";
+import type { Strapi } from "strapi-types";
 declare global {
   module NodeJS {
     interface Global {
