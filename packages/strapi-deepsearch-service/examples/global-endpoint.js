@@ -5,7 +5,7 @@ const {
   count,
   search,
   countSearch,
-} = require("@strapi-molecules/deepsearch-service");
+} = require("strapi-deepsearch-service");
 
 module.exports = {
   async find(ctx) {

@@ -1,3 +1,1 @@
-import deepsearch from "./services/deepsearch";
-
-export default deepsearch;
+export * from "./services/deepsearch";

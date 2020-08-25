@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.2](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-content-search@0.3.1...strapi-plugin-content-search@0.3.2) (2020-08-25)
+
+
+### Bug Fixes
+
+* deepsearch fix module resolution with wrong exports ([#12](https://github.com/VirtusLab/strapi-molecules/issues/12)) ([13d976f](https://github.com/VirtusLab/strapi-molecules/commit/13d976f107de7346c4a6cdb080eaa5df03271b5b))
+
+
+
+
+
 ## [0.3.1](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-content-search@0.3.0...strapi-plugin-content-search@0.3.1) (2020-08-20)
 
 **Note:** Version bump only for package strapi-plugin-content-search

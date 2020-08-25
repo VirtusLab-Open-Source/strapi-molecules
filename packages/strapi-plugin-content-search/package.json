@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-content-search",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Strapi search plugin provides /search endpoint that can be used to find content type fields which contain search string",
   "strapi": {
     "name": "content-search",
@@ -18,7 +18,7 @@
     "postpublish": "yarn clean-dist-from-root"
   },
   "dependencies": {
-    "strapi-deepsearch-service": "0.3.0"
+    "strapi-deepsearch-service": "0.3.1"
   },
   "author": {
     "name": "VirtusLab",
