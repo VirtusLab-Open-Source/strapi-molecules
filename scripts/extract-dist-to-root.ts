@@ -16,7 +16,6 @@ function getAllFilesFromDir(dir = "dist") {
 
 function validateDist(distContent: string[]) {
   const existingFiles = distContent.filter(fs.existsSync);
-  console.log(existingFiles);
   if (existingFiles.length) {
     throw new Error(
       `"${existingFiles.join(", ")}" already exist(s) in root directory`,
