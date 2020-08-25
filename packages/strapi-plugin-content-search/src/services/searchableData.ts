@@ -1,8 +1,8 @@
-import deepsearch from "strapi-deepsearch-service";
+import { search } from "strapi-deepsearch-service";
 
 const getAsyncData = async (contentType: string, _q: string) => {
   const model = global.strapi.query(contentType).model;
-  const result = await deepsearch.search(model, { _q });
+  const result = await search(model, { _q });
   return result.map((item: any) => ({ ...item, __contentType: contentType }));
 };
 
