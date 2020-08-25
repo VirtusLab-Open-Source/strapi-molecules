@@ -1,3 +1,6 @@
+import Knex from "knex";
+import { Context, Next } from "koa";
+
 type ComponentAttribute = {
   type: "component";
   repeatable: boolean;
@@ -18,6 +21,11 @@ type BaseModel = {
   };
 };
 
+type Model = {
+  collectionName: string;
+  uid: string;
+};
+
 type ComponentModel = BaseModel & {};
 
 export type Strapi = {
@@ -31,4 +39,14 @@ export type Strapi = {
     [key: string]: any;
   };
   query: (s: string) => any;
+  connections: {
+    default: Knex;
+  };
+  models: {
+    [key: string]: Model;
+  };
+  db: any;
+  app: {
+    use: (x: (ctx: Context, next: Next) => Promise<any>) => any;
+  };
 };
