@@ -1,5 +1,5 @@
 const versioningService =
-  global.strapi.plugins["versioning-plugin"].services.versioning;
+  global.strapi.plugins["versioning"].services.versioning;
 
 module.exports = () => {
   return {

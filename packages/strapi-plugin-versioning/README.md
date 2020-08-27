@@ -9,7 +9,7 @@ searching across nested structures including components.
 [Install yarn with these docs](https://yarnpkg.com/lang/en/docs/install/).)
 
 ```bash
-yarn add @strapi-molecules/versioning-plugin
+yarn add strapi-plugin-versioning
 ```
 
 Enjoy 🎉

@@ -2,9 +2,8 @@ const { isModelExists, findUid } = require("../src/services/Versioning");
 const strapiObject = require("../../strapi-global-object/strapi-global");
 
 describe("versioning test", () => {
-  global.strapi = strapiObject;
-
   test("isModelExists: should return false if model doesn't exists in strapi object", () => {
+    global.strapi = strapiObject;
     const ctx = {
       params: {
         id: 1,
@@ -22,6 +21,7 @@ describe("versioning test", () => {
   });
 
   test("isModelExists: should return true if model exists in strapi object", () => {
+    global.strapi = strapiObject;
     const ctx = {
       params: {
         id: 1,
@@ -33,6 +33,7 @@ describe("versioning test", () => {
   });
 
   test("findUid: should return proper uid for proper strapi structure and ctx url", () => {
+    global.strapi = strapiObject;
     const ctx = {
       params: {
         id: 1,
@@ -50,6 +51,7 @@ describe("versioning test", () => {
   });
 
   test("findUid: should return proper uid for proper strapi structure and ctx url", () => {
+    global.strapi = strapiObject;
     const ctx = {
       params: {
         id: 1,

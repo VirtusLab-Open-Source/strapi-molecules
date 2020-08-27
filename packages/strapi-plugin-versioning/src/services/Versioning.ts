@@ -30,16 +30,13 @@ const saveDataInDB = async (
       entity_id: entity.id,
       entity: JSON.stringify(entity),
     })
-    .returning("*")
-    .toString();
-  const resp = await knexQueryBuilder.then();
-  console.log("Results of new version saving: ", resp);
+    .then();
 };
 
 const getVersionsForAllConentTypes = async (): Promise<Data> => {
   const knexQueryBuilder = global.strapi.connections.default("versions");
   knexQueryBuilder.select().returning("*").toString();
-  return await knexQueryBuilder.then();
+  return await knexQueryBuilder;
 };
 
 module.exports = {
