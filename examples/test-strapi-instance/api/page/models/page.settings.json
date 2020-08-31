@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "pages",
+  "info": {
+    "name": "Page"
+  },
+  "options": {
+    "increments": true,
+    "timestamps": true
+  },
+  "attributes": {
+    "Content": {
+      "type": "richtext"
+    },
+    "Articles": {
+      "collection": "article"
+    },
+    "Title": {
+      "type": "string"
+    }
+  }
+}
