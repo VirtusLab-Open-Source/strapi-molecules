@@ -1,27 +1,34 @@
 const { isModelExists, findUid } = require("../src/services/Versioning");
-const strapiObject = require("../../strapi-global-object/strapi-global");
+const { StrapiBuilder: StrapiBuilder2 } = require("strapi-builder");
 
 describe("versioning test", () => {
+  const ctx = {
+    params: {
+      id: 1,
+    },
+    url: "/content-manager/content-types/application::test.test",
+  };
   test("isModelExists: should return false if model doesn't exists in strapi object", () => {
-    global.strapi = strapiObject;
-    const ctx = {
-      params: {
-        id: 1,
-      },
-      url: "/content-manager/content-types/application::test.test",
-    };
-
-    global.strapi.models = {
-      fake: {
-        collectionName: "fakeModelCollectionName",
-        uid: "fakeModelCollectionNameUid",
-      },
-    };
+    global.strapi = new StrapiBuilder2()
+      .addModel({
+        fake: {
+          collectionName: "fakeModelCollectionName",
+          uid: "fakeModelCollectionNameUid",
+        },
+      })
+      .build();
     expect(isModelExists(ctx)).toBe(false);
   });
 
   test("isModelExists: should return true if model exists in strapi object", () => {
-    global.strapi = strapiObject;
+    global.strapi = new StrapiBuilder2()
+      .addModel({
+        fake: {
+          collectionName: "fakeModelCollectionName",
+          uid: "fakeModelCollectionNameUid",
+        },
+      })
+      .build();
     const ctx = {
       params: {
         id: 1,
@@ -33,7 +40,14 @@ describe("versioning test", () => {
   });
 
   test("findUid: should return proper uid for proper strapi structure and ctx url", () => {
-    global.strapi = strapiObject;
+    global.strapi = new StrapiBuilder2()
+      .addModel({
+        "application::test.test": {
+          collectionName: "tests",
+          uid: "test",
+        },
+      })
+      .build();
     const ctx = {
       params: {
         id: 1,
@@ -41,17 +55,19 @@ describe("versioning test", () => {
       url: "/tests/15",
     };
 
-    global.strapi.models = {
-      "application::test.test": {
-        collectionName: "tests",
-        uid: "test",
-      },
-    };
     expect(findUid(ctx)).toBe("test");
   });
 
   test("findUid: should return proper uid for proper strapi structure and ctx url", () => {
-    global.strapi = strapiObject;
+    global.strapi = new StrapiBuilder2()
+      .addModel({
+        "application::test.test": {
+          collectionName: "tests",
+          uid: "test",
+        },
+      })
+      .build();
+
     const ctx = {
       params: {
         id: 1,
@@ -60,16 +76,7 @@ describe("versioning test", () => {
       url: "/test/15",
     };
 
-    global.strapi.models = {
-      "application::test.test": {
-        collectionName: "tests",
-        uid: "test",
-      },
-    };
-
-    global.strapi.db = {
-      getModel: jest.fn(),
-    };
+    global.strapi.db.getModel = jest.fn();
     global.strapi.db.getModel.mockReturnValueOnce({ uid: "mocked" });
     findUid(ctx);
     expect(global.strapi.db.getModel).toHaveBeenCalled();

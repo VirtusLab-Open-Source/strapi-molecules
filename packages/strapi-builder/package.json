@@ -1,23 +1,16 @@
 {
-  "name": "strapi-plugin-versioning",
+  "name": "strapi-builder",
+  "private": true,
   "version": "0.1.0",
-  "description": "Strapi plugin for collecting versions of content type entities",
+  "description": "Strapi object builder for internal use only",
+  "main": "index.ts",
   "scripts": {
-    "test": "jest --coverage",
-    "build": "tsc",
-    "clean": "rimraf dist coverage",
-    "clean-all": "rimraf dist coverage node_modules",
-    "set-publish-package-json": "ts-node ../../scripts/set-publish-package-json.ts",
-    "extract-dist-to-root": "ts-node ../../scripts/extract-dist-to-root.ts",
-    "clean-dist-from-root": "ts-node ../../scripts/clean-dist-from-root.ts",
-    "prepublishOnly": "yarn build && yarn set-publish-package-json",
-    "postpublish": "yarn set-development-package-json",
-    "postinstall": "cp -r dist/extension-file-to-copy/content-manager $INIT_CWD/extensions"
+    "test": "echo \"no tests yet\""
   },
   "dependencies": {
     "lodash": "^4.17.12",
     "strapi-utils": "^3.0.6",
-    "strapi-builder": "0.1.0"
+    "strapi-types": "0.3.0"
   },
   "author": {
     "name": "VirtusLab",
@@ -48,7 +41,8 @@
     "strapi",
     "utilities",
     "utils",
-    "versions",
-    "versioning"
+    "deep search",
+    "search",
+    "TypeScript"
   ]
 }

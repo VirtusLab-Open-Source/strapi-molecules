@@ -1,7 +1,7 @@
 # Strapi - Versioning Plugin (bookshelf only)
 
 Utilities for [Strapi Headless CMS](https://github.com/strapi/strapi) that allow
-searching across nested structures including components.
+to store entity versions.
 
 ### ⏳ Installation
 
@@ -23,11 +23,11 @@ Requirements</a>.
 
 **Supported Strapi versions**:
 
-- Strapi v3.1.1 (recently tested)
-- Strapi v3.x
+- Strapi v3.1.4 (recently tested)
 
-(This plugin may work with the older Strapi versions, but these are not tested
-nor officially supported at this time.)
+(Because this plugin is based on an extension, there is no guarantee that it
+will work properly on any other Strapi version. Not working with v3.13 (there is
+no select on entity edit page))
 
 **We recommend always using the latest version of Strapi to start your new
 projects**.

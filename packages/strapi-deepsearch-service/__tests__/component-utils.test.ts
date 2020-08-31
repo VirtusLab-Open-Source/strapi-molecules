@@ -3,27 +3,28 @@ const {
   isModelComponentSearchable,
   getComponentByModel,
 } = require("../src/services/utils/component-utils.js");
+const { StrapiBuilder } = require("strapi-builder");
 
 describe("Test Deep search component utils functions", () => {
-  global.strapi = {
-    components: {
+  global.strapi = new StrapiBuilder()
+    .addComponent({
       "group1.component1": {
         allAttributes: {},
         options: {
           searchable: true,
         },
       },
+    })
+    .addComponent({
       "group2.component1": {
         allAttributes: {},
         options: {
           searchable: false,
         },
       },
-    },
-    contentTypes: {},
-    plugins: {},
-    query: (s: string) => s,
-  };
+    })
+    .build();
+
   const contentTypeModel = {
     allAttributes: {
       searchableComponent: {

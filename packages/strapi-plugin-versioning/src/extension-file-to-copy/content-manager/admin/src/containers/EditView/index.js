@@ -99,7 +99,9 @@ const EditView = ({
         strapi.notification.error("content-manager.error.relation.fetch");
       }
     };
-    getVersions();
+    if (entityId != "create") {
+      getVersions();
+    }
   }, [slug, entityId]);
 
   const generateDataForSelectedOption = () =>
@@ -302,6 +304,8 @@ const EditView = ({
                       name={name}
                       max={max}
                       min={min}
+                      dataForCurrentVersion={generateDataForSelectedOption()}
+                      isVersionCurrent={isVersionCurrent()}
                     />
                   );
                 }
@@ -339,6 +343,8 @@ const EditView = ({
                                   max={max}
                                   min={min}
                                   name={name}
+                                  dataForCurrentVersion={generateDataForSelectedOption()}
+                                  isVersionCurrent={isVersionCurrent()}
                                 />
                               );
                             }
@@ -356,7 +362,6 @@ const EditView = ({
                                   name={name}
                                   dataForCurrentVersion={generateDataForSelectedOption()}
                                   isVersionCurrent={isVersionCurrent()}
-                                  onChange={() => {}}
                                 />
                               </div>
                             );
@@ -396,7 +401,7 @@ const EditView = ({
                           relationsType={relation.relationType}
                           valueToSet={
                             isVersionCurrent()
-                              ? undefined
+                              ? "current"
                               : findSelectedVersionRelationValue(relationName)
                           }
                         />
@@ -437,34 +442,36 @@ const EditView = ({
                   )}
                 </ul>
               </LinkWrapper>
-              <div className="form-inline well">
-                <div className="form-group pr-2">
-                  <label className="control-label">
-                    <FormattedMessage
-                      id={`${pluginId}.containers.EditView.versions`}
+              {entityId != "create" && (
+                <div className="form-inline well">
+                  <div className="form-group pr-2">
+                    <label className="control-label">
+                      <FormattedMessage
+                        id={`${pluginId}.containers.EditView.versions`}
+                      />
+                    </label>
+                  </div>
+                  <div>
+                    <Select
+                      name="versionSelect"
+                      onChange={({ target: { value } }) => {
+                        setSelectedVersion(value);
+                      }}
+                      options={versions.map((el) => el.date).reverse()}
+                      value={selectedVersion}
                     />
-                  </label>
+                    <Button
+                      color="success"
+                      type="submit"
+                      disabled={isRevertButtonDisabled()}
+                    >
+                      <FormattedMessage
+                        id={`${pluginId}.containers.EditView.revert`}
+                      />
+                    </Button>
+                  </div>
                 </div>
-                <div className="">
-                  <Select
-                    name="verionSelect"
-                    onChange={({ target: { value } }) => {
-                      setSelectedVersion(value);
-                    }}
-                    options={versions.map((el) => el.date).reverse()}
-                    value={selectedVersion}
-                  />
-                  <Button
-                    color="success"
-                    type="submit"
-                    disabled={isRevertButtonDisabled()}
-                  >
-                    <FormattedMessage
-                      id={`${pluginId}.containers.EditView.revert`}
-                    />
-                  </Button>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </Container>

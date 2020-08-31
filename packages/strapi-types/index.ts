@@ -21,32 +21,43 @@ type BaseModel = {
   };
 };
 
-type Model = {
+export type Model = {
   collectionName: string;
   uid: string;
 };
 
-type ComponentModel = BaseModel & {};
+export type ComponentModel = BaseModel & {};
 
-export type Strapi = {
+type Entity = {
+  [key: string]: Model;
+};
+
+export type Plugin = {
+  [key: string]: any;
+};
+
+export class Strapi {
   components: {
     [key: string]: ComponentModel;
-  };
-  plugins: {
-    [key: string]: any;
-  };
+  } = {};
+  plugins: Plugin = {};
   contentTypes: {
     [key: string]: any;
-  };
-  query: (s: string) => any;
+  } = {};
+  query = (s: string): Entity => ({
+    fakeModel: {
+      collectionName: s,
+      uid: "uid",
+    },
+  });
   connections: {
-    default: Knex;
-  };
+    default: typeof Knex;
+  } = { default: Knex };
   models: {
     [key: string]: Model;
-  };
-  db: any;
+  } = {};
+  db: any = {};
   app: {
-    use: (x: (ctx: Context, next: Next) => Promise<any>) => any;
-  };
-};
+    use: (x: (ctx: Context, next: Next) => Promise<any>) => void;
+  } = { use: (callback) => callback };
+}

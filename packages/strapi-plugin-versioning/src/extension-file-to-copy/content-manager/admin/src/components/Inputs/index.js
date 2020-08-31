@@ -238,7 +238,7 @@ function Inputs({
 Inputs.defaultProps = {
   autoFocus: false,
   onBlur: null,
-  dataForCurrentVersion: undefined,
+  dataForCurrentVersion: null,
   isVersionCurrent: true,
 };
 

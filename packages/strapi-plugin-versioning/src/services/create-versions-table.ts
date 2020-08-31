@@ -1,10 +1,12 @@
 "use strict";
+import * as Knex from "knex";
 
 module.exports = {
   async createVersionsTable(): Promise<void> {
-    const knex = global.strapi.connections.default;
+    //check after knex type update
+    const knex: any = global.strapi.connections.default;
     knex.schema
-      .createTableIfNotExists("versions", (table) => {
+      .createTableIfNotExists("versions", (table: Knex.TableBuilder) => {
         table.increments("id");
         table.string("content_type");
         table.string("content");

@@ -43,7 +43,10 @@ function SelectWrapper({
   } = useDataManager();
   const { isDraggingComponent } = useEditView();
 
-  const value = valueToSet ? valueToSet : get(modifiedData, name, null);
+  const value =
+    valueToSet && valueToSet !== "current"
+      ? valueToSet
+      : get(modifiedData, name, null);
   const initialValue = get(initialData, name, null);
 
   // This is needed for making requests when used in a component
@@ -195,9 +198,11 @@ function SelectWrapper({
   ].includes(relationType);
 
   const changeRelationValueForCurrentVersion = () => {
-    valueToSet
-      ? onChange({ target: { name, value: valueToSet } })
-      : onChange({ target: { name, value: initialValue } });
+    if (valueToSet && startRef.current != 0) {
+      valueToSet !== "current"
+        ? onChange({ target: { name, value: valueToSet } })
+        : onChange({ target: { name, value: initialValue } });
+    }
   };
 
   useEffect(() => {
@@ -313,7 +318,7 @@ SelectWrapper.defaultProps = {
   label: "",
   isFieldAllowed: true,
   placeholder: "",
-  valueToSet: undefined,
+  valueToSet: null,
 };
 
 SelectWrapper.propTypes = {

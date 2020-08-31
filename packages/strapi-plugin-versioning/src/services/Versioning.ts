@@ -1,10 +1,11 @@
 import { Context } from "koa";
+import Knex from "knex";
 
 type Entity = any;
 type Data = Array<Entity>;
 
 const isModelExists = (ctx: Context): boolean =>
-  (ctx.params !== undefined && ctx.params.model !== undefined) ||
+  ctx.params?.model !== undefined ||
   Object.values(global.strapi.models).find(
     (el) => el.collectionName == ctx.url.split("/")[1],
   ) !== undefined;
@@ -33,7 +34,7 @@ const saveDataInDB = async (
     .then();
 };
 
-const getVersionsForAllConentTypes = async (): Promise<Data> => {
+const getVersionsForAllConentTypes = async (): Promise<Knex> => {
   const knexQueryBuilder = global.strapi.connections.default("versions");
   knexQueryBuilder.select().returning("*").toString();
   return await knexQueryBuilder;
