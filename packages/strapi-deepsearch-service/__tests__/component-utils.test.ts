@@ -7,22 +7,22 @@ const { StrapiBuilder } = require("strapi-builder");
 
 describe("Test Deep search component utils functions", () => {
   global.strapi = new StrapiBuilder()
-    .addComponent({
+    .addComponents([{
       "group1.component1": {
         allAttributes: {},
         options: {
           searchable: true,
         },
       },
-    })
-    .addComponent({
+    },
+    {
       "group2.component1": {
         allAttributes: {},
         options: {
           searchable: false,
         },
       },
-    })
+    }])
     .build();
 
   const contentTypeModel = {

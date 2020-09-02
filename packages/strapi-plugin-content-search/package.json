@@ -18,7 +18,8 @@
     "postpublish": "yarn clean-dist-from-root"
   },
   "dependencies": {
-    "strapi-deepsearch-service": "0.3.1"
+    "strapi-deepsearch-service": "0.3.1",
+    "strapi-builder": "0.1.0"
   },
   "author": {
     "name": "VirtusLab",

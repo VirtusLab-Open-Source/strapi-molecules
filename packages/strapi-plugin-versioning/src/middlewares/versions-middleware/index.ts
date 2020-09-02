@@ -7,9 +7,10 @@ module.exports = () => {
       global.strapi.app.use(async (ctx, next) => {
         await next();
         const properMethods = ["PUT", "POST"];
+        const model = versioningService.getModelFromCtx(ctx);
         if (
           properMethods.includes(ctx.response.request.method) &&
-          versioningService.isModelExists(ctx) &&
+          versioningService.isModelExists(model) &&
           ctx.response.message == "OK"
         ) {
           const uid = versioningService.findUid(ctx);

@@ -4,11 +4,23 @@ import Knex from "knex";
 type Entity = any;
 type Data = Array<Entity>;
 
-const isModelExists = (ctx: Context): boolean =>
-  ctx.params?.model !== undefined ||
-  Object.values(global.strapi.models).find(
-    (el) => el.collectionName == ctx.url.split("/")[1],
-  ) !== undefined;
+const getModelFromCtx = (ctx: Context): string | undefined => {
+  if(ctx.params?.model) {
+    return ctx.params.model
+  }
+  return ctx.url.split("/")[1];
+}
+
+const isModelExists = (model: string | undefined): boolean => {
+  if (model) {
+    return (
+      !!Object.values(global.strapi.models).find(
+        (el) => el.collectionName === model || el.uid === model,
+      )
+    );
+  }
+  return false;
+};
 
 const findUid = (ctx: Context): string =>
   ctx.params.model
@@ -45,4 +57,5 @@ module.exports = {
   getVersionsForAllConentTypes,
   isModelExists,
   findUid,
+  getModelFromCtx
 };

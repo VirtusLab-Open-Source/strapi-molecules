@@ -8,11 +8,9 @@
     "clean": "rimraf dist coverage",
     "clean-all": "rimraf dist coverage node_modules",
     "set-publish-package-json": "ts-node ../../scripts/set-publish-package-json.ts",
-    "extract-dist-to-root": "ts-node ../../scripts/extract-dist-to-root.ts",
-    "clean-dist-from-root": "ts-node ../../scripts/clean-dist-from-root.ts",
     "prepublishOnly": "yarn build && yarn set-publish-package-json",
     "postpublish": "yarn set-development-package-json",
-    "postinstall": "cp -r dist/extension-file-to-copy/content-manager $INIT_CWD/extensions"
+    "postinstall": "cp -r extension-file-to-copy/content-manager $INIT_CWD/extensions"
   },
   "dependencies": {
     "lodash": "^4.17.12",

@@ -43,14 +43,14 @@ projects**.
 
 For Strapi stable versions, add a middleware.js file within your config folder
 
-```diff
+```bash
 touch config/middleware.js
 ```
 
 Enable the versions middleware by adding the following snippet to an empty
 middleware file or simply add in the settings from the below example:
 
-```diff
+```bash
 module.exports = ({ env }) => ({
   settings: {
    "versions-middleware": {

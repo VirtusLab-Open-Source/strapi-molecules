@@ -12,7 +12,9 @@ type PrimitiveTypeAttribute = {
 
 type ModelAttribute = PrimitiveTypeAttribute | ComponentAttribute;
 
-type BaseModel = {
+export type Model = {
+  collectionName: string;
+  uid: string;
   options: {
     [key: string]: any;
   };
@@ -21,12 +23,12 @@ type BaseModel = {
   };
 };
 
-export type Model = {
-  collectionName: string;
-  uid: string;
-};
+export type ComponentModel = Model & {};
 
-export type ComponentModel = BaseModel & {};
+type Db = {
+  query: any;
+  getModel: any;
+};
 
 type Entity = {
   [key: string]: Model;
@@ -36,27 +38,29 @@ export type Plugin = {
   [key: string]: any;
 };
 
+export type ContentType = any;
+
 export class Strapi {
   components: {
     [key: string]: ComponentModel;
   } = {};
   plugins: Plugin = {};
   contentTypes: {
-    [key: string]: any;
+    [key: string]: ContentType;
   } = {};
-  query = (s: string): Entity => ({
-    fakeModel: {
-      collectionName: s,
-      uid: "uid",
-    },
-  });
+  db: Db = {
+    query: {},
+    getModel: {}
+  };
+  query = (entity: string): Entity => {
+    return this.db.query(entity);
+  };
   connections: {
     default: typeof Knex;
   } = { default: Knex };
   models: {
     [key: string]: Model;
   } = {};
-  db: any = {};
   app: {
     use: (x: (ctx: Context, next: Next) => Promise<any>) => void;
   } = { use: (callback) => callback };

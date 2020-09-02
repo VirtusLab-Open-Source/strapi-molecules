@@ -1,48 +1,62 @@
-import { Strapi, Plugin, Model, ComponentModel } from "strapi-types";
+import {
+  Strapi,
+  Plugin,
+  Model,
+  ComponentModel,
+  ContentType,
+} from "strapi-types";
 
 export class StrapiBuilder {
   strapi = new Strapi();
-  addContentType = (contentType: { [key: string]: any }) => {
-    this.strapi = {
-      ...this.strapi,
-      contentTypes: {
-        ...this.strapi.contentTypes,
-        ...contentType,
-      },
-    };
+  addContentTypes = (contentTypes: Array<{ [key: string]: ContentType }>) => {
+    contentTypes.forEach((el) => {
+      this.strapi = {
+        ...this.strapi,
+        contentTypes: {
+          ...this.strapi.contentTypes,
+          ...el,
+        },
+      };
+    });
     return this;
   };
 
-  addModel = (model: { [key: string]: Model }) => {
-    this.strapi = {
-      ...this.strapi,
-      models: {
-        ...this.strapi.models,
-        ...model,
-      },
-    };
+  addModels = (models: Array<{ [key: string]: Model }>) => {
+    models.forEach((el) => {
+      this.strapi = {
+        ...this.strapi,
+        models: {
+          ...this.strapi.models,
+          ...el,
+        },
+      };
+    });
     return this;
   };
 
-  addComponent = (component: { [key: string]: ComponentModel }) => {
-    this.strapi = {
-      ...this.strapi,
-      components: {
-        ...this.strapi.components,
-        ...component,
-      },
-    };
+  addComponents = (components: Array<{ [key: string]: ComponentModel }>) => {
+    components.forEach((el) => {
+      this.strapi = {
+        ...this.strapi,
+        components: {
+          ...this.strapi.components,
+          ...el,
+        },
+      };
+    });
     return this;
   };
 
-  addPlugin = (plugin: { [key: string]: Plugin }) => {
-    this.strapi = {
-      ...this.strapi,
-      plugins: {
-        ...this.strapi.plugins,
-        ...plugin,
-      },
-    };
+  addPlugins = (plugins: Array<{ [key: string]: Plugin }>) => {
+    plugins.forEach((el) => {
+      this.strapi = {
+        ...this.strapi,
+        plugins: {
+          ...this.strapi.plugins,
+          ...el,
+        },
+      };
+    });
     return this;
   };
 
