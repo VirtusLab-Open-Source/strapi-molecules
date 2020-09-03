@@ -26,8 +26,8 @@ export type Model = {
 export type ComponentModel = Model & {};
 
 type Db = {
-  query: any;
-  getModel: any;
+  query: (uid: string) => any;
+  getModel: (modelName: string) => any;
 };
 
 export type Plugin = {
@@ -57,5 +57,5 @@ export class Strapi {
 
 export type StrapiGlobal = Strapi & {
   db: Db;
-  query: () => any;
+  query: () => { model: Model };
 };

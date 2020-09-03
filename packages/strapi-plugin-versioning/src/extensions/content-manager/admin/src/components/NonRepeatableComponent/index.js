@@ -72,6 +72,8 @@ const NonRepeatableComponent = ({
 NonRepeatableComponent.defaultProps = {
   fields: [],
   isFromDynamicZone: false,
+  dataForCurrentVersion: undefined,
+  isVersionCurrent: true,
 };
 
 NonRepeatableComponent.propTypes = {
@@ -80,6 +82,8 @@ NonRepeatableComponent.propTypes = {
   isFromDynamicZone: PropTypes.bool,
   name: PropTypes.string.isRequired,
   schema: PropTypes.object.isRequired,
+  dataForCurrentVersion: PropTypes.object,
+  isVersionCurrent: PropTypes.bool,
 };
 
 export default NonRepeatableComponent;
