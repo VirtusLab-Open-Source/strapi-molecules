@@ -6,23 +6,21 @@ const {
 const { StrapiBuilder } = require("strapi-builder");
 
 describe("Test Deep search component utils functions", () => {
-  global.strapi = new StrapiBuilder()
-    .addComponents([{
+  global.strapi = new StrapiBuilder({ query: () => {}, db: {} })
+    .addComponents({
       "group1.component1": {
         allAttributes: {},
         options: {
           searchable: true,
         },
       },
-    },
-    {
       "group2.component1": {
         allAttributes: {},
         options: {
           searchable: false,
         },
       },
-    }])
+    })
     .build();
 
   const contentTypeModel = {

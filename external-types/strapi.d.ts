@@ -1,8 +1,8 @@
-import type { Strapi } from "strapi-types";
+import type { StrapiGlobal } from "strapi-types";
 declare global {
   module NodeJS {
     interface Global {
-      strapi: Strapi;
+      strapi: StrapiGlobal;
     }
   }
 }

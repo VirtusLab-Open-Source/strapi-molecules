@@ -5,33 +5,28 @@ describe("content search test", () => {
   const fetchAsyncData = jest.fn();
 
   test("search: should trigger fetchAsyncData function with [searchableComponent] and first string arguments", async () => {
-    global.strapi = new StrapiBuilder1()
-      .addPlugins([
-        {
-          "content-search": {
-            services: {
-              searchabledata: {
-                fetchAsyncData,
-              },
-            },
-          },
-        }])
-      .addContentTypes([
-        {
-          searchableComponent: {
-            options: {
-              searchable: true,
+    global.strapi = new StrapiBuilder1({ query: () => {}, db: {} })
+      .addPlugins({
+        "content-search": {
+          services: {
+            searchabledata: {
+              fetchAsyncData,
             },
           },
         },
-        {
-          nonSearchableComponent: {
-            options: {
-              searchable: false,
-            },
+      })
+      .addContentTypes({
+        searchableComponent: {
+          options: {
+            searchable: true,
           },
         },
-      ])
+        nonSearchableComponent: {
+          options: {
+            searchable: false,
+          },
+        },
+      })
       .build();
 
     await search({ request: { body: { _q: "first" } }, is: () => false });
@@ -39,40 +34,33 @@ describe("content search test", () => {
   });
 
   test("search: should trigger fetchAsyncData function with  [searchableComponent, secondSearchableComponent,thirdSearchableComponent] and second string arguments", async () => {
-    global.strapi = new StrapiBuilder1()
-      .addPlugins([
-        {
-          "content-search": {
-            services: {
-              searchabledata: {
-                fetchAsyncData,
-              },
-            },
-          },
-        }])
-      .addContentTypes([
-        {
-          searchableComponent: {
-            options: {
-              searchable: true,
+    global.strapi = new StrapiBuilder1({ query: () => {}, db: {} })
+      .addPlugins({
+        "content-search": {
+          services: {
+            searchabledata: {
+              fetchAsyncData,
             },
           },
         },
-        {
-          secondSearchableComponent: {
-            options: {
-              searchable: true,
-            },
+      })
+      .addContentTypes({
+        searchableComponent: {
+          options: {
+            searchable: true,
           },
         },
-        {
-          thirdSearchableComponent: {
-            options: {
-              searchable: true,
-            },
+        secondSearchableComponent: {
+          options: {
+            searchable: true,
           },
         },
-      ])
+        thirdSearchableComponent: {
+          options: {
+            searchable: true,
+          },
+        },
+      })
       .build();
 
     await search({ request: { body: { _q: "second" } }, is: () => false });
@@ -87,34 +75,28 @@ describe("content search test", () => {
   });
 
   test("search: should trigger fetchAsyncData function with [] and third string arguments", async () => {
-    global.strapi = new StrapiBuilder1()
-      .addPlugins([
-        {
-          "content-search": {
-            services: {
-              searchabledata: {
-                fetchAsyncData,
-              },
+    global.strapi = new StrapiBuilder1({ query: () => {}, db: {} })
+      .addPlugins({
+        "content-search": {
+          services: {
+            searchabledata: {
+              fetchAsyncData,
             },
           },
         },
-      ])
-      .addContentTypes([
-        {
-          searchableComponent: {
-            options: {
-              searchable: false,
-            },
+      })
+      .addContentTypes({
+        searchableComponent: {
+          options: {
+            searchable: false,
           },
         },
-        {
-          secondSearchableComponent: {
-            options: {
-              searchable: false,
-            },
+        secondSearchableComponent: {
+          options: {
+            searchable: false,
           },
         },
-      ])
+      })
       .build();
     await search({ request: { body: { _q: "third" } }, is: () => false });
     expect(fetchAsyncData).toBeCalledWith([], "third");

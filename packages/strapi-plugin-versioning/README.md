@@ -1,7 +1,7 @@
 # Strapi - Versioning Plugin (bookshelf only)
 
-Utilities for [Strapi Headless CMS](https://github.com/strapi/strapi) that allow
-to store entity versions.
+Plugin for [Strapi Headless CMS](https://github.com/strapi/strapi) that allow to
+store entity versions.
 
 ### ⏳ Installation
 
@@ -50,15 +50,18 @@ touch config/middleware.js
 Enable the versions middleware by adding the following snippet to an empty
 middleware file or simply add in the settings from the below example:
 
-```bash
+```js script
 module.exports = ({ env }) => ({
   settings: {
-   "versions-middleware": {
+    "versions-middleware": {
       enabled: true,
     },
   },
 });
 ```
+
+Copy / merge files from node_modules/strapi-versioning-plugin/extensions to
+extensions.
 
 ## Contributing
 

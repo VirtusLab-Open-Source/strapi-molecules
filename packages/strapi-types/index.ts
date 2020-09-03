@@ -30,10 +30,6 @@ type Db = {
   getModel: any;
 };
 
-type Entity = {
-  [key: string]: Model;
-};
-
 export type Plugin = {
   [key: string]: any;
 };
@@ -48,13 +44,6 @@ export class Strapi {
   contentTypes: {
     [key: string]: ContentType;
   } = {};
-  db: Db = {
-    query: {},
-    getModel: {}
-  };
-  query = (entity: string): Entity => {
-    return this.db.query(entity);
-  };
   connections: {
     default: typeof Knex;
   } = { default: Knex };
@@ -65,3 +54,8 @@ export class Strapi {
     use: (x: (ctx: Context, next: Next) => Promise<any>) => void;
   } = { use: (callback) => callback };
 }
+
+export type StrapiGlobal = Strapi & {
+  db: Db;
+  query: () => any;
+};
