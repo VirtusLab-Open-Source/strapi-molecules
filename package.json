@@ -20,6 +20,9 @@
     "on-pre-push": "yarn lint-branch-commit-msg"
   },
   "dependencies": {
+    "@types/koa": "^2.11.4",
+    "knex": "^0.21.5",
+    "koa": "^2.13.0"
   },
   "devDependencies": {
     "@commitlint/cli": "^9.1.1",

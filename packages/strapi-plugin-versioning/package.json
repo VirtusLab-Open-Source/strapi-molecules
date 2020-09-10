@@ -1,24 +1,18 @@
 {
-  "name": "strapi-plugin-content-search",
-  "version": "0.3.2",
-  "description": "Strapi search plugin provides /search endpoint that can be used to find content type fields which contain search string",
-  "strapi": {
-    "name": "content-search",
-    "icon": "plug",
-    "description": "Search api for searchable models"
-  },
+  "name": "strapi-plugin-versioning",
+  "version": "0.1.0",
+  "description": "Strapi plugin for collecting versions of content type entities",
   "scripts": {
     "test": "jest --coverage",
     "build": "tsc",
     "clean": "rimraf dist coverage",
     "clean-all": "rimraf dist coverage node_modules",
-    "extract-dist-to-root": "ts-node ../../scripts/extract-dist-to-root.ts",
-    "clean-dist-from-root": "ts-node ../../scripts/clean-dist-from-root.ts",
-    "prepublishOnly": "yarn build && yarn extract-dist-to-root",
-    "postpublish": "yarn clean-dist-from-root"
+    "set-publish-package-json": "ts-node ../../scripts/set-publish-package-json.ts",
+    "prepublishOnly": "yarn build && yarn set-publish-package-json",
+    "postpublish": "yarn set-development-package-json"
   },
   "dependencies": {
-    "strapi-deepsearch-service": "0.3.1",
+    "lodash": "^4.17.12",
     "strapi-builder": "0.1.0"
   },
   "author": {
@@ -46,5 +40,11 @@
     "node": ">=10.0.0",
     "npm": ">=6.0.0"
   },
-  "license": "MIT"
+  "keywords": [
+    "strapi",
+    "utilities",
+    "utils",
+    "versions",
+    "versioning"
+  ]
 }

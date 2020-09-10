@@ -1,0 +1,133 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/explorer/versions/:model/:id",
+      "handler": "Versions.listEntityVersions",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/content-types",
+      "handler": "ContentTypes.listContentTypes",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/content-types/:uid",
+      "handler": "ContentTypes.findContentType",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/content-types/:uid",
+      "handler": "ContentTypes.updateContentType",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/components",
+      "handler": "Components.listComponents",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/components/:uid",
+      "handler": "Components.findComponent",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/components/:uid",
+      "handler": "Components.updateComponent",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/explorer/uid/generate",
+      "handler": "ContentManager.generateUID",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/explorer/uid/check-availability",
+      "handler": "ContentManager.checkUIDAvailability",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/explorer/:model",
+      "handler": "ContentManager.find",
+      "config": {
+        "policies": ["routing"]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/explorer/:model/count",
+      "handler": "ContentManager.count",
+      "config": {
+        "policies": ["routing"]
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/explorer/:model/:id",
+      "handler": "ContentManager.findOne",
+      "config": {
+        "policies": ["routing"]
+      }
+    },
+    {
+      "method": "POST",
+      "path": "/explorer/:model",
+      "handler": "ContentManager.create",
+      "config": {
+        "policies": ["routing"]
+      }
+    },
+    {
+      "method": "PUT",
+      "path": "/explorer/:model/:id",
+      "handler": "ContentManager.update",
+      "config": {
+        "policies": ["routing"]
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/explorer/deleteAll/:model",
+      "handler": "ContentManager.deleteMany",
+      "config": {
+        "policies": ["routing"]
+      }
+    },
+    {
+      "method": "DELETE",
+      "path": "/explorer/:model/:id",
+      "handler": "ContentManager.delete",
+      "config": {
+        "policies": ["routing"]
+      }
+    }
+  ]
+}
+
