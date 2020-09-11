@@ -5,23 +5,24 @@
   "description": "Set of molecules which speed up Strapi development.",
   "scripts": {
     "bootstrap": "yarn install --frozen-lockfile && lerna bootstrap",
-    "watch": "lerna run --stream watch --no-private",
+    "test": "lerna run --parallel test",
+    "test:unit": "jest --coverage",
     "clean": "lerna run --parallel clean && rimraf coverage dist",
     "clean-all": "lerna run --parallel clean-all && rimraf coverage node_modules",
     "build": "lerna run --parallel build",
-    "test": "lerna run --parallel test",
     "extract-dist-to-root": "lerna run --parallel extract-dist-to-root",
     "clean-dist-from-root": "lerna run --parallel clean-dist-from-root",
-    "test:unit": "jest --coverage",
     "lint-branch-commit-msg": "commitlint --from=$(git merge-base master $(git rev-parse --abbrev-ref HEAD)) --to=HEAD",
     "run-lint-staged": "lint-staged",
     "version-and-publish": "lerna publish",
     "on-pre-commit": "yarn run-lint-staged",
-    "on-pre-push": "yarn lint-branch-commit-msg"
+    "on-pre-push": "yarn lint-branch-commit-msg",
+    "watch": "lerna run --stream watch --no-private"
   },
   "dependencies": {
+    "@types/bookshelf": "^1.1.1",
     "@types/koa": "^2.11.4",
-    "knex": "^0.21.5",
+    "knex": "0.20.13",
     "koa": "^2.13.0"
   },
   "devDependencies": {

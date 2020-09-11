@@ -1,7 +1,7 @@
-# Strapi - Deep search service (bookshelf only)
+# Strapi - Content search service (bookshelf only)
 
 Utilities for [Strapi Headless CMS](https://github.com/strapi/strapi) that allow
-searching across nested structures including components.
+searching across content types fields which have searchable property.
 
 ### ⏳ Installation
 
@@ -9,7 +9,7 @@ searching across nested structures including components.
 [Install yarn with these docs](https://yarnpkg.com/lang/en/docs/install/).)
 
 ```bash
-yarn add @strapi-molecules/deepsearch-service
+yarn add strapi-plugin-content-search
 ```
 
 Enjoy 🎉
@@ -34,12 +34,8 @@ projects**.
 
 ## Features
 
-- **Nested structure support** Now you can search by a component or even their
-  children (components, related content types)
-- **StrapiGlobalQuery by the components:** When component is searchable \_q
-  parameter will apply also to all component attributes
-- **Using builtin filters wit components** now such suffixes like \_contains,
-  \_eq etc could be used together with components attributes
+-**Search by content type entity field** Now you will be able to search through
+all content-type fields!
 
 ## Component model configuration
 
@@ -68,48 +64,45 @@ For example for component called `paragraph_component` You need to change
 }
 ```
 
-## Public API
+## Usage
 
-### find
-
-```
-    const entities = await find(model, ctx.query);
-```
-
-request examples: `/restaurant?paragraph_component.body_contains=foo`
-`/restaurant?paragraph_component.body_contains=foo&paragraph_component.body_contains=bar`
-
-### count
+To be able to find model content field, model needs **searchable** property with
+true value, then just use:
 
 ```
-    const count = await count(model, ctx.query);
+POST /content-search/search
 ```
 
-request examples: `/restaurant/count?paragraph_component.body_contains=bar`
-
-### search
+with:
 
 ```
-    const entities = await search(model, ctx.query);
+"_q": "string"
 ```
 
-request examples (will search by all searchable components):
-`/restaurant?_q=foo` `/restaurant?_q=foo&paragraph_component.title_contains=foo`
-
-### searchCount
+Example:
 
 ```
-    const count = await countSearch(model, ctx.query);
+{
+"_q": "lorem"
+}
 ```
 
-request examples (will search by all searchable components):
-`/restaurant?_q=foo` `/restaurant?_q=foo&paragraph_component.title_contains=foo`
+Response:
 
-## Examples
-
-#### deep search for single model example [resturant controller](examples/restaurant.js)
-
-#### generic deep search [deep search controller](examples/global-endpoint.js)
+```
+[
+    [
+        {
+            "id": 1,
+            "title": "lorem",
+            "content": "lorem ipsum",
+            "created_at": "2020-07-23T09:48:24.140Z",
+            "updated_at": "2020-07-23T09:48:24.140Z",
+            "__contentType": "exmaple_content_type"
+        }
+    ]
+]
+```
 
 ## Contributing
 
