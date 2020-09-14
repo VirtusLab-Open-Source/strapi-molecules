@@ -26,7 +26,7 @@ Requirements</a>.
 
 **Supported Strapi versions**:
 
-- Strapi v3.1.1 (recently tested)
+- Strapi v3.1.4 (recently tested)
 - Strapi v3.x
 
 (This plugin may work with the older Strapi versions, but these are not tested
@@ -37,14 +37,15 @@ projects**.
 
 ## Features
 
--**Search by content type entity field** Now you will be able to search through
-all content-type fields!
+-**Create Clone (draft)** Now you will be able to clone every content type
+entry -**Preview your entry** With customised preview URI, You can preview your
+draft (entry)
 
 ## Component model configuration
 
-Component by default is not searchable. To enable Component to be included in
-search or be able to filter by, you've to add option searchable to true in a
-configuration json file (`*.settings.json`):
+Component by default is not previewable. To enable content type to be
+previewable and see preview, or clone entry, you've to add option previewable to
+true in a configuration json file (`*.settings.json`):
 
 For example for component called `paragraph_component` You need to change
 `components/text/paragraph_component.json` by modifying option object:
@@ -57,7 +58,7 @@ For example for component called `paragraph_component` You need to change
     "icon": "align-justify"
   },
   "options": {
-    +"searchable": true
++    "previewable": true
   },
   "attributes": {
     "body": {
@@ -69,43 +70,13 @@ For example for component called `paragraph_component` You need to change
 
 ## Usage
 
-To be able to find model content field, model needs **searchable** property with
-true value, then just use:
-
-```
-POST /content-search/search
-```
-
-with:
-
-```
-"_q": "string"
-```
-
-Example:
-
-```
-{
-"_q": "lorem"
-}
-```
-
-Response:
-
-```
-[
-    [
-        {
-            "id": 1,
-            "title": "lorem",
-            "content": "lorem ipsum",
-            "created_at": "2020-07-23T09:48:24.140Z",
-            "updated_at": "2020-07-23T09:48:24.140Z",
-            "__contentType": "exmaple_content_type"
-        }
-    ]
-]
-```
+- Clone - Go to entry and click Clone (it will add new entry and set relation to
+  original entry "cloneOf")
+- Preview - Go to entry and click Preview (it will redirect to URI provided in
+  custom.js configuration with injected contentType and id)
+- Publish - if entry has `cloneOf` relation, than You will be able to replace
+  original entry with your modified one by clicking "publish" and confirmation
+  in modal
 
 ## Contributing
 
