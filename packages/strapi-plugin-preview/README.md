@@ -9,8 +9,11 @@ searching across content types fields which have searchable property.
 [Install yarn with these docs](https://yarnpkg.com/lang/en/docs/install/).)
 
 ```bash
-yarn add strapi-plugin-content-search
+yarn add strapi-plugin-preview
 ```
+
+Then need to integrate /extensions folder with content-manager/admin to see
+manual follow [This README](README-EXTENSIONS.md)
 
 Enjoy 🎉
 

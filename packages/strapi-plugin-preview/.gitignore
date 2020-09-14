@@ -120,7 +120,6 @@ build
 ############################
 /config
 /controllers
-/extensions
 /middlewares
 /model
 /services
