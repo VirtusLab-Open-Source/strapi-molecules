@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-preview",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Strapi - Preview plugin",
   "strapi": {
     "name": "Preview",
@@ -15,11 +15,11 @@
     "test": "echo \"no tests yet\""
   },
   "devDependencies": {
-    "koa": "^2.8.0",
+    "codecov": "^3.7.2",
     "jest": "^26.0.1",
     "jest-cli": "^26.0.1",
     "jest-styled-components": "^7.0.2",
-    "codecov": "^3.7.2"
+    "koa": "^2.8.0"
   },
   "author": {
     "name": "VirtusLab",

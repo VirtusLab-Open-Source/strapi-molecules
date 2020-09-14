@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-versioning",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Strapi plugin for collecting versions of content type entities",
   "scripts": {
     "test": "jest --coverage",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.12",
-    "strapi-builder": "0.1.0"
+    "strapi-builder": "0.2.0"
   },
   "author": {
     "name": "VirtusLab",
