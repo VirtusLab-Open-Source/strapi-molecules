@@ -1,7 +1,7 @@
-# Strapi - Deep search service (bookshelf only)
+# Strapi - Content search service (bookshelf only)
 
 Utilities for [Strapi Headless CMS](https://github.com/strapi/strapi) that allow
-searching across nested structures including components.
+searching across content types fields which have searchable property.
 
 ### ⏳ Installation
 
@@ -9,8 +9,11 @@ searching across nested structures including components.
 [Install yarn with these docs](https://yarnpkg.com/lang/en/docs/install/).)
 
 ```bash
-yarn add @strapi-molecules/deepsearch-service
+yarn add strapi-plugin-preview
 ```
+
+Then need to integrate /extensions folder with content-manager/admin to see
+manual follow [This README](README-EXTENSIONS.md)
 
 Enjoy 🎉
 
@@ -23,7 +26,7 @@ Requirements</a>.
 
 **Supported Strapi versions**:
 
-- Strapi v3.1.1 (recently tested)
+- Strapi v3.1.4 (recently tested)
 - Strapi v3.x
 
 (This plugin may work with the older Strapi versions, but these are not tested
@@ -34,18 +37,15 @@ projects**.
 
 ## Features
 
-- **Nested structure support** Now you can search by a component or even their
-  children (components, related content types)
-- **StrapiGlobalQuery by the components:** When component is searchable \_q
-  parameter will apply also to all component attributes
-- **Using builtin filters wit components** now such suffixes like \_contains,
-  \_eq etc could be used together with components attributes
+-**Create Clone (draft)** Now you will be able to clone every content type
+entry -**Preview your entry** With customised preview URI, You can preview your
+draft (entry)
 
 ## Component model configuration
 
-Component by default is not searchable. To enable Component to be included in
-search or be able to filter by, you've to add option searchable to true in a
-configuration json file (`*.settings.json`):
+Component by default is not previewable. To enable content type to be
+previewable and see preview, or clone entry, you've to add option previewable to
+true in a configuration json file (`*.settings.json`):
 
 For example for component called `paragraph_component` You need to change
 `components/text/paragraph_component.json` by modifying option object:
@@ -58,7 +58,7 @@ For example for component called `paragraph_component` You need to change
     "icon": "align-justify"
   },
   "options": {
-    +"searchable": true
++    "previewable": true
   },
   "attributes": {
     "body": {
@@ -68,48 +68,15 @@ For example for component called `paragraph_component` You need to change
 }
 ```
 
-## Public API
+## Usage
 
-### find
-
-```
-    const entities = await find(model, ctx.query);
-```
-
-request examples: `/restaurant?paragraph_component.body_contains=foo`
-`/restaurant?paragraph_component.body_contains=foo&paragraph_component.body_contains=bar`
-
-### count
-
-```
-    const count = await count(model, ctx.query);
-```
-
-request examples: `/restaurant/count?paragraph_component.body_contains=bar`
-
-### search
-
-```
-    const entities = await search(model, ctx.query);
-```
-
-request examples (will search by all searchable components):
-`/restaurant?_q=foo` `/restaurant?_q=foo&paragraph_component.title_contains=foo`
-
-### searchCount
-
-```
-    const count = await countSearch(model, ctx.query);
-```
-
-request examples (will search by all searchable components):
-`/restaurant?_q=foo` `/restaurant?_q=foo&paragraph_component.title_contains=foo`
-
-## Examples
-
-#### deep search for single model example [resturant controller](examples/restaurant.js)
-
-#### generic deep search [deep search controller](examples/global-endpoint.js)
+- Clone - Go to entry and click Clone (it will add new entry and set relation to
+  original entry "cloneOf")
+- Preview - Go to entry and click Preview (it will redirect to URI provided in
+  custom.js configuration with injected contentType and id)
+- Publish - if entry has `cloneOf` relation, than You will be able to replace
+  original entry with your modified one by clicking "publish" and confirmation
+  in modal
 
 ## Contributing
 

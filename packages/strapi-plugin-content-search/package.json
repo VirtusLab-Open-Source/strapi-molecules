@@ -12,10 +12,7 @@
     "build": "tsc",
     "clean": "rimraf dist coverage",
     "clean-all": "rimraf dist coverage node_modules",
-    "extract-dist-to-root": "ts-node ../../scripts/extract-dist-to-root.ts",
-    "clean-dist-from-root": "ts-node ../../scripts/clean-dist-from-root.ts",
-    "prepublishOnly": "yarn build && yarn extract-dist-to-root",
-    "postpublish": "yarn clean-dist-from-root"
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {
     "strapi-deepsearch-service": "0.3.1",

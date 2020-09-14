@@ -1,13 +1,15 @@
+import { StrapiBuilder } from "strapi-builder";
+import { StrapiGlobalComponents } from "strapi-types";
+
 const {
   isModelComponent,
   isModelComponentSearchable,
   getComponentByModel,
 } = require("../src/services/utils/component-utils.js");
-const { StrapiBuilder } = require("strapi-builder");
 
 describe("Test Deep search component utils functions", () => {
-  global.strapi = new StrapiBuilder({ query: () => {}, db: {} })
-    .addComponents({
+  global.strapi = new StrapiBuilder()
+    .addComponents(({
       "group1.component1": {
         allAttributes: {},
         options: {
@@ -20,7 +22,7 @@ describe("Test Deep search component utils functions", () => {
           searchable: false,
         },
       },
-    })
+    } as any) as StrapiGlobalComponents)
     .build();
 
   const contentTypeModel = {
@@ -76,3 +78,5 @@ describe("Test Deep search component utils functions", () => {
     );
   });
 });
+
+export {};

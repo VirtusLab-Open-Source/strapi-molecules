@@ -1,11 +1,11 @@
 const { search } = require("../src/controllers/Search");
-const { StrapiBuilder: StrapiBuilder1 } = require("strapi-builder");
+const { StrapiBuilder } = require("strapi-builder");
 
 describe("content search test", () => {
   const fetchAsyncData = jest.fn();
 
   test("search: should trigger fetchAsyncData function with [searchableComponent] and first string arguments", async () => {
-    global.strapi = new StrapiBuilder1({ query: () => {}, db: {} })
+    global.strapi = new StrapiBuilder()
       .addPlugins({
         "content-search": {
           services: {
@@ -34,7 +34,7 @@ describe("content search test", () => {
   });
 
   test("search: should trigger fetchAsyncData function with  [searchableComponent, secondSearchableComponent,thirdSearchableComponent] and second string arguments", async () => {
-    global.strapi = new StrapiBuilder1({ query: () => {}, db: {} })
+    global.strapi = new StrapiBuilder()
       .addPlugins({
         "content-search": {
           services: {
@@ -75,7 +75,7 @@ describe("content search test", () => {
   });
 
   test("search: should trigger fetchAsyncData function with [] and third string arguments", async () => {
-    global.strapi = new StrapiBuilder1({ query: () => {}, db: {} })
+    global.strapi = new StrapiBuilder()
       .addPlugins({
         "content-search": {
           services: {
@@ -102,3 +102,5 @@ describe("content search test", () => {
     expect(fetchAsyncData).toBeCalledWith([], "third");
   });
 });
+
+export {};
