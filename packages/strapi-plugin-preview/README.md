@@ -1,7 +1,8 @@
-# Strapi - Content search service (bookshelf only)
+# Strapi - Preview plugin
 
 Utilities for [Strapi Headless CMS](https://github.com/strapi/strapi) that allow
-searching across content types fields which have searchable property.
+to preview content (pointing to custom URL) and allow to create clone of
+original entry
 
 ### ⏳ Installation
 
@@ -37,9 +38,27 @@ projects**.
 
 ## Features
 
--**Create Clone (draft)** Now you will be able to clone every content type
-entry -**Preview your entry** With customised preview URI, You can preview your
-draft (entry)
+-**Create Clone (draft)** Now you will be able to clone every content type entry
+
+-**Publish Clone (draft)** When entry is clone, it could be published, which
+will overwrite original contentType record
+
+-**Preview your entry** With customised preview URI, You can preview your draft
+(entry)
+
+## Preview URL customization: Custom.js
+
+in file `/config/custom.js` need to add previewUrl field with two parameters
+like below:
+
+```json
+{
+  "previewUrl": "http://localhost:8001/preview/:contentType/:id"
+}
+```
+
+`:contentType` - will be replaced with contentType `:id` - will be replaced with
+id of contentType record
 
 ## Component model configuration
 

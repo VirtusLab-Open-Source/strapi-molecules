@@ -10,8 +10,7 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "lodash": "^4.17.12",
-    "strapi-builder": "0.2.0"
+    "lodash": "^4.17.12"
   },
   "author": {
     "name": "VirtusLab",
