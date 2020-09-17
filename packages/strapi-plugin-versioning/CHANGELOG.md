@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-versioning@0.2.0...strapi-plugin-versioning@0.2.1) (2020-09-17)
+
+
+### Bug Fixes
+
+* fix unexisting dependnecy in npm registry ([#17](https://github.com/VirtusLab/strapi-molecules/issues/17)) ([9afa2c9](https://github.com/VirtusLab/strapi-molecules/commit/9afa2c97c52c9586e842ce54f2fda105b1fe274f))
+
+
+
+
+
 # 0.2.0 (2020-09-14)
 
 
