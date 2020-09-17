@@ -24,11 +24,11 @@ module.exports = {
     );
 
     const versionsForCurrentId = versionsForCurrentContentType.filter(
-      (version) => version.entity_id == id,
+      (version) => version.entity_id === parseInt(id),
     );
 
     return versionsForCurrentId.map((el) => ({
-      content: JSON.parse(el.entity),
+      content: el.entity,
       date: el.date,
       id: el.id,
     }));

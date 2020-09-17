@@ -9,10 +9,10 @@ module.exports = {
       .createTableIfNotExists("versions", (table: Knex.TableBuilder) => {
         table.increments("id");
         table.string("content_type");
-        table.string("content");
+        table.json("content");
         table.string("date");
         table.integer("entity_id");
-        table.string("entity");
+        table.json("entity");
       })
       .then();
   },
