@@ -1,22 +1,19 @@
 import { Context } from "koa";
-import Knex from "knex";
 
 type Entity = any;
 type Data = Array<Entity>;
 
 const getModelFromCtx = (ctx: Context): string | undefined => {
-  if(ctx.params?.model) {
-    return ctx.params.model
+  if (ctx.params?.model) {
+    return ctx.params.model;
   }
   return ctx.url.split("/")[1];
-}
+};
 
 const isModelExists = (model: string | undefined): boolean => {
   if (model) {
-    return (
-      !!Object.values(global.strapi.models).find(
-        (el) => el.collectionName === model || el.uid === model,
-      )
+    return !!Object.values(global.strapi.models).find(
+      (el) => el.collectionName === model || el.uid === model,
     );
   }
   return false;
@@ -46,7 +43,7 @@ const saveDataInDB = async (
     .then();
 };
 
-const getVersionsForAllConentTypes = async (): Promise<Knex> => {
+const getVersionsForAllConentTypes = async () => {
   const knexQueryBuilder = global.strapi.connections.default("versions");
   knexQueryBuilder.select().returning("*").toString();
   return await knexQueryBuilder;
@@ -57,5 +54,5 @@ module.exports = {
   getVersionsForAllConentTypes,
   isModelExists,
   findUid,
-  getModelFromCtx
+  getModelFromCtx,
 };
