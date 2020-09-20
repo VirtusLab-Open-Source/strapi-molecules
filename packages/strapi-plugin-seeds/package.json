@@ -1,7 +1,7 @@
 {
   "name": "strapi-plugin-seeds",
   "version": "0.0.1",
-  "description": "Strapi service for DB migrations",
+  "description": "Strapi plugin for adding seeds/fixtures",
   "scripts": {
     "test": "echo \"no tests yet\"",
     "build": "tsc",
@@ -10,9 +10,7 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "lodash": "^4.17.12",
-    "strapi-builder": "0.2.0",
-    "strapi-utils": "^3.0.6"
+    "lodash": "^4.17.12"
   },
   "author": {
     "name": "VirtusLab",
