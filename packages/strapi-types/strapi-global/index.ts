@@ -8,3 +8,4 @@ export * from "./db";
 export * from "./models";
 export * from "./plugins";
 export * from "./query";
+export * from "./services";

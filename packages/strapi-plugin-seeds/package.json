@@ -1,22 +1,16 @@
 {
-  "name": "strapi-plugin-content-search",
-  "version": "0.4.0",
-  "description": "Strapi search plugin provides /search endpoint that can be used to find content type fields which contain search string",
-  "strapi": {
-    "name": "content-search",
-    "icon": "plug",
-    "description": "Search api for searchable models"
-  },
+  "name": "strapi-plugin-seeds",
+  "version": "0.0.1",
+  "description": "Strapi plugin for adding seeds/fixtures",
   "scripts": {
-    "test": "jest --coverage",
+    "test": "echo \"no tests yet\"",
     "build": "tsc",
-    "clean": "rimraf dist coverage config controllers services",
+    "clean": "rimraf dist coverage config services tsconfig.tsbuildinfo package strapi-plugin-seeds-0.0.1.tgz",
     "clean-all": "rimraf dist coverage node_modules",
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "strapi-builder": "0.2.0",
-    "strapi-deepsearch-service": "0.4.0"
+    "lodash": "^4.17.12"
   },
   "author": {
     "name": "VirtusLab",
@@ -43,5 +37,13 @@
     "node": ">=10.0.0",
     "npm": ">=6.0.0"
   },
-  "license": "MIT"
+  "keywords": [
+    "strapi",
+    "service",
+    "utils",
+    "database",
+    "seed",
+    "seed",
+    "fixtures"
+  ]
 }

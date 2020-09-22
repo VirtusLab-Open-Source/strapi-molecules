@@ -11,6 +11,7 @@ import {
   StrapiGlobalModels,
   StrapiGlobalPlugins,
   StrapiGlobalQuery,
+  StrapiGlobalServices,
 } from "./strapi-global";
 
 export class Strapi {
@@ -18,14 +19,27 @@ export class Strapi {
   plugins: StrapiGlobalPlugins = {};
   contentTypes: StrapiGlobalContentTypes = {};
   models: StrapiGlobalModels = {};
+  services: StrapiGlobalServices = {};
 
+  dir = "";
+  log = {
+    trace: console.trace,
+    debug: console.debug,
+    info: console.info,
+    warn: console.warn,
+    error: console.error,
+    fatal: console.error,
+    silent: console.log,
+  };
   config: StrapiGlobalConfig = {
     get: (_s) => {
       throw new Error("For testing purposes please mock this function");
     },
   };
   connections: StrapiGlobalConnections = {
-    default: Knex,
+    get default(): Knex {
+      throw new Error("For testing purposes please mock this function");
+    },
   };
   app: StrapiGlobalApp = {
     use: (_callback) => {
