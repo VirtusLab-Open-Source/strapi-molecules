@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-versioning",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "description": "Strapi plugin for collecting versions of content type entities",
   "scripts": {
     "test": "jest --coverage",

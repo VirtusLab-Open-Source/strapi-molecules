@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-seeds",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Strapi plugin for adding seeds/fixtures",
   "scripts": {
     "test": "echo \"no tests yet\"",
