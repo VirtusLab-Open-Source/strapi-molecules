@@ -2,7 +2,8 @@ import { SEEDS_TABLE } from "./utils";
 
 export const create = async (): Promise<void> => {
   const knex = global.strapi.connections.default;
-  if (knex.schema.hasTable(SEEDS_TABLE)) {
+  const doesSeedTableExists = await knex.schema.hasTable(SEEDS_TABLE);
+  if (doesSeedTableExists) {
     return;
   }
   return knex.schema
