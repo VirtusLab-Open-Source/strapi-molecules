@@ -60,8 +60,8 @@ module.exports = ({ env }) => ({
 });
 ```
 
-Copy / merge files from node_modules/strapi-versioning-plugin/extensions to
-extensions.
+Copy / merge files from `./node_modules/strapi-plugin-versioning/extensions` to
+`./extensions`.
 
 Also on copied content-manager extension you will be able to find file diffs
 (README.md) to compare your existing content-manager extension to ours.
