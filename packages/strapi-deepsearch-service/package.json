@@ -15,8 +15,10 @@
   },
   "dependencies": {
     "lodash": "^4.17.12",
-    "strapi-builder": "0.2.1",
     "strapi-utils": "^3.0.6"
+  },
+  "optionalDependencies": {
+    "strapi-builder": "0.2.1"
   },
   "author": {
     "name": "VirtusLab",
