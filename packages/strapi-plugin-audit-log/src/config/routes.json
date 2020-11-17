@@ -1,0 +1,21 @@
+{
+  "routes": [
+    {
+      "method": "GET",
+      "path": "/",
+      "handler": "AuditLog.getHistory",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
+      "path": "/:originId/snapshots",
+      "handler": "AuditLog.getSnapshots",
+      "config": {
+        "policies": []
+      }
+    }
+  ]
+}
+
