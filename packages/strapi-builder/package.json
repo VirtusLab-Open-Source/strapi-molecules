@@ -1,14 +1,14 @@
 {
   "name": "strapi-builder",
   "private": true,
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Strapi object builder for internal use only",
   "main": "index.ts",
   "scripts": {
     "test": "echo \"no tests yet\""
   },
   "dependencies": {
-    "strapi-types": "0.5.0"
+    "strapi-types": "0.6.0"
   },
   "author": {
     "name": "VirtusLab",

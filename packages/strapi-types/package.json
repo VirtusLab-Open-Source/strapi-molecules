@@ -1,7 +1,7 @@
 {
   "name": "strapi-types",
   "private": true,
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Strapi typings for internal use only",
   "main": "index.ts",
   "scripts": {

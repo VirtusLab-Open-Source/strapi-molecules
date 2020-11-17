@@ -1,6 +1,6 @@
 {
   "name": "strapi-deepsearch-service",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Strapi service for deep search using bookshelf (search by components)",
   "main": "src/index.ts",
   "scripts": {
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.12",
-    "strapi-builder": "0.2.1",
+    "strapi-builder": "0.2.2",
     "strapi-utils": "^3.0.6"
   },
   "author": {
