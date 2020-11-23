@@ -123,4 +123,5 @@ build
 /middlewares
 /model
 /services
-
+/admin
+/main

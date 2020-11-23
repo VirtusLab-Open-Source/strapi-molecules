@@ -9,28 +9,29 @@ import React, {
 import PropTypes from "prop-types";
 import { connect } from "react-redux";
 import { bindActionCreators, compose } from "redux";
-import { get, sortBy } from "lodash";
-import { FormattedMessage } from "react-intl";
+import { get, isEmpty, sortBy } from "lodash";
+import { FormattedMessage, useIntl } from "react-intl";
 import { useLocation } from "react-router-dom";
 import { Header } from "@buffetjs/custom";
 import {
   PopUpWarning,
   generateFiltersFromSearch,
-  useGlobalContext,
   request,
   CheckPermissions,
   useUserPermissions,
   useQuery,
 } from "strapi-helper-plugin";
+import { shouldAddCloneHeader, getCloneHeader } from "strapi-plugin-preview";
 import pluginId from "../../pluginId";
 import pluginPermissions from "../../permissions";
-import { generatePermissionsObject, getRequestUrl } from "../../utils";
+import { generatePermissionsObject, getRequestUrl, getTrad } from "../../utils";
 
 import DisplayedFieldsDropdown from "../../components/DisplayedFieldsDropdown";
 import Container from "../../components/Container";
 import CustomTable from "../../components/CustomTable";
 import FilterPicker from "../../components/FilterPicker";
 import Search from "../../components/Search";
+import State from "../../components/State";
 import ListViewProvider from "../ListViewProvider";
 import { onChangeListLabels, resetListLabels } from "../Main/actions";
 import { AddFilterCta, FilterIcon, Wrapper } from "./components";
@@ -92,7 +93,7 @@ function ListView({
   const query = useQuery();
   const { search } = useLocation();
   const isFirstRender = useRef(true);
-  const { formatMessage } = useGlobalContext();
+  const { formatMessage } = useIntl();
 
   const [isLabelPickerOpen, setLabelPickerState] = useState(false);
   const [isFilterPickerOpen, setFilterPickerState] = useState(false);
@@ -100,6 +101,13 @@ function ListView({
   const contentTypePath = useMemo(() => {
     return [slug, "contentType"];
   }, [slug]);
+  const hasDraftAndPublish = useMemo(() => {
+    return get(
+      layouts,
+      [...contentTypePath, "schema", "options", "draftAndPublish"],
+      false,
+    );
+  }, [contentTypePath, layouts]);
 
   const getLayoutSetting = useCallback(
     (settingName) => {
@@ -188,7 +196,10 @@ function ListView({
 
       getDataSucceededRef.current(count, data);
     } catch (err) {
-      strapi.notification.error(`${pluginId}.error.model.fetch`);
+      strapi.notification.toggle({
+        type: "warning",
+        message: { id: `${pluginId}.error.model.fetch` },
+      });
     }
   };
 
@@ -211,29 +222,41 @@ function ListView({
     return get(listSchema, ["info", "name"], "");
   }, [listSchema]);
 
-  // MODYFIED START ----------------
-  const _tableHeaders = useMemo(() => {
-    return listLayout.map((label) => {
+  const tableHeaders = useMemo(() => {
+    let headers = listLayout.map((label) => {
       return { ...getMetaDatas([label, "list"]), name: label };
     });
-  }, [getMetaDatas, listLayout]);
-  const includesCloneOf = useMemo(() => {
-    const { options, attributes } = layouts[slug].contentType.schema;
-    return options.previewable && !!attributes.cloneOf;
-  });
-  const tableHeaders = includesCloneOf
-    ? [
-        {
-          label: "Clone",
-          name: "cloneOf",
-          searchable: true,
-          sortable: true,
-        },
-        ..._tableHeaders,
-      ]
-    : _tableHeaders;
 
-  // MODYFIED END ------------------
+    if (hasDraftAndPublish) {
+      headers.push({
+        label: formatMessage({
+          id: getTrad("containers.ListPage.table-headers.published_at"),
+        }),
+        searchable: false,
+        sortable: true,
+        name: "published_at",
+        key: "__published_at__",
+        cellFormatter: (cellData) => {
+          const isPublished = !isEmpty(cellData.published_at);
+
+          return <State isPublished={isPublished} />;
+        },
+      });
+    }
+    if (shouldAddCloneHeader(layouts[slug])) {
+      headers.unshift(getCloneHeader(formatMessage));
+    }
+
+    return headers;
+  }, [
+    formatMessage,
+    getMetaDatas,
+    hasDraftAndPublish,
+    listLayout,
+    slug,
+    layouts,
+  ]);
+
   const getFirstSortableElement = useCallback(
     (name = "") => {
       return get(
@@ -248,8 +271,10 @@ function ListView({
   );
 
   const allLabels = useMemo(() => {
+    const filteredMetadatas = getMetaDatas();
+
     return sortBy(
-      Object.keys(getMetaDatas())
+      Object.keys(filteredMetadatas)
         .filter(
           (key) =>
             ![
@@ -302,18 +327,33 @@ function ListView({
 
   const handleConfirmDeleteData = useCallback(async () => {
     try {
-      emitEvent("willDeleteEntry");
+      let trackerProperty = {};
+
+      if (hasDraftAndPublish) {
+        const dataToDelete = data.find(
+          (obj) => obj.id.toString() === idToDelete.toString(),
+        );
+        const isDraftEntry = isEmpty(dataToDelete.published_at);
+        const status = isDraftEntry ? "draft" : "published";
+
+        trackerProperty = { status };
+      }
+
+      emitEvent("willDeleteEntry", trackerProperty);
       setModalLoadingState();
 
       await request(getRequestUrl(`explorer/${slug}/${idToDelete}`), {
         method: "DELETE",
       });
 
-      strapi.notification.success(`${pluginId}.success.record.delete`);
+      strapi.notification.toggle({
+        type: "success",
+        message: { id: `${pluginId}.success.record.delete` },
+      });
 
       // Close the modal and refetch data
       onDeleteDataSucceeded();
-      emitEvent("didDeleteEntry");
+      emitEvent("didDeleteEntry", trackerProperty);
     } catch (err) {
       const errorMessage = get(
         err,
@@ -321,12 +361,22 @@ function ListView({
         formatMessage({ id: `${pluginId}.error.record.delete` }),
       );
 
-      strapi.notification.error(errorMessage);
+      strapi.notification.toggle({
+        type: "warning",
+        message: errorMessage,
+      });
       // Close the modal
       onDeleteDataError();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [setModalLoadingState, slug, idToDelete, onDeleteDataSucceeded]);
+  }, [
+    setModalLoadingState,
+    slug,
+    idToDelete,
+    onDeleteDataSucceeded,
+    hasDraftAndPublish,
+    data,
+  ]);
 
   const handleConfirmDeleteAllData = useCallback(async () => {
     const params = Object.assign(entriesToDelete);
@@ -341,7 +391,10 @@ function ListView({
 
       onDeleteSeveralDataSucceeded();
     } catch (err) {
-      strapi.notification.error(`${pluginId}.error.record.delete`);
+      strapi.notification.toggle({
+        type: "warning",
+        message: { id: `${pluginId}.error.record.delete` },
+      });
     }
   }, [
     entriesToDelete,
@@ -355,9 +408,10 @@ function ListView({
 
     // Display a notification if trying to remove the last displayed field
     if (value && listLayout.length === 1) {
-      strapi.notification.error(
-        "content-manager.notification.error.displayedFields",
-      );
+      strapi.notification.toggle({
+        type: "warning",
+        message: { id: "content-manager.notification.error.displayedFields" },
+      });
 
       return;
     }
@@ -485,7 +539,11 @@ function ListView({
             },
           ),
           onClick: () => {
-            emitEvent("willCreateEntry");
+            const trackerProperty = hasDraftAndPublish
+              ? { status: "draft" }
+              : {};
+
+            emitEvent("willCreateEntry", trackerProperty);
             push({
               pathname: `${pathname}/create`,
             });
@@ -502,7 +560,7 @@ function ListView({
       ];
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [label, pathname, search, canCreate, formatMessage],
+    [label, pathname, search, canCreate, formatMessage, hasDraftAndPublish],
   );
 
   const headerProps = useMemo(() => {
@@ -642,10 +700,7 @@ function ListView({
           isOpen={showWarningDelete}
           toggleModal={toggleModalDelete}
           content={{
-            title: `${pluginId}.popUpWarning.title`,
-            message: `${pluginId}.popUpWarning.bodyMessage.contentType.delete`,
-            cancel: `${pluginId}.popUpWarning.button.cancel`,
-            confirm: `${pluginId}.popUpWarning.button.confirm`,
+            message: getTrad("popUpWarning.bodyMessage.contentType.delete"),
           }}
           onConfirm={handleConfirmDeleteData}
           popUpWarningType="danger"
@@ -656,12 +711,11 @@ function ListView({
           isOpen={showWarningDeleteAll}
           toggleModal={toggleModalDeleteAll}
           content={{
-            title: `${pluginId}.popUpWarning.title`,
-            message: `${pluginId}.popUpWarning.bodyMessage.contentType.delete${
-              entriesToDelete.length > 1 ? ".all" : ""
-            }`,
-            cancel: `${pluginId}.popUpWarning.button.cancel`,
-            confirm: `${pluginId}.popUpWarning.button.confirm`,
+            message: getTrad(
+              `popUpWarning.bodyMessage.contentType.delete${
+                entriesToDelete.length > 1 ? ".all" : ""
+              }`,
+            ),
           }}
           popUpWarningType="danger"
           onConfirm={handleConfirmDeleteAllData}
