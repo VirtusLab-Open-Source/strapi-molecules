@@ -1,8 +1,8 @@
-import pluginPkg from "../../package.json";
-import pluginId from "./pluginId";
-import trads from "./translations";
-import Initializer from "./containers/Initializer";
-import { noop } from "lodash";
+import pluginPkg from '../../package.json';
+import pluginId from './pluginId';
+import trads from './translations';
+import Initializer from './containers/Initializer';
+import { noop } from 'lodash';
 
 export default (strapi) => {
   const pluginDescription =

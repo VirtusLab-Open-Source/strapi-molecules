@@ -1,9 +1,9 @@
-import PropTypes from "prop-types";
-import React from "react";
-import { useIntl } from "react-intl";
-import styled from "styled-components";
+import PropTypes from 'prop-types';
+import React from 'react';
+import { useIntl } from 'react-intl';
+import styled from 'styled-components';
 
-import { Text } from "@buffetjs/core";
+import { Text } from '@buffetjs/core';
 
 const Wrapper = styled.div`
   display: flex;
@@ -26,14 +26,14 @@ export const CloneBadge = ({ isClone }) => {
   const { formatMessage } = useIntl();
 
   if (!isClone) {
-    return "-";
+    return '-';
   }
 
   return (
     <Wrapper>
       <Text lineHeight="19px">
         {formatMessage({
-          id: "preview.containers.List.clone",
+          id: 'preview.containers.List.clone',
         })}
       </Text>
     </Wrapper>

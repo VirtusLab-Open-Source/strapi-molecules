@@ -1,17 +1,17 @@
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 import React, {
   useState,
   useEffect,
   useMemo,
   useContext,
   createContext,
-} from "react";
-import { useIntl } from "react-intl";
-import { request, PopUpWarning } from "strapi-helper-plugin";
+} from 'react';
+import { useIntl } from 'react-intl';
+import { request, PopUpWarning } from 'strapi-helper-plugin';
 
-import { get, isEmpty, isEqual } from "lodash";
+import { get, isEmpty, isEqual } from 'lodash';
 
-const CONTENT_MANAGER_PLUGIN_ID = "content-manager";
+const CONTENT_MANAGER_PLUGIN_ID = 'content-manager';
 
 const PreviewContext = createContext(undefined);
 
@@ -38,7 +38,7 @@ export const PreviewProvider = ({
 
   useEffect(() => {
     request(`/preview/is-previewable/${layout.apiID}`, {
-      method: "GET",
+      method: 'GET',
     }).then(({ isPreviewable }) => {
       setIsPreviewable(isPreviewable);
     });
@@ -61,20 +61,20 @@ export const PreviewProvider = ({
       headerActions.push({
         disabled: didChangeData,
         label: formatMessage({
-          id: getPreviewPluginTrad("containers.Edit.preview"),
+          id: getPreviewPluginTrad('containers.Edit.preview'),
         }),
-        color: "secondary",
+        color: 'secondary',
         onClick: async () => {
           await request(
             `/preview/preview-url/${layout.apiID}/${initialData.id}`,
             {
-              method: "GET",
+              method: 'GET',
             },
           ).then((data) => {
-            window.open(data.url, "_blank");
+            window.open(data.url, '_blank');
           });
         },
-        type: "button",
+        type: 'button',
         style: {
           paddingLeft: 15,
           paddingRight: 15,
@@ -86,13 +86,13 @@ export const PreviewProvider = ({
         headerActions.push({
           disabled: didChangeData,
           label: formatMessage({
-            id: getPreviewPluginTrad("containers.Edit.publish"),
+            id: getPreviewPluginTrad('containers.Edit.publish'),
           }),
-          color: "primary",
+          color: 'primary',
           onClick: async () => {
             toggleWarningPublish();
           },
-          type: "button",
+          type: 'button',
           style: {
             paddingLeft: 15,
             paddingRight: 15,
@@ -103,11 +103,11 @@ export const PreviewProvider = ({
         headerActions.push({
           disabled: didChangeData,
           label: formatMessage({
-            id: getPreviewPluginTrad("containers.Edit.clone"),
+            id: getPreviewPluginTrad('containers.Edit.clone'),
           }),
-          color: "secondary",
+          color: 'secondary',
           onClick: toggleWarningClone,
-          type: "button",
+          type: 'button',
           style: {
             paddingLeft: 15,
             paddingRight: 15,
@@ -135,7 +135,7 @@ export const PreviewProvider = ({
       // Show the loading state
       setButtonLoading(true);
       const clonedPayload = await request(getRequestUrl(slug), {
-        method: "POST",
+        method: 'POST',
         body: {
           ...initialData,
           cloneOf: initialData.id,
@@ -146,14 +146,14 @@ export const PreviewProvider = ({
         },
       });
 
-      strapi.notification.success(getPreviewPluginTrad("success.record.clone"));
+      strapi.notification.success(getPreviewPluginTrad('success.record.clone'));
 
       window.location.replace(getFrontendEntityUrl(slug, clonedPayload.id));
     } catch (err) {
       const errorMessage = get(
         err,
-        "response.payload.message",
-        formatMessage({ id: getPreviewPluginTrad("error.record.clone") }),
+        'response.payload.message',
+        formatMessage({ id: getPreviewPluginTrad('error.record.clone') }),
       );
       strapi.notification.error(errorMessage);
     } finally {
@@ -175,22 +175,22 @@ export const PreviewProvider = ({
       });
 
       await request(`${urlPart}/${targetId}`, {
-        method: "PUT",
+        method: 'PUT',
         body,
       });
       await request(`${urlPart}/${initialData.id}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
 
       strapi.notification.success(
-        getPreviewPluginTrad("success.record.publish"),
+        getPreviewPluginTrad('success.record.publish'),
       );
       window.location.replace(getFrontendEntityUrl(slug, targetId));
     } catch (err) {
       const errorMessage = get(
         err,
-        "response.payload.message",
-        formatMessage({ id: getPreviewPluginTrad("error.record.publish") }),
+        'response.payload.message',
+        formatMessage({ id: getPreviewPluginTrad('error.record.publish') }),
       );
       strapi.notification.error(errorMessage);
     } finally {
@@ -213,9 +213,9 @@ export const PreviewProvider = ({
           isOpen={showWarningClone}
           toggleModal={toggleWarningClone}
           content={{
-            message: getPreviewPluginTrad("popUpWarning.warning.clone"),
+            message: getPreviewPluginTrad('popUpWarning.warning.clone'),
             secondMessage: getPreviewPluginTrad(
-              "popUpWarning.warning.clone-question",
+              'popUpWarning.warning.clone-question',
             ),
           }}
           popUpWarningType="info"
@@ -228,9 +228,9 @@ export const PreviewProvider = ({
           isOpen={showWarningPublish}
           toggleModal={toggleWarningPublish}
           content={{
-            message: getPreviewPluginTrad("popUpWarning.warning.publish"),
+            message: getPreviewPluginTrad('popUpWarning.warning.publish'),
             secondMessage: getPreviewPluginTrad(
-              "popUpWarning.warning.publish-question",
+              'popUpWarning.warning.publish-question',
             ),
           }}
           popUpWarningType="info"
@@ -246,7 +246,7 @@ export const usePreview = () => {
   const context = useContext(PreviewContext);
 
   if (context === undefined) {
-    throw new Error("usePreview must be used within a PreviewProvider");
+    throw new Error('usePreview must be used within a PreviewProvider');
   }
 
   return context;
@@ -263,7 +263,7 @@ function prepareToPublish(payload) {
     payload.forEach(prepareToPublish);
   } else if (payload && payload.constructor === Object) {
     // eslint-disable-next-line no-prototype-builtins
-    if (payload.hasOwnProperty("__component")) {
+    if (payload.hasOwnProperty('__component')) {
       delete payload.id;
     }
     Object.values(payload).forEach(prepareToPublish);
