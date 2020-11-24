@@ -13,14 +13,13 @@ const Wrapper = styled.div`
   padding: 1rem;
   border-radius: 0.2rem;
   height: 2.5rem;
-  ${({ theme }) =>
-    `
-      border: 1px solid #82b3c9;
-      background-color: #e1f5fe;
-      ${Text} {
-          font-weight: ${theme.main.fontWeights.bold};
-      }
-    `};
+  ${({ theme }) => `
+    border: 1px solid #82b3c9;
+    background-color: #e1f5fe;
+    ${Text} {
+        font-weight: ${theme.main.fontWeights.bold};
+    }
+  `};
 `;
 
 export const CloneBadge = ({ isClone }) => {

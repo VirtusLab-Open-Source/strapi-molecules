@@ -2,6 +2,7 @@ import pluginPkg from "../../package.json";
 import pluginId from "./pluginId";
 import trads from "./translations";
 import Initializer from "./containers/Initializer";
+import { noop } from "lodash";
 
 export default (strapi) => {
   const pluginDescription =
@@ -19,7 +20,7 @@ export default (strapi) => {
     isReady: false,
     isRequired: pluginPkg.strapi.required || false,
     layout: null,
-    lifecycles: () => {},
+    lifecycles: noop,
     leftMenuLinks: [],
     leftMenuSections: [],
     mainComponent: null,
