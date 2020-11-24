@@ -1,10 +1,10 @@
-import React, { memo, useCallback, useMemo, useRef, useState } from "react";
-import { useIntl } from "react-intl";
-import { Header as PluginHeader } from "@buffetjs/custom";
-import { get, isEqual, isEmpty, toString } from "lodash";
-import PropTypes from "prop-types";
-import isEqualFastCompare from "react-fast-compare";
-import { Button, Text, Padded } from "@buffetjs/core";
+import React, { memo, useCallback, useMemo, useRef, useState } from 'react';
+import { useIntl } from 'react-intl';
+import { Header as PluginHeader } from '@buffetjs/custom';
+import { get, isEqual, isEmpty, toString } from 'lodash';
+import PropTypes from 'prop-types';
+import isEqualFastCompare from 'react-fast-compare';
+import { Button, Text, Padded } from '@buffetjs/core';
 import {
   PopUpWarning,
   templateObject,
@@ -13,14 +13,14 @@ import {
   PopUpWarningHeader,
   PopUpWarningIcon,
   PopUpWarningModal,
-} from "strapi-helper-plugin";
-import { usePreview } from "strapi-plugin-preview";
-import { getTrad } from "../../../utils";
-import { connect, getDraftRelations, select } from "./utils";
+} from 'strapi-helper-plugin';
+import { usePreview } from 'strapi-plugin-preview';
+import { getTrad } from '../../../utils';
+import { connect, getDraftRelations, select } from './utils';
 
 const primaryButtonObject = {
-  color: "primary",
-  type: "button",
+  color: 'primary',
+  type: 'button',
   style: {
     minWidth: 150,
     fontWeight: 600,
@@ -47,36 +47,26 @@ const Header = ({
   const { formatMessage } = useIntl();
   const formatMessageRef = useRef(formatMessage);
   const [draftRelationsCount, setDraftRelationsCount] = useState(0);
-  const [showWarningDraftRelation, setShowWarningDraftRelation] = useState(
-    false,
-  );
+  const [showWarningDraftRelation, setShowWarningDraftRelation] = useState(false);
   const [shouldUnpublish, setShouldUnpublish] = useState(false);
   const [shouldPublish, setShouldPublish] = useState(false);
 
-  const currentContentTypeMainField = useMemo(
-    () => get(layout, ["settings", "mainField"], "id"),
-    [layout],
-  );
-  const currentContentTypeName = useMemo(
-    () => get(layout, ["schema", "info", "name"]),
-    [layout],
-  );
+  const currentContentTypeMainField = useMemo(() => get(layout, ['settings', 'mainField'], 'id'), [
+    layout,
+  ]);
+  const currentContentTypeName = useMemo(() => get(layout, ['schema', 'info', 'name']), [layout]);
 
   const didChangeData = useMemo(() => {
-    return (
-      !isEqual(initialData, modifiedData) ||
-      (isCreatingEntry && !isEmpty(modifiedData))
-    );
+    return !isEqual(initialData, modifiedData) || (isCreatingEntry && !isEmpty(modifiedData));
   }, [initialData, isCreatingEntry, modifiedData]);
   const apiID = useMemo(() => layout.apiID, [layout.apiID]);
 
   /* eslint-disable indent */
   const entryHeaderTitle = isCreatingEntry
     ? formatMessage({
-        id: getTrad("containers.Edit.pluginHeader.title.new"),
-      })
-    : templateObject({ mainField: currentContentTypeMainField }, initialData)
-        .mainField;
+      id: getTrad('containers.Edit.pluginHeader.title.new'),
+    })
+    : templateObject({ mainField: currentContentTypeMainField }, initialData).mainField;
   /* eslint-enable indent */
 
   const headerTitle = useMemo(() => {
@@ -100,12 +90,12 @@ const Header = ({
       headerActions = [
         {
           disabled: !didChangeData,
-          color: "success",
+          color: 'success',
           label: formatMessage({
-            id: getTrad("containers.Edit.submit"),
+            id: getTrad('containers.Edit.submit'),
           }),
-          isLoading: status === "submit-pending",
-          type: "submit",
+          isLoading: status === 'submit-pending',
+          type: 'submit',
           style: {
             minWidth: 150,
             fontWeight: 600,
@@ -116,20 +106,18 @@ const Header = ({
 
     if (hasDraftAndPublish && canPublish) {
       const isPublished = !isEmpty(initialData.published_at);
-      const isLoading = isPublished
-        ? status === "unpublish-pending"
-        : status === "publish-pending";
-      const labelID = isPublished ? "app.utils.unpublish" : "app.utils.publish";
+      const isLoading = isPublished ? status === 'unpublish-pending' : status === 'publish-pending';
+      const labelID = isPublished ? 'app.utils.unpublish' : 'app.utils.publish';
       /* eslint-disable indent */
       const onClick = isPublished
         ? () => setWarningUnpublish(true)
-        : (e) => {
-            if (!checkIfHasDraftRelations()) {
-              onPublish(e);
-            } else {
-              setShowWarningDraftRelation(true);
-            }
-          };
+        : e => {
+          if (!checkIfHasDraftRelations()) {
+            onPublish(e);
+          } else {
+            setShowWarningDraftRelation(true);
+          }
+        };
       /* eslint-enable indent */
 
       const action = {
@@ -164,18 +152,15 @@ const Header = ({
       title: {
         label: toString(headerTitle),
       },
-      content: `${formatMessageRef.current({
-        id: getTrad("api.id"),
-      })} : ${apiID}`,
+      content: `${formatMessageRef.current({ id: getTrad('api.id') })} : ${apiID}`,
       actions: headerActions,
     };
   }, [headerActions, headerTitle, apiID]);
 
-  const toggleWarningPublish = () =>
-    setWarningUnpublish((prevState) => !prevState);
+  const toggleWarningPublish = () => setWarningUnpublish(prevState => !prevState);
 
   const toggleWarningDraftRelation = useCallback(() => {
-    setShowWarningDraftRelation((prev) => !prev);
+    setShowWarningDraftRelation(prev => !prev);
   }, []);
 
   const handleConfirmPublish = useCallback(() => {
@@ -189,51 +174,51 @@ const Header = ({
   }, []);
 
   const handleCloseModalPublish = useCallback(
-    (e) => {
+    e => {
       if (shouldPublish) {
         onPublish(e);
       }
 
       setShouldUnpublish(false);
     },
-    [onPublish, shouldPublish],
+    [onPublish, shouldPublish]
   );
 
   const handleCloseModalUnpublish = useCallback(
-    (e) => {
+    e => {
       if (shouldUnpublish) {
         onUnpublish(e);
       }
 
       setShouldUnpublish(false);
     },
-    [onUnpublish, shouldUnpublish],
+    [onUnpublish, shouldUnpublish]
   );
 
   const boldText = formatMessage(
     {
       id: getTrad(
         `popUpwarning.warning.has-draft-relations.message.bold-text.${
-          draftRelationsCount > 1 ? "plural" : "singular"
-        }`,
+          draftRelationsCount > 1 ? 'plural' : 'singular'
+        }`
       ),
     },
-    { count: draftRelationsCount },
+    { count: draftRelationsCount }
   );
 
   const buttonCancelLabel = useMemo(
     () =>
       formatMessage({
-        id: "components.popUpWarning.button.cancel",
+        id: 'components.popUpWarning.button.cancel',
       }),
-    [formatMessage],
+    [formatMessage]
   );
   const buttonConfirmLabel = useMemo(
     () =>
       formatMessage({
-        id: getTrad("popUpwarning.warning.has-draft-relations.button-confirm"),
+        id: getTrad('popUpwarning.warning.has-draft-relations.button-confirm'),
       }),
-    [formatMessage],
+    [formatMessage]
   );
 
   return (
@@ -243,8 +228,8 @@ const Header = ({
         isOpen={showWarningUnpublish}
         toggleModal={toggleWarningPublish}
         content={{
-          message: getTrad("popUpWarning.warning.unpublish"),
-          secondMessage: getTrad("popUpWarning.warning.unpublish-question"),
+          message: getTrad('popUpWarning.warning.unpublish'),
+          secondMessage: getTrad('popUpWarning.warning.unpublish-question'),
         }}
         popUpWarningType="danger"
         onConfirm={handleConfirmUnpublish}
@@ -266,24 +251,16 @@ const Header = ({
               {boldText}&nbsp;
             </Text>
             {formatMessage({
-              id: getTrad(
-                "popUpwarning.warning.has-draft-relations.first-message",
-              ),
+              id: getTrad('popUpwarning.warning.has-draft-relations.first-message'),
             })}
           </Text>
           <Text lineHeight="18px">
             {formatMessage({
-              id: getTrad(
-                "popUpwarning.warning.has-draft-relations.second-message",
-              ),
+              id: getTrad('popUpwarning.warning.has-draft-relations.second-message'),
             })}
           </Text>
           <Padded top size="smd">
-            <Text>
-              {formatMessage({
-                id: getTrad("popUpWarning.warning.publish-question"),
-              })}
-            </Text>
+            <Text>{formatMessage({ id: getTrad('popUpWarning.warning.publish-question') })}</Text>
           </Padded>
         </PopUpWarningBody>
         <PopUpWarningFooter>
