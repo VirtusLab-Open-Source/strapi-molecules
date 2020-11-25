@@ -1,0 +1,54 @@
+{
+  "kind": "collectionType",
+  "collectionName": "audit_logs",
+  "info": {
+    "name": "audit-logs"
+  },
+  "options": {
+    "timestamps": false,
+    "isManaged": false
+  },
+  "attributes": {
+    "origin_id": {
+      "type": "string",
+      "required": true,
+      "configurable": false
+    },
+    "model_name": {
+      "type": "string",
+      "required": true,
+      "configurable": false
+    },
+    "action": {
+      "type": "enumeration",
+      "enum": [
+        "CREATE",
+        "UPDATE",
+        "DELETE",
+        "UPDATE_REMOVE",
+        "REMOVE_UPDATE",
+        "UPDATE_CREATE",
+        "CREATE_UPDATE",
+        "CREATE_REMOVE",
+        "REMOVE_CREATE",
+        "CREATE_UPDATE_REMOVE",
+        "CREATE_REMOVE_UPDATE",
+        "UPDATE_CREATE_REMOVE",
+        "UPDATE_REMOVE_CREATE",
+        "REMOVE_UPDATE_CREATE",
+        "REMOVE_CREATE_UPDATE"
+      ],
+      "required": true,
+      "configurable": false
+    },
+    "content": {
+      "type": "json",
+      "required": true,
+      "configurable": false
+    },
+    "timestamp": {
+      "type": "currentTimestamp",
+      "configurable": false
+    }
+  }
+}

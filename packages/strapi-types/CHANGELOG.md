@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/VirtusLab/strapi-molecules/compare/strapi-types@0.5.0...strapi-types@0.6.0) (2020-11-17)
+
+
+### Bug Fixes
+
+* **strapi-types:** update readme ([#22](https://github.com/VirtusLab/strapi-molecules/issues/22)) ([#25](https://github.com/VirtusLab/strapi-molecules/issues/25)) ([d2504fe](https://github.com/VirtusLab/strapi-molecules/commit/d2504fe9121ac7aecd3fb7a4b9e4fb828343a950))
+
+
+### Features
+
+* audit log ([#26](https://github.com/VirtusLab/strapi-molecules/issues/26)) ([4ca548d](https://github.com/VirtusLab/strapi-molecules/commit/4ca548d18deaa6cdea82beb077c696d6cf134562))
+
+
+
+
+
 # [0.5.0](https://github.com/VirtusLab/strapi-molecules/compare/strapi-types@0.4.0...strapi-types@0.5.0) (2020-09-22)
 
 

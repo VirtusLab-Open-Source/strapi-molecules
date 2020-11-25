@@ -1,0 +1,13 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": ".",
+    "target": "es5",
+    "sourceRoot": "./src"
+  },
+  "include": [
+    "../../external-types/*",
+    "src/**/*",
+    "src/**/*.json"
+  ]
+}

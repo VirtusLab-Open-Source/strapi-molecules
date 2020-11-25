@@ -12,7 +12,8 @@ import {
   StrapiGlobalPlugins,
   StrapiGlobalQuery,
   StrapiGlobalServices,
-} from "./strapi-global";
+} from './strapi-global';
+import { EntityService } from './strapi-global/entity-service';
 
 export class Strapi {
   components: StrapiGlobalComponents = {};
@@ -20,8 +21,9 @@ export class Strapi {
   contentTypes: StrapiGlobalContentTypes = {};
   models: StrapiGlobalModels = {};
   services: StrapiGlobalServices = {};
+  entityService: Partial<EntityService> = {};
 
-  dir = "";
+  dir = '';
   log = {
     trace: console.trace,
     debug: console.debug,
@@ -33,7 +35,11 @@ export class Strapi {
   };
   config: StrapiGlobalConfig = {
     get: (_s) => {
-      throw new Error("For testing purposes please mock this function");
+      throw new Error('For testing purposes please mock this function');
+    },
+    middleware: {
+      settings: {},
+      timeout: 0,
     },
   };
   connections: StrapiGlobalConnections = {
