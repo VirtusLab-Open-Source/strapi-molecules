@@ -1,22 +1,22 @@
-import { StrapiBuilder } from "strapi-builder";
-import { StrapiGlobalComponents } from "strapi-types";
+import { StrapiBuilder } from 'strapi-builder';
+import { StrapiGlobalComponents } from 'strapi-types';
 
 const {
   isModelComponent,
   isModelComponentSearchable,
   getComponentByModel,
-} = require("../src/services/utils/component-utils.js");
+} = require('../src/services/utils/component-utils');
 
-describe("Test Deep search component utils functions", () => {
+describe('Test Deep search component utils functions', () => {
   global.strapi = new StrapiBuilder()
     .addComponents(({
-      "group1.component1": {
+      'group1.component1': {
         allAttributes: {},
         options: {
           searchable: true,
         },
       },
-      "group2.component1": {
+      'group2.component1': {
         allAttributes: {},
         options: {
           searchable: false,
