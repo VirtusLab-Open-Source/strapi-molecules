@@ -4,9 +4,17 @@
   "description": "Strapi - Preview plugin",
   "strapi": {
     "name": "Preview",
-    "icon": "preview",
+    "icon": "eye",
     "description": "Content preview plugin"
   },
+  "main": "admin/main/index.js",
+  "files": [
+    "admin",
+    "config",
+    "controllers",
+    "services",
+    "README-EXTENSIONS.md"
+  ],
   "scripts": {
     "build": "tsc",
     "clean": "rimraf dist coverage",

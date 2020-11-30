@@ -1,0 +1,18 @@
+{
+  "containers.Edit.clone": "Sklonuj",
+  "containers.Edit.preview": "Podgląd",
+  "containers.Edit.publish": "Opublikuj",
+
+  "containers.List.clone": "Kopia",
+  "containers.List.state": "Status",
+
+  "success.record.clone": "Sklonowano",
+  "error.record.clone": "Wystąpił błąd podczas klonowania.",
+  "success.record.publish": "Opublikowano",
+  "error.record.publish": "Wystąpił błąd podczas publikowania.",
+
+  "popUpWarning.warning.clone": "Klonowanie stworzy nową kopię z dokładnie tymi samymi wartościami.",
+  "popUpWarning.warning.clone-question": "Czy na pewno chcesz sklonować ten wpis?",
+  "popUpWarning.warning.publish": "Publikowanie nadpisze poprzednio sklonowany wpis (zmiany będą widoczne w oryginalnym wpisie)",
+  "popUpWarning.warning.publish-question": "Czy na pewno chcesz opublikować ten wpis?"
+}

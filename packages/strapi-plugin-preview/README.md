@@ -27,8 +27,7 @@ Requirements</a>.
 
 **Supported Strapi versions**:
 
-- Strapi v3.1.4 (recently tested)
-- Strapi v3.x
+- Strapi v3.3.3 (recently tested)
 
 (This plugin may work with the older Strapi versions, but these are not tested
 nor officially supported at this time.)
