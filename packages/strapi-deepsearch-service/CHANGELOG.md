@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.3](https://github.com/VirtusLab/strapi-molecules/compare/strapi-deepsearch-service@0.4.2...strapi-deepsearch-service@0.4.3) (2020-11-30)
+
+
+### Bug Fixes
+
+* move strapi-builder to optional dependencies ([#28](https://github.com/VirtusLab/strapi-molecules/issues/28)) ([b398ecd](https://github.com/VirtusLab/strapi-molecules/commit/b398ecde89441540988cc24aeb02106e89e36c92))
+* remove internal dependencies ([ebe3e58](https://github.com/VirtusLab/strapi-molecules/commit/ebe3e58b4d681a9926faa064b0b30b4b49b3cc6b))
+
+
+
+
+
 ## [0.4.2](https://github.com/VirtusLab/strapi-molecules/compare/strapi-deepsearch-service@0.4.1...strapi-deepsearch-service@0.4.2) (2020-11-17)
 
 **Note:** Version bump only for package strapi-deepsearch-service
