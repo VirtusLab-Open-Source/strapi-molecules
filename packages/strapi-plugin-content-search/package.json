@@ -15,7 +15,6 @@
     "prepublishOnly": "yarn build"
   },
   "dependencies": {
-    "strapi-builder": "0.2.2",
     "strapi-deepsearch-service": "0.4.2"
   },
   "author": {
