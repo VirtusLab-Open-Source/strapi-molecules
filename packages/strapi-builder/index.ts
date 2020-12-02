@@ -10,7 +10,7 @@ import {
   StrapiGlobalModels,
   StrapiGlobalPlugins,
   StrapiGlobalQuery,
-} from "strapi-types";
+} from 'strapi-types';
 
 export class StrapiBuilder {
   strapi = new Strapi();
@@ -43,6 +43,14 @@ export class StrapiBuilder {
     this.strapi.plugins = {
       ...this.strapi.plugins,
       ...plugins,
+    };
+    return this;
+  };
+
+  addPluginConfig = (config: { [key: string]: any }) => {
+    this.strapi.config.plugins = {
+      ...this.strapi.config.plugins,
+      ...config,
     };
     return this;
   };

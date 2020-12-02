@@ -1,10 +1,10 @@
-import _ from "lodash";
-import { convertRestQueryParams } from "strapi-utils";
+import _ from 'lodash';
+import { convertRestQueryParams } from 'strapi-utils';
 import {
   buildDeepSearchCount,
   buildDeepSearch,
-} from "./utils/build-deep-query";
-import { buildQuery } from "./utils/build-query";
+} from './utils/build-deep-query';
+import { buildQuery } from './utils/build-query';
 
 /**
  * Find multiple entries based on params
@@ -44,7 +44,7 @@ export const count = async (model, params = {}) => {
  * @returns {Promise<any>}
  */
 export const search = async (model, params, populate) => {
-  const filters = convertRestQueryParams(_.omit(params, "_q"));
+  const filters = convertRestQueryParams(_.omit(params, '_q'));
 
   return model
     .query((qb) => {
@@ -63,7 +63,7 @@ export const search = async (model, params, populate) => {
  * @returns {Promise<number>}
  */
 export const countSearch = async (model, params) => {
-  const filters = convertRestQueryParams(_.omit(params, "_q"));
+  const filters = convertRestQueryParams(_.omit(params, '_q'));
   return model
     .query(buildDeepSearchCount({ model }))
     .query(buildDeepSearch({ model, params }))

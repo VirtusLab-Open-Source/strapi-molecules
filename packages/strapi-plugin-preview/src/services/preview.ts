@@ -1,7 +1,7 @@
-"use strict";
-const { sanitizeEntity } = require("strapi-utils");
+'use strict';
+const { sanitizeEntity } = require('strapi-utils');
 
-const PreviewError = require("./preview-error");
+const PreviewError = require('./preview-error');
 
 const getTemplateComponentFromTemplate = (
   template: { __component: string }[],
@@ -10,7 +10,7 @@ const getTemplateComponentFromTemplate = (
     const componentName = template[0].__component;
     return global.strapi.components[componentName];
   }
-  throw new PreviewError(400, "Template field is incompatible");
+  throw new PreviewError(400, 'Template field is incompatible');
 };
 
 module.exports = {
@@ -20,30 +20,31 @@ module.exports = {
     if (model) {
       return model.options.previewable;
     }
-    throw new PreviewError(400, "Wrong contentType");
+    throw new PreviewError(400, 'Wrong contentType');
   },
 
-  findOne: async (contentType: string, contentId: string) => {
-    const model = await global.strapi.query(contentType)?.model;
-
-    if (!model) {
-      throw new PreviewError(400, "Wrong contentType");
+  findOne: async (
+    contentType: string,
+    id: string,
+    query: { [key: string]: string } = {},
+  ) => {
+    const service = global.strapi.services[contentType];
+    const model = global.strapi.models[contentType];
+    if (!service) {
+      throw new PreviewError(400, 'Wrong contentType');
     }
     if (!model.options.previewable) {
-      throw new PreviewError(400, "This content type is not previewable");
+      throw new PreviewError(400, 'This content type is not previewable');
     }
-    model.query();
-
-    const contentPreview = await model
-      .query((qb) => {
-        qb.where("id", contentId);
-      })
-      .fetch();
+    const contentPreview = await service.findOne({
+      ...query,
+      id,
+    });
 
     if (!contentPreview) {
       throw new PreviewError(
         404,
-        "Preview not found for given content type and Id",
+        'Preview not found for given content type and Id',
       );
     }
     const data = sanitizeEntity(contentPreview, { model });
@@ -57,10 +58,10 @@ module.exports = {
   },
 
   getPreviewUrl: async (contentType: string, contentId: string) => {
-    let url = await global.strapi.config.get("custom.previewUrl");
+    let url = await global.strapi.config.get('custom.previewUrl');
 
-    url = url.replace(":contentType", contentType);
-    url = url.replace(":id", contentId);
+    url = url.replace(':contentType', contentType);
+    url = url.replace(':id', contentId);
 
     return {
       url,

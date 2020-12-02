@@ -1,5 +1,5 @@
-"use strict";
-import { Context } from "koa";
+'use strict';
+import { Context } from 'koa';
 
 module.exports = {
   isPreviewable: async (ctx: Context) => {
@@ -14,6 +14,7 @@ module.exports = {
     const contentPreview = await global.strapi.plugins.preview.services.preview.findOne(
       ctx.params.contentType,
       ctx.params.id,
+      ctx.query,
     );
 
     ctx.send(contentPreview);

@@ -1,4 +1,4 @@
-import Knex from "knex";
+import Knex from 'knex';
 
 import {
   StrapiGlobalAdmin,
@@ -41,15 +41,16 @@ export class Strapi {
       settings: {},
       timeout: 0,
     },
+    plugins: {},
   };
   connections: StrapiGlobalConnections = {
     get default(): Knex {
-      throw new Error("For testing purposes please mock this function");
+      throw new Error('For testing purposes please mock this function');
     },
   };
   app: StrapiGlobalApp = {
     use: (_callback) => {
-      throw new Error("For testing purposes please mock this function");
+      throw new Error('For testing purposes please mock this function');
     },
   };
   admin: StrapiGlobalAdmin = {
@@ -57,7 +58,7 @@ export class Strapi {
       permission: {
         actionProvider: {
           register: (_actions) => {
-            throw new Error("For testing purposes please mock this function");
+            throw new Error('For testing purposes please mock this function');
           },
         },
       },
@@ -65,14 +66,14 @@ export class Strapi {
   };
   db: StrapiGlobalDB = {
     query: (_uid) => {
-      throw new Error("For testing purposes please mock this function");
+      throw new Error('For testing purposes please mock this function');
     },
     getModel: (_modelName) => {
-      throw new Error("For testing purposes please mock this function");
+      throw new Error('For testing purposes please mock this function');
     },
   };
 
   query: StrapiGlobalQuery = (_s) => {
-    throw new Error("For testing purposes please mock this function");
+    throw new Error('For testing purposes please mock this function');
   };
 }
