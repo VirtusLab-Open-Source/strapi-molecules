@@ -30,9 +30,7 @@ export function getComponentsFromAttributes(attrs: Attribute[]) {
   return _.uniq(components);
 }
 
-export function getSearchableComponents(attributes: {
-  [key: string]: Attribute;
-}) {
+export function getSearchableComponents(attributes: Record<string, Attribute>) {
   const attrs = Object.values(attributes).filter((attr) => attr.searchable);
   const componentNames = getComponentsFromAttributes(attrs);
   return componentNames

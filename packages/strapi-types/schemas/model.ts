@@ -40,13 +40,7 @@ export type Model = BookshelfModel<any> & {
   primaryKey: string;
   componentsJoinModel: { foreignKey: string } & Model;
   uid: string;
-  options: {
-    [key: string]: any;
-  };
-  allAttributes: {
-    [key: string]: Attribute;
-  };
-  attributes: {
-    [key: string]: Attribute;
-  };
+  options: Record<string, any>;
+  allAttributes: Record<string, Attribute>;
+  attributes: Record<string, Attribute>;
 };

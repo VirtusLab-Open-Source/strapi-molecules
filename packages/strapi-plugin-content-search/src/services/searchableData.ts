@@ -1,9 +1,8 @@
 import { flatten } from 'lodash';
 import { search } from 'strapi-deepsearch-service';
 
-type QueryParams = {
+type QueryParams = Record<string, string> & {
   _q: string;
-  [key: string]: string;
 };
 
 const getAsyncData = async (contentType: string, params: QueryParams) => {

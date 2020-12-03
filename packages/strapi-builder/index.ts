@@ -47,7 +47,7 @@ export class StrapiBuilder {
     return this;
   };
 
-  addPluginConfig = (config: { [key: string]: any }) => {
+  addPluginConfig = (config: Record<string, any>) => {
     this.strapi.config.plugins = {
       ...this.strapi.config.plugins,
       ...config,

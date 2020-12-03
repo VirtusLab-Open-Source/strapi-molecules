@@ -26,7 +26,7 @@ module.exports = {
   findOne: async (
     contentType: string,
     id: string,
-    query: { [key: string]: string } = {},
+    query: Record<string, string> = {},
   ) => {
     const service = global.strapi.services[contentType];
     const model = global.strapi.models[contentType];

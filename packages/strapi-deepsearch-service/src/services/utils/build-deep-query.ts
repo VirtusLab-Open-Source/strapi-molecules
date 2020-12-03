@@ -105,9 +105,7 @@ class QueryTree {
   }: {
     qb: QueryBuilder;
     model: Model;
-    params: {
-      [key: string]: string;
-    };
+    params: Record<string, string>;
   }) {
     const { attributes } = model;
     const componentModels = getSearchableComponents(attributes);
@@ -126,7 +124,7 @@ export const buildDeepSearch = ({
   params,
 }: {
   model: Model;
-  params: { [key: string]: string };
+  params: Record<string, string>;
   queryTree: QueryTree;
 }) => (qb: QueryBuilder) => {
   const qt = new QueryTree().buildTree(model).buildJoins(qb);
@@ -193,9 +191,7 @@ const buildWhereClauses = ({
 }: {
   qb: QueryBuilder;
   model: Model;
-  params: {
-    [key: string]: string;
-  };
+  params: Record<string, string>;
 }) => {
   const { attributes } = model;
   const componentModels = getSearchableComponents(attributes);

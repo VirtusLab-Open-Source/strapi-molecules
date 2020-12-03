@@ -15,7 +15,5 @@ export type Middleware = {
 export type StrapiGlobalConfig = {
   get: (s: string) => any;
   middleware: Middleware;
-  plugins: {
-    [key: string]: any;
-  };
+  plugins: Record<string, any>;
 };
