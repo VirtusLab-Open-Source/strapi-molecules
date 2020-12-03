@@ -10,7 +10,7 @@ describe('content search test', () => {
         'content-search': {
           services: {
             searchabledata: {
-              fetchData: fetchData,
+              fetchData,
             },
           },
         },
@@ -42,7 +42,7 @@ describe('content search test', () => {
         'content-search': {
           services: {
             searchabledata: {
-              fetchData: fetchData,
+              fetchData,
             },
           },
         },
@@ -84,7 +84,7 @@ describe('content search test', () => {
         'content-search': {
           services: {
             searchabledata: {
-              fetchData: fetchData,
+              fetchData,
             },
           },
         },
