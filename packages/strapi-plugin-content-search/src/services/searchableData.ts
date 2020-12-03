@@ -16,7 +16,7 @@ const getAsyncData = async (contentType: string, params: QueryParams) => {
   return undefined;
 };
 
-const fetchAsyncData = async (contentTypes: string[], params: QueryParams) => {
+const fetchData = async (contentTypes: string[], params: QueryParams) => {
   const requests = contentTypes.map((contentType) => {
     return getAsyncData(contentType, params);
   });
@@ -24,6 +24,6 @@ const fetchAsyncData = async (contentTypes: string[], params: QueryParams) => {
 };
 
 module.exports = {
-  fetchAsyncData,
+  fetchData,
   getAsyncData,
 };

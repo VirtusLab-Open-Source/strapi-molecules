@@ -6,7 +6,7 @@ module.exports = {
       return ctx.throw(400, 'Malformed request body');
     }
 
-    const { fetchAsyncData } = global.strapi.plugins[
+    const { fetchData } = global.strapi.plugins[
       'content-search'
     ].services.searchabledata;
 
@@ -14,7 +14,7 @@ module.exports = {
       .filter(([_key, value]) => value.options.searchable)
       .map(([_key]) => _key);
 
-    const payload = await fetchAsyncData(searchableContentTypes, ctx.query);
+    const payload = await fetchData(searchableContentTypes, ctx.query);
     const { beforeSend } = global.strapi.config.plugins['content-search'];
     if (typeof beforeSend === 'function') {
       return beforeSend(payload);
