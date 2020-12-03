@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.3](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-content-search@0.5.2...strapi-plugin-content-search@0.5.3) (2020-12-03)
+
+**Note:** Version bump only for package strapi-plugin-content-search
+
+
+
+
+
 ## [0.5.2](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-content-search@0.5.1...strapi-plugin-content-search@0.5.2) (2020-11-30)
 
 
