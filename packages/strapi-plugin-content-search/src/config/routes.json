@@ -1,8 +1,8 @@
 {
   "routes": [
     {
-      "method": "POST",
-      "path": "/search",
+      "method": "GET",
+      "path": "/",
       "handler": "Search.search",
       "config": {
         "policies": []

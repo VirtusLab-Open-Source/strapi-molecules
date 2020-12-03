@@ -1,22 +1,28 @@
-import { search } from "strapi-deepsearch-service";
+import { flatten } from 'lodash';
+import { search } from 'strapi-deepsearch-service';
 
-const getAsyncData = async (contentType: string, _q: string) => {
+type QueryParams = Record<string, string> & {
+  _q: string;
+};
+
+const getAsyncData = async (contentType: string, params: QueryParams) => {
   const model = global.strapi.query(contentType)?.model;
   if (model) {
-    const result = await search(model, { _q });
+    const result = await search(model, params);
+
     return result.map((item: any) => ({ ...item, __contentType: contentType }));
   }
   return undefined;
 };
 
-const fetchAsyncData = async (contentTypes: string[], _q: string) => {
+const fetchData = async (contentTypes: string[], params: QueryParams) => {
   const requests = contentTypes.map((contentType) => {
-    return getAsyncData(contentType, _q);
+    return getAsyncData(contentType, params);
   });
-  return Promise.all(requests);
+  return Promise.all(requests).then(flatten);
 };
 
 module.exports = {
-  fetchAsyncData,
+  fetchData,
   getAsyncData,
 };

@@ -1,5 +1,6 @@
-const _ = require("lodash");
-const { escapeQuery } = require("strapi-utils");
+const _ = require('lodash');
+const { escapeQuery } = require('strapi-utils');
+const { isModelAttrSearchable } = require('./component-utils');
 
 /**
  * util to build search query
@@ -13,16 +14,16 @@ const buildSearchQuery = ({ model, params, qb }) => {
 
   const associations = model.associations.map((x) => x.alias);
   const stringTypes = [
-    "string",
-    "text",
-    "uid",
-    "email",
-    "enumeration",
-    "richtext",
+    'string',
+    'text',
+    'uid',
+    'email',
+    'enumeration',
+    'richtext',
   ];
-  const numberTypes = ["biginteger", "integer", "decimal", "float"];
+  const numberTypes = ['biginteger', 'integer', 'decimal', 'float'];
 
-  const searchColumns = Object.keys(model._attributes)
+  const _searchColumns = Object.keys(model._attributes)
     .filter((attribute) => !associations.includes(attribute))
     .filter((attribute) =>
       stringTypes.includes(model._attributes[attribute].type),
@@ -33,35 +34,38 @@ const buildSearchQuery = ({ model, params, qb }) => {
       .filter((attribute) =>
         numberTypes.includes(model._attributes[attribute].type),
       );
-    searchColumns.push(...numberColumns);
+    _searchColumns.push(...numberColumns);
   }
 
   if ([...numberTypes, ...stringTypes].includes(model.primaryKeyType)) {
-    searchColumns.push(model.primaryKey);
+    _searchColumns.push(model.primaryKey);
   }
+  const searchColumns = _searchColumns.filter((attr) =>
+    isModelAttrSearchable(model, attr),
+  );
   // Search in columns with text using index.
   switch (model.client) {
-    case "pg":
+    case 'pg':
       searchColumns.forEach((attr) =>
         qb.orWhereRaw(
           `"${model.collectionName}"."${attr}"::text ILIKE ?`,
-          `%${escapeQuery(query, "*%\\")}%`,
+          `%${escapeQuery(query, '*%\\')}%`,
         ),
       );
       break;
-    case "sqlite3":
+    case 'sqlite3':
       searchColumns.forEach((attr) =>
         qb.orWhereRaw(
           `"${model.collectionName}"."${attr}" LIKE ? ESCAPE '\\'`,
-          `%${escapeQuery(query, "*%\\")}%`,
+          `%${escapeQuery(query, '*%\\')}%`,
         ),
       );
       break;
-    case "mysql":
+    case 'mysql':
       searchColumns.forEach((attr) =>
         qb.orWhereRaw(
           `\`${model.collectionName}\`.\`${attr}\` LIKE ?`,
-          `%${escapeQuery(query, "*%\\")}%`,
+          `%${escapeQuery(query, '*%\\')}%`,
         ),
       );
       break;
