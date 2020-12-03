@@ -2,7 +2,7 @@
   "routes": [
     {
       "method": "GET",
-      "path": "/search",
+      "path": "/",
       "handler": "Search.search",
       "config": {
         "policies": []

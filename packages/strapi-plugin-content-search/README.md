@@ -23,7 +23,7 @@ Requirements</a>.
 
 **Supported Strapi versions**:
 
-- Strapi v3.1.1 (recently tested)
+- Strapi v3.3.3 (recently tested)
 - Strapi v3.x
 
 (This plugin may work with the older Strapi versions, but these are not tested
@@ -54,11 +54,12 @@ For example for component called `paragraph_component` You need to change
     "icon": "align-justify"
   },
   "options": {
-    +"searchable": true
+++    "searchable": true
   },
   "attributes": {
     "body": {
       "type": "text"
+++    "searchable": true
     }
   }
 }
@@ -70,37 +71,27 @@ To be able to find model content field, model needs **searchable** property with
 true value, then just use:
 
 ```
-POST /content-search/search
+GET /content-search
 ```
 
-with:
+with query parameter:
 
 ```
-"_q": "string"
-```
-
-Example:
-
-```
-{
-"_q": "lorem"
-}
+/content-search?_q=string
 ```
 
 Response:
 
 ```
 [
-    [
-        {
-            "id": 1,
-            "title": "lorem",
-            "content": "lorem ipsum",
-            "created_at": "2020-07-23T09:48:24.140Z",
-            "updated_at": "2020-07-23T09:48:24.140Z",
-            "__contentType": "exmaple_content_type"
-        }
-    ]
+    {
+        "id": 1,
+        "title": "lorem",
+        "content": "lorem ipsum",
+        "created_at": "2020-07-23T09:48:24.140Z",
+        "updated_at": "2020-07-23T09:48:24.140Z",
+        "__contentType": "exmaple_content_type"
+    }
 ]
 ```
 
