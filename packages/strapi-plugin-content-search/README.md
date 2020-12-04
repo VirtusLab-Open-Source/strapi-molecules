@@ -58,7 +58,7 @@ For example for component called `paragraph_component` You need to change
   },
   "attributes": {
     "body": {
-      "type": "text"
+      "type": "text",
 ++    "searchable": true
     }
   }
@@ -68,16 +68,10 @@ For example for component called `paragraph_component` You need to change
 ## Usage
 
 To be able to find model content field, model needs **searchable** property with
-true value, then just use:
+true value, then just use endpoint with required query parameter `_q`:
 
 ```
-GET /content-search
-```
-
-with query parameter:
-
-```
-/content-search?_q=string
+/content-search?_q=lorem
 ```
 
 Response:
@@ -93,6 +87,27 @@ Response:
         "__contentType": "exmaple_content_type"
     }
 ]
+```
+
+### Custom hook
+
+#### transformResponse
+
+To be able to modify payload before send response add `transformResponse` to
+plugin configuration:
+
+```javascript 1.8
+// /config/plugins.js
+module.exports = ({ env }) => ({
+  'content-search': {
+    transformResponse: (payload) => {
+      return {
+        ...payload,
+        injectedProperty: 'injectedProperty',
+      };
+    },
+  },
+});
 ```
 
 ## Contributing
