@@ -1,6 +1,6 @@
 {
   "name": "strapi-deepsearch-service",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "description": "Strapi service for deep search using bookshelf (search by components)",
   "main": "src/index.ts",
   "scripts": {
