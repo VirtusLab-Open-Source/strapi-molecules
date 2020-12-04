@@ -1,8 +1,9 @@
 import { Context } from 'koa';
+import { get } from 'lodash';
 
 module.exports = {
   async search(ctx: Context) {
-    if (!ctx.query) {
+    if (get(ctx, 'query._q', '') === '') {
       return ctx.throw(400, 'Malformed request body');
     }
 
@@ -15,9 +16,11 @@ module.exports = {
       .map(([_key]) => _key);
 
     const payload = await fetchData(searchableContentTypes, ctx.query);
-    const { beforeSend } = global.strapi.config.plugins['content-search'];
-    if (typeof beforeSend === 'function') {
-      return beforeSend(payload);
+    const { transformResponse } = global.strapi.config.plugins[
+      'content-search'
+    ];
+    if (typeof transformResponse === 'function') {
+      return transformResponse(payload);
     }
     return payload;
   },
