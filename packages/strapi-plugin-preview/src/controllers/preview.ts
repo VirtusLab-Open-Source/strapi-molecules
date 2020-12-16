@@ -40,7 +40,7 @@ module.exports = {
       query,
     } = ctx;
     const service = global.strapi.plugins.preview.services.preview;
-    const tenantId = query?.tenantId ? parseInt(query.tenantId) : null;
+    const tenantId = query?.tenantId ? Number(query.tenantId) : NaN;
     const tenant = tenants.find(
       (t) => t.id === tenantId || t.key === query?.tenantKey,
     );
