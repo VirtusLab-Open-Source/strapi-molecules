@@ -57,14 +57,37 @@ module.exports = {
     };
   },
 
-  getPreviewUrl: async (contentType: string, contentId: string) => {
-    let url = await global.strapi.config.get('custom.previewUrl');
+  getPreviewUrl: (contentType: string, contentId: string) => {
+    const service = global.strapi.plugins.preview.services.preview;
+    const previewUrl = global.strapi.config.get('custom.previewUrl') || '';
 
-    url = url.replace(':contentType', contentType);
-    url = url.replace(':id', contentId);
+    return service.replacePreviewParams(contentType, contentId, previewUrl);
+  },
 
-    return {
-      url,
-    };
+  replacePreviewParams: (
+    contentType: string,
+    contentId: string,
+    url: string,
+  ) => {
+    return url.replace(':contentType', contentType).replace(':id', contentId);
+  },
+
+  getTenantUrlByTenantKey: (key: string) => {
+    return (
+      global.strapi.config
+        .get<{ key: string; previewUrl: string }[]>('custom.tenants')
+        ?.find((t) => t.key === key)?.previewUrl || ''
+    );
+  },
+
+  getTenantUrl: (
+    { key }: { key: string },
+    contentType: string,
+    contentId: string,
+  ) => {
+    const service = global.strapi.plugins.preview.services.preview;
+    const previewUrl = service.getTenantUrlByTenantKey(key);
+
+    return service.replacePreviewParams(contentType, contentId, previewUrl);
   },
 };

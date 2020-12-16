@@ -13,7 +13,7 @@ export type Middleware = {
 };
 
 export type StrapiGlobalConfig = {
-  get: (s: string) => any;
+  get: <T extends any>(s: string) => T;
   middleware: Middleware;
   plugins: Record<string, any>;
 };
