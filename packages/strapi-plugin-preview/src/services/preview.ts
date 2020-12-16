@@ -14,7 +14,7 @@ const getTemplateComponentFromTemplate = (
 };
 
 module.exports = {
-  isPreviewable: async (contentType: string) => {
+  isPreviewable: async function (contentType: string) {
     const model = await global.strapi.query(contentType)?.model;
 
     if (model) {
@@ -23,11 +23,11 @@ module.exports = {
     throw new PreviewError(400, 'Wrong contentType');
   },
 
-  findOne: async (
+  findOne: async function (
     contentType: string,
     id: string,
-    query: Record<string, string> = {},
-  ) => {
+    query: Record<string, string>,
+  ) {
     const service = global.strapi.services[contentType];
     const model = global.strapi.models[contentType];
     if (!service) {
@@ -57,22 +57,21 @@ module.exports = {
     };
   },
 
-  getPreviewUrl: (contentType: string, contentId: string) => {
-    const service = global.strapi.plugins.preview.services.preview;
+  getPreviewUrl: function (contentType: string, contentId: string) {
     const previewUrl = global.strapi.config.get('custom.previewUrl') || '';
 
-    return service.replacePreviewParams(contentType, contentId, previewUrl);
+    return this.replacePreviewParams(contentType, contentId, previewUrl);
   },
 
-  replacePreviewParams: (
+  replacePreviewParams: function (
     contentType: string,
     contentId: string,
     url: string,
-  ) => {
+  ) {
     return url.replace(':contentType', contentType).replace(':id', contentId);
   },
 
-  getTenantUrlByTenantKey: (key: string) => {
+  getTenantUrlByTenantKey: function (key: string) {
     return (
       global.strapi.config
         .get<{ key: string; previewUrl: string }[]>('custom.tenants')
@@ -80,14 +79,13 @@ module.exports = {
     );
   },
 
-  getTenantUrl: (
+  getTenantUrl: function (
     { key }: { key: string },
     contentType: string,
     contentId: string,
-  ) => {
-    const service = global.strapi.plugins.preview.services.preview;
-    const previewUrl = service.getTenantUrlByTenantKey(key);
+  ) {
+    const previewUrl = this.getTenantUrlByTenantKey(key);
 
-    return service.replacePreviewParams(contentType, contentId, previewUrl);
+    return this.replacePreviewParams(contentType, contentId, previewUrl);
   },
 };

@@ -7,8 +7,8 @@ type Tenant = {
   previewUrl: string;
 };
 type ContextWithTenants = {
-  user: {
-    tenants: Tenant[];
+  user?: {
+    tenants?: Tenant[];
   };
 };
 
@@ -34,15 +34,13 @@ module.exports = {
   getPreviewUrl: (ctx: ParameterizedContext<ContextWithTenants>) => {
     const {
       params: { contentType, id },
-      state: {
-        user: { tenants },
-      },
+      state: { user },
       query,
     } = ctx;
     const service = global.strapi.plugins.preview.services.preview;
-    const tenantId = Number(query?.tenantId);
-    const tenant = tenants.find(
-      (t) => t.id === tenantId || t.key === query?.tenantKey,
+    const tenantId = Number(query.tenantId);
+    const tenant = user?.tenants?.find(
+      (t) => t.id === tenantId || t.key === query.tenantKey,
     );
     const url = tenant
       ? service.getTenantUrl(tenant, contentType, id)
