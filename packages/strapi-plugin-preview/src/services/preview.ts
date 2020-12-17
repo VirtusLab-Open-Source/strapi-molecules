@@ -14,7 +14,7 @@ const getTemplateComponentFromTemplate = (
 };
 
 module.exports = {
-  isPreviewable: async function (contentType: string) {
+  async isPreviewable(contentType: string) {
     const model = await global.strapi.query(contentType)?.model;
 
     if (model) {
@@ -23,7 +23,7 @@ module.exports = {
     throw new PreviewError(400, 'Wrong contentType');
   },
 
-  findOne: async function (
+  async findOne(
     contentType: string,
     id: string,
     query: Record<string, string>,
@@ -57,21 +57,17 @@ module.exports = {
     };
   },
 
-  getPreviewUrl: function (contentType: string, contentId: string) {
+  getPreviewUrl(contentType: string, contentId: string) {
     const previewUrl = global.strapi.config.get('custom.previewUrl') || '';
 
     return this.replacePreviewParams(contentType, contentId, previewUrl);
   },
 
-  replacePreviewParams: function (
-    contentType: string,
-    contentId: string,
-    url: string,
-  ) {
+  replacePreviewParams(contentType: string, contentId: string, url: string) {
     return url.replace(':contentType', contentType).replace(':id', contentId);
   },
 
-  getTenantUrlByTenantKey: function (key: string) {
+  getTenantUrlByTenantKey(key: string) {
     return (
       global.strapi.config
         .get<{ key: string; previewUrl: string }[]>('custom.tenants')
@@ -79,7 +75,7 @@ module.exports = {
     );
   },
 
-  getTenantUrl: function (
+  getTenantUrl(
     { key }: { key: string },
     contentType: string,
     contentId: string,

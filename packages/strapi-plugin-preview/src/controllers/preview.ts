@@ -13,7 +13,7 @@ type ContextWithTenants = {
 };
 
 module.exports = {
-  isPreviewable: async (ctx: Context) => {
+  async isPreviewable(ctx: Context) {
     const isPreviewable = await global.strapi.plugins.preview.services.preview.isPreviewable(
       ctx.params.contentType,
     );
@@ -21,7 +21,7 @@ module.exports = {
     ctx.send({ isPreviewable });
   },
 
-  findOne: async (ctx: Context) => {
+  async findOne(ctx: Context) {
     const contentPreview = await global.strapi.plugins.preview.services.preview.findOne(
       ctx.params.contentType,
       ctx.params.id,
@@ -31,7 +31,7 @@ module.exports = {
     ctx.send(contentPreview);
   },
 
-  getPreviewUrl: (ctx: ParameterizedContext<ContextWithTenants>) => {
+  getPreviewUrl(ctx: ParameterizedContext<ContextWithTenants>) {
     const {
       params: { contentType, id },
       state: { user },
