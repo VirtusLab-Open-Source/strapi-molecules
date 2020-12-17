@@ -1,8 +1,19 @@
 'use strict';
-import { Context } from 'koa';
+import { Context, ParameterizedContext } from 'koa';
+
+type Tenant = {
+  key: string;
+  id: number;
+  previewUrl: string;
+};
+type ContextWithTenants = {
+  user?: {
+    tenants?: Tenant[];
+  };
+};
 
 module.exports = {
-  isPreviewable: async (ctx: Context) => {
+  async isPreviewable(ctx: Context) {
     const isPreviewable = await global.strapi.plugins.preview.services.preview.isPreviewable(
       ctx.params.contentType,
     );
@@ -10,7 +21,7 @@ module.exports = {
     ctx.send({ isPreviewable });
   },
 
-  findOne: async (ctx: Context) => {
+  async findOne(ctx: Context) {
     const contentPreview = await global.strapi.plugins.preview.services.preview.findOne(
       ctx.params.contentType,
       ctx.params.id,
@@ -20,12 +31,21 @@ module.exports = {
     ctx.send(contentPreview);
   },
 
-  getPreviewUrl: async (ctx: Context) => {
-    const previewUrl = await global.strapi.plugins.preview.services.preview.getPreviewUrl(
-      ctx.params.contentType,
-      ctx.params.id,
+  getPreviewUrl(ctx: ParameterizedContext<ContextWithTenants>) {
+    const {
+      params: { contentType, id },
+      state: { user },
+      query,
+    } = ctx;
+    const service = global.strapi.plugins.preview.services.preview;
+    const tenantId = Number(query.tenantId);
+    const tenant = user?.tenants?.find(
+      (t) => t.id === tenantId || t.key === query.tenantKey,
     );
+    const url = tenant
+      ? service.getTenantUrl(tenant, contentType, id)
+      : service.getPreviewUrl(contentType, id);
 
-    ctx.send(previewUrl);
+    ctx.send({ url });
   },
 };

@@ -58,6 +58,8 @@ export const PreviewProvider = ({
       previewable &&
       ((isCreatingEntry && canCreate) || (!isCreatingEntry && canUpdate))
     ) {
+      const tenantId = getTenantId(initialData);
+      const params = tenantId ? { tenantId } : {};
       headerActions.push({
         disabled: didChangeData,
         label: formatMessage({
@@ -69,9 +71,16 @@ export const PreviewProvider = ({
             `/preview/preview-url/${layout.apiID}/${initialData.id}`,
             {
               method: 'GET',
+              params,
             },
           ).then((data) => {
-            window.open(data.url, '_blank');
+            if (data.url) {
+              window.open(data.url, '_blank');
+            } else {
+              strapi.notification.error(
+                getPreviewPluginTrad('error.previewUrl.empty'),
+              );
+            }
           });
         },
         type: 'button',
@@ -271,6 +280,10 @@ function prepareToPublish(payload) {
 
   return payload;
 }
+
+const getTenantId = (data) => {
+  return get(data, 'tenant.id');
+};
 
 const getRequestUrl = (path) =>
   `/${CONTENT_MANAGER_PLUGIN_ID}/explorer/${path}`;
