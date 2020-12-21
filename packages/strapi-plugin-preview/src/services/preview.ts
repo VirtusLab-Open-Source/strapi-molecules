@@ -60,7 +60,7 @@ module.exports = {
   getPreviewUrl(
     contentType: string,
     contentId: string,
-    _query: { [key: string]: string },
+    _query: Record<string, string | number>,
   ) {
     const previewUrl = global.strapi.config.get('custom.previewUrl') || '';
 

@@ -24,7 +24,7 @@ export const PreviewProvider = ({
   slug,
   canUpdate,
   canCreate,
-  getPreviewUrlParams = () => {},
+  getPreviewUrlParams = () => ({}),
 }) => {
   const { formatMessage } = useIntl();
 
@@ -59,8 +59,7 @@ export const PreviewProvider = ({
       previewable &&
       ((isCreatingEntry && canCreate) || (!isCreatingEntry && canUpdate))
     ) {
-      const params =
-        getPreviewUrlParams(initialData, modifiedData, layout) || {};
+      const params = getPreviewUrlParams(initialData, modifiedData, layout);
       headerActions.push({
         disabled: didChangeData,
         label: formatMessage({
@@ -68,21 +67,26 @@ export const PreviewProvider = ({
         }),
         color: 'secondary',
         onClick: async () => {
-          await request(
-            `/preview/preview-url/${layout.apiID}/${initialData.id}`,
-            {
-              method: 'GET',
-              params,
-            },
-          ).then((data) => {
+          try {
+            const data = await request(
+              `/preview/preview-url/${layout.apiID}/${initialData.id}`,
+              {
+                method: 'GET',
+                params,
+              },
+            );
             if (data.url) {
               window.open(data.url, '_blank');
             } else {
               strapi.notification.error(
-                getPreviewPluginTrad('error.previewUrl.empty'),
+                getPreviewPluginTrad('error.previewUrl.notFound'),
               );
             }
-          });
+          } catch (_e) {
+            strapi.notification.error(
+              getPreviewPluginTrad('error.previewUrl.notFound'),
+            );
+          }
         },
         type: 'button',
         style: {
