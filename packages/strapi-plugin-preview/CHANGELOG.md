@@ -1,5 +1,18 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+## [0.4.1](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-preview@0.4.0...strapi-plugin-preview@0.4.1) (2020-12-21)
+
+**Note:** Version bump only for package strapi-plugin-preview
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
