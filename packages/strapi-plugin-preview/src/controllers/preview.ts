@@ -1,16 +1,5 @@
 'use strict';
-import { Context, ParameterizedContext } from 'koa';
-
-type Tenant = {
-  key: string;
-  id: number;
-  previewUrl: string;
-};
-type ContextWithTenants = {
-  user?: {
-    tenants?: Tenant[];
-  };
-};
+import { Context } from 'koa';
 
 module.exports = {
   async isPreviewable(ctx: Context) {
@@ -31,20 +20,13 @@ module.exports = {
     ctx.send(contentPreview);
   },
 
-  getPreviewUrl(ctx: ParameterizedContext<ContextWithTenants>) {
+  getPreviewUrl(ctx: Context) {
     const {
       params: { contentType, id },
-      state: { user },
       query,
     } = ctx;
     const service = global.strapi.plugins.preview.services.preview;
-    const tenantId = Number(query.tenantId);
-    const tenant = user?.tenants?.find(
-      (t) => t.id === tenantId || t.key === query.tenantKey,
-    );
-    const url = tenant
-      ? service.getTenantUrl(tenant, contentType, id)
-      : service.getPreviewUrl(contentType, id);
+    const url = service.getPreviewUrl(contentType, id, query);
 
     ctx.send({ url });
   },

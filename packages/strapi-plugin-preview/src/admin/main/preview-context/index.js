@@ -24,6 +24,7 @@ export const PreviewProvider = ({
   slug,
   canUpdate,
   canCreate,
+  getPreviewUrlParams = () => {},
 }) => {
   const { formatMessage } = useIntl();
 
@@ -58,8 +59,8 @@ export const PreviewProvider = ({
       previewable &&
       ((isCreatingEntry && canCreate) || (!isCreatingEntry && canUpdate))
     ) {
-      const tenantId = getTenantId(initialData);
-      const params = tenantId ? { tenantId } : {};
+      const params =
+        getPreviewUrlParams(initialData, modifiedData, layout) || {};
       headerActions.push({
         disabled: didChangeData,
         label: formatMessage({
@@ -281,10 +282,6 @@ function prepareToPublish(payload) {
   return payload;
 }
 
-const getTenantId = (data) => {
-  return get(data, 'tenant.id');
-};
-
 const getRequestUrl = (path) =>
   `/${CONTENT_MANAGER_PLUGIN_ID}/explorer/${path}`;
 const getFrontendEntityUrl = (path, id) =>
@@ -301,4 +298,5 @@ PreviewProvider.propTypes = {
   layout: PropTypes.object.isRequired,
   modifiedData: PropTypes.object.isRequired,
   slug: PropTypes.string.isRequired,
+  getPreviewUrlParams: PropTypes.func,
 };

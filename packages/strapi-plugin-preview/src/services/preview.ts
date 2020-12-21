@@ -57,7 +57,11 @@ module.exports = {
     };
   },
 
-  getPreviewUrl(contentType: string, contentId: string) {
+  getPreviewUrl(
+    contentType: string,
+    contentId: string,
+    _query: { [key: string]: string },
+  ) {
     const previewUrl = global.strapi.config.get('custom.previewUrl') || '';
 
     return this.replacePreviewParams(contentType, contentId, previewUrl);
@@ -65,23 +69,5 @@ module.exports = {
 
   replacePreviewParams(contentType: string, contentId: string, url: string) {
     return url.replace(':contentType', contentType).replace(':id', contentId);
-  },
-
-  getTenantUrlByTenantKey(key: string) {
-    return (
-      global.strapi.config
-        .get<{ key: string; previewUrl: string }[]>('custom.tenants')
-        ?.find((t) => t.key === key)?.previewUrl || ''
-    );
-  },
-
-  getTenantUrl(
-    { key }: { key: string },
-    contentType: string,
-    contentId: string,
-  ) {
-    const previewUrl = this.getTenantUrlByTenantKey(key);
-
-    return this.replacePreviewParams(contentType, contentId, previewUrl);
   },
 };
