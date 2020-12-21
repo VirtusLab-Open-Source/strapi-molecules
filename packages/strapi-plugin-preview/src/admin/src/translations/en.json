@@ -14,5 +14,7 @@
   "popUpWarning.warning.clone": "Cloning this entry will create a new copy with the same fields.",
   "popUpWarning.warning.clone-question": "Are you sure you want to clone this entry?",
   "popUpWarning.warning.publish": "Publishing this entry will replace previously cloned entry (changes will automatically apply to original entry)",
-  "popUpWarning.warning.publish-question": "Are you sure you want to publish this entry?"
+  "popUpWarning.warning.publish-question": "Are you sure you want to publish this entry?",
+
+  "error.previewUrl.notFound": "An error occurred during preview url fetch."
 }

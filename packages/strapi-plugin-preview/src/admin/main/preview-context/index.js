@@ -24,6 +24,7 @@ export const PreviewProvider = ({
   slug,
   canUpdate,
   canCreate,
+  getPreviewUrlParams = () => ({}),
 }) => {
   const { formatMessage } = useIntl();
 
@@ -58,8 +59,7 @@ export const PreviewProvider = ({
       previewable &&
       ((isCreatingEntry && canCreate) || (!isCreatingEntry && canUpdate))
     ) {
-      const tenantId = getTenantId(initialData);
-      const params = tenantId ? { tenantId } : {};
+      const params = getPreviewUrlParams(initialData, modifiedData, layout);
       headerActions.push({
         disabled: didChangeData,
         label: formatMessage({
@@ -67,21 +67,26 @@ export const PreviewProvider = ({
         }),
         color: 'secondary',
         onClick: async () => {
-          await request(
-            `/preview/preview-url/${layout.apiID}/${initialData.id}`,
-            {
-              method: 'GET',
-              params,
-            },
-          ).then((data) => {
+          try {
+            const data = await request(
+              `/preview/preview-url/${layout.apiID}/${initialData.id}`,
+              {
+                method: 'GET',
+                params,
+              },
+            );
             if (data.url) {
               window.open(data.url, '_blank');
             } else {
               strapi.notification.error(
-                getPreviewPluginTrad('error.previewUrl.empty'),
+                getPreviewPluginTrad('error.previewUrl.notFound'),
               );
             }
-          });
+          } catch (_e) {
+            strapi.notification.error(
+              getPreviewPluginTrad('error.previewUrl.notFound'),
+            );
+          }
         },
         type: 'button',
         style: {
@@ -281,10 +286,6 @@ function prepareToPublish(payload) {
   return payload;
 }
 
-const getTenantId = (data) => {
-  return get(data, 'tenant.id');
-};
-
 const getRequestUrl = (path) =>
   `/${CONTENT_MANAGER_PLUGIN_ID}/explorer/${path}`;
 const getFrontendEntityUrl = (path, id) =>
@@ -301,4 +302,5 @@ PreviewProvider.propTypes = {
   layout: PropTypes.object.isRequired,
   modifiedData: PropTypes.object.isRequired,
   slug: PropTypes.string.isRequired,
+  getPreviewUrlParams: PropTypes.func,
 };

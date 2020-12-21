@@ -1,20 +1,11 @@
 # Change Log
 
-All notable changes to this project will be documented in this file.
-See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+All notable changes to this project will be documented in this file. See
+[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 ## [0.2.4](https://github.com/VirtusLab/strapi-molecules/compare/strapi-builder@0.2.3...strapi-builder@0.2.4) (2020-12-17)
 
 **Note:** Version bump only for package strapi-builder
-
-
-
-
-
-# Change Log
-
-All notable changes to this project will be documented in this file. See
-[Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
 ## [0.2.3](https://github.com/VirtusLab/strapi-molecules/compare/strapi-builder@0.2.2...strapi-builder@0.2.3) (2020-12-03)
 
