@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-preview@0.4.1...strapi-plugin-preview@0.5.0) (2021-01-06)
+
+
+### Features
+
+* **strapi-plugin-preview:** add transformResponse hook, remove templateLogic from plugin, service will return directly entity without wrapping with model ([#37](https://github.com/VirtusLab/strapi-molecules/issues/37)) ([f1ba847](https://github.com/VirtusLab/strapi-molecules/commit/f1ba84708d091376800b573ad1e7c119b7c171f1))
+
+
+
+
+
 ## [0.4.1](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-preview@0.4.0...strapi-plugin-preview@0.4.1) (2020-12-21)
 
 **Note:** Version bump only for package strapi-plugin-preview
