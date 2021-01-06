@@ -1,11 +1,5 @@
 import PropTypes from 'prop-types';
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  useContext,
-  createContext,
-} from 'react';
+import React, { useState, useMemo, useContext, createContext } from 'react';
 import { useIntl } from 'react-intl';
 import { request, PopUpWarning } from 'strapi-helper-plugin';
 
@@ -30,20 +24,14 @@ export const PreviewProvider = ({
 
   const [showWarningClone, setWarningClone] = useState(false);
   const [showWarningPublish, setWarningPublish] = useState(false);
-  const [previewable, setIsPreviewable] = useState(false);
   const [isButtonLoading, setButtonLoading] = useState(false);
+
+  const isPreviewable = get(layout, 'schema.options.previewable', false);
+  const isCloneable = get(layout, 'schema.options.cloneable', false);
 
   const toggleWarningClone = () => setWarningClone((prevState) => !prevState);
   const toggleWarningPublish = () =>
     setWarningPublish((prevState) => !prevState);
-
-  useEffect(() => {
-    request(`/preview/is-previewable/${layout.apiID}`, {
-      method: 'GET',
-    }).then(({ isPreviewable }) => {
-      setIsPreviewable(isPreviewable);
-    });
-  }, [layout.apiID]);
 
   const didChangeData = useMemo(() => {
     return (
@@ -55,10 +43,10 @@ export const PreviewProvider = ({
   const previewHeaderActions = useMemo(() => {
     const headerActions = [];
 
-    if (
-      previewable &&
-      ((isCreatingEntry && canCreate) || (!isCreatingEntry && canUpdate))
-    ) {
+    if (!((isCreatingEntry && canCreate) || (!isCreatingEntry && canUpdate))) {
+      return headerActions;
+    }
+    if (isPreviewable) {
       const params = getPreviewUrlParams(initialData, modifiedData, layout);
       headerActions.push({
         disabled: didChangeData,
@@ -95,7 +83,8 @@ export const PreviewProvider = ({
           fontWeight: 600,
         },
       });
-
+    }
+    if (isCloneable) {
       if (initialData.cloneOf) {
         headerActions.push({
           disabled: didChangeData,
@@ -136,7 +125,7 @@ export const PreviewProvider = ({
     didChangeData,
     formatMessage,
     layout.apiID,
-    previewable,
+    isPreviewable,
     initialData.cloneOf,
     initialData.id,
     canCreate,
@@ -153,10 +142,6 @@ export const PreviewProvider = ({
         body: {
           ...initialData,
           cloneOf: initialData.id,
-          options: {
-            ...initialData.options,
-            previewable: true,
-          },
         },
       });
 
@@ -222,7 +207,7 @@ export const PreviewProvider = ({
       <PreviewContext.Provider value={value}>
         {children}
       </PreviewContext.Provider>
-      {previewable && (
+      {isCloneable && (
         <PopUpWarning
           isOpen={showWarningClone}
           toggleModal={toggleWarningClone}
@@ -237,7 +222,7 @@ export const PreviewProvider = ({
           isConfirmButtonLoading={isButtonLoading}
         />
       )}
-      {previewable && (
+      {isCloneable && (
         <PopUpWarning
           isOpen={showWarningPublish}
           toggleModal={toggleWarningPublish}

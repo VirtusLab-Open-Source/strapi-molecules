@@ -3,26 +3,7 @@ const { sanitizeEntity } = require('strapi-utils');
 
 const PreviewError = require('./preview-error');
 
-const getTemplateComponentFromTemplate = (
-  template: { __component: string }[],
-) => {
-  if (template && template[0] && template[0].__component) {
-    const componentName = template[0].__component;
-    return global.strapi.components[componentName];
-  }
-  throw new PreviewError(400, 'Template field is incompatible');
-};
-
 module.exports = {
-  async isPreviewable(contentType: string) {
-    const model = await global.strapi.query(contentType)?.model;
-
-    if (model) {
-      return model.options.previewable;
-    }
-    throw new PreviewError(400, 'Wrong contentType');
-  },
-
   async findOne(
     contentType: string,
     id: string,
@@ -47,14 +28,8 @@ module.exports = {
         'Preview not found for given content type and Id',
       );
     }
-    const data = sanitizeEntity(contentPreview, { model });
-    const templateComponent = getTemplateComponentFromTemplate(data.template);
 
-    return {
-      templateName: templateComponent.options.templateName,
-      contentType,
-      data,
-    };
+    return sanitizeEntity(contentPreview, { model });
   },
 
   getPreviewUrl(

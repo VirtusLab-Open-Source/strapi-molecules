@@ -2,14 +2,6 @@
   "routes": [
     {
       "method": "GET",
-      "path": "/is-previewable/:contentType",
-      "handler": "preview.isPreviewable",
-      "config": {
-        "policies": []
-      }
-    },
-    {
-      "method": "GET",
       "path": "/:contentType/:id",
       "handler": "preview.findOne",
       "config": {

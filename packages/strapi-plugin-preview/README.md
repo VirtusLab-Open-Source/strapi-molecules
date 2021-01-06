@@ -37,10 +37,10 @@ projects**.
 
 ## Features
 
--**Create Clone (draft)** Now you will be able to clone every content type entry
+-**Create Clone ** Now you will be able to clone every content type entry
 
--**Publish Clone (draft)** When entry is clone, it could be published, which
-will overwrite original contentType record
+-**Publish Clone ** When entry is clone, it could be published, which will
+overwrite original contentType record
 
 -**Preview your entry** With customised preview URI, You can preview your draft
 (entry)
@@ -61,9 +61,9 @@ id of contentType record
 
 ## Component model configuration
 
-Component by default is not previewable. To enable content type to be
-previewable and see preview, or clone entry, you've to add option previewable to
-true in a configuration json file (`*.settings.json`):
+Component by default is neither previewable and cloneable . To enable You can
+configure it by setting `previewable` or `cloneable` to true in a configuration
+json file (`*.settings.json`):
 
 For example for component called `paragraph_component` You need to change
 `components/text/paragraph_component.json` by modifying option object:
@@ -76,7 +76,8 @@ For example for component called `paragraph_component` You need to change
     "icon": "align-justify"
   },
   "options": {
-+    "previewable": true
++    "previewable": true,
++    "cloneable": true
   },
   "attributes": {
     "body": {
@@ -85,6 +86,8 @@ For example for component called `paragraph_component` You need to change
   }
 }
 ```
+
+Previewing and Cloning could be mixed, or you can just set one of them.
 
 ## Usage
 

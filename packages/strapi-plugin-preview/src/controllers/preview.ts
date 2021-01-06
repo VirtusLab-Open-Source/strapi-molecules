@@ -2,22 +2,22 @@
 import { Context } from 'koa';
 
 module.exports = {
-  async isPreviewable(ctx: Context) {
-    const isPreviewable = await global.strapi.plugins.preview.services.preview.isPreviewable(
-      ctx.params.contentType,
-    );
-
-    ctx.send({ isPreviewable });
-  },
-
   async findOne(ctx: Context) {
-    const contentPreview = await global.strapi.plugins.preview.services.preview.findOne(
+    const data = await global.strapi.plugins.preview.services.preview.findOne(
       ctx.params.contentType,
       ctx.params.id,
       ctx.query,
     );
 
-    ctx.send(contentPreview);
+    const { transformResponse } = global.strapi.config.plugins['preview'];
+    if (typeof transformResponse === 'function') {
+      return transformResponse(data, ctx.params.contentType, ctx.params.id);
+    }
+
+    return {
+      data,
+      contentType: ctx.params.contentType,
+    };
   },
 
   getPreviewUrl(ctx: Context) {
