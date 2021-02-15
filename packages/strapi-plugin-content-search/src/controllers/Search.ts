@@ -4,7 +4,7 @@ import { get } from 'lodash';
 module.exports = {
   async search(ctx: Context) {
     if (get(ctx, 'query._q', '') === '') {
-      return ctx.throw(400, 'Malformed request body');
+      return ctx.badRequest();
     }
 
     const { searchContentTypes } = global.strapi.plugins[
@@ -30,7 +30,7 @@ module.exports = {
       !ctx.request.body?._q ||
       ctx.request.body._q === ''
     ) {
-      return ctx.throw(400, 'Malformed request body');
+      return ctx.badRequest();
     }
     const { getFieldsToSearch, searchByFields } = global.strapi.plugins[
       'content-search'

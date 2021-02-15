@@ -5,12 +5,12 @@ type QueryParams = Record<string, string> & {
   _q: string;
 };
 
-export const searchSingleContentType = async (
+export const searchSingleContentType = async <T extends unknown>(
   contentType: string,
   params: QueryParams,
   populate?: (string | object)[],
   fields?: Fields[],
-) => {
+): Promise<T[]> => {
   const model = global.strapi.query(contentType)?.model;
   if (model) {
     const result = await search(model, params, populate, fields);
@@ -20,18 +20,19 @@ export const searchSingleContentType = async (
       __contentType: contentType,
     }));
   }
-  return undefined;
+  return [];
 };
 
 export const searchContentTypes = (
   contentTypes: string[],
   params: QueryParams,
-) => {
-  const requests = contentTypes.map((contentType) => {
-    return searchSingleContentType(contentType, params);
-  });
-  return Promise.all(requests).then(flatten);
-};
+) =>
+  Promise.all(
+    contentTypes.map((contentType) => {
+      return searchSingleContentType(contentType, params);
+    }),
+  ).then(flatten);
+
 type Fields = {
   name: string;
   fields?: Fields;
@@ -49,9 +50,9 @@ export const getFieldsToSearch = (contentTypes: ContentType[]) => {
 export const searchByFields = (
   contentTypes: ContentType[],
   query: QueryParams,
-) => {
-  const contentTypesWithFields = contentTypes.map((c) =>
-    searchSingleContentType(c.contentType, query, undefined, c.fields),
-  );
-  return Promise.all(contentTypesWithFields).then(flatten);
-};
+) =>
+  Promise.all(
+    contentTypes.map((c) =>
+      searchSingleContentType(c.contentType, query, undefined, c.fields),
+    ),
+  ).then(flatten);
