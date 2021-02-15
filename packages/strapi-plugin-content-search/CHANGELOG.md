@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-content-search@0.5.4...strapi-plugin-content-search@0.6.0) (2021-02-15)
+
+
+### Features
+
+* **content-search:** add searching by contentTypes and 1 level field… ([#39](https://github.com/VirtusLab/strapi-molecules/issues/39)) ([431141b](https://github.com/VirtusLab/strapi-molecules/commit/431141b4614a2251557c988a95d168ad876fb940))
+
+
+
+
+
 ## [0.5.4](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-content-search@0.5.3...strapi-plugin-content-search@0.5.4) (2020-12-04)
 
 **Note:** Version bump only for package strapi-plugin-content-search

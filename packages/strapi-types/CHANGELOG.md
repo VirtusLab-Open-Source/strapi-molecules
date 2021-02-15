@@ -1,5 +1,21 @@
 # Change Log
 
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [0.8.0](https://github.com/VirtusLab/strapi-molecules/compare/strapi-types@0.7.0...strapi-types@0.8.0) (2021-02-15)
+
+
+### Features
+
+* **content-search:** add searching by contentTypes and 1 level field… ([#39](https://github.com/VirtusLab/strapi-molecules/issues/39)) ([431141b](https://github.com/VirtusLab/strapi-molecules/commit/431141b4614a2251557c988a95d168ad876fb940))
+
+
+
+
+
+# Change Log
+
 All notable changes to this project will be documented in this file. See
 [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
