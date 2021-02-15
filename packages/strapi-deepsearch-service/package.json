@@ -4,6 +4,7 @@
   "description": "Strapi service for deep search using bookshelf (search by components)",
   "main": "src/index.ts",
   "scripts": {
+    "dev": "tsc -w",
     "test": "jest --coverage",
     "build": "tsc",
     "clean": "rimraf dist coverage",

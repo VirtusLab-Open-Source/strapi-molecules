@@ -8,6 +8,7 @@
     "description": "Search api for searchable models"
   },
   "scripts": {
+    "dev": "tsc -w",
     "test": "jest --coverage",
     "build": "tsc",
     "clean": "rimraf dist coverage config controllers services",

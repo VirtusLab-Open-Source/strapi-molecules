@@ -25,6 +25,12 @@ export type RelationAttribute = PluginsCustomConfigurations & {
   via?: string;
 };
 
+export type ToManyRelationAttribute = PluginsCustomConfigurations & {
+  collection: string;
+  attribute: string;
+  column: string;
+};
+
 type PrimitiveTypeAttribute = PluginsCustomConfigurations & {
   type: string;
 };
@@ -33,14 +39,36 @@ export type Attribute =
   | PrimitiveTypeAttribute
   | ComponentAttribute
   | DynamicZoneAttribute
-  | RelationAttribute;
+  | RelationAttribute
+  | ToManyRelationAttribute;
 
 export type Model = BookshelfModel<any> & {
   collectionName: string;
+  modelName: string;
+  databaseName: string;
   primaryKey: string;
   componentsJoinModel: { foreignKey: string } & Model;
   uid: string;
   options: Record<string, any>;
   allAttributes: Record<string, Attribute>;
   attributes: Record<string, Attribute>;
+  associations: Association[];
 };
+export type ModelAssociation = {
+  alias: string;
+  type: 'model' | 'collection';
+  model: string;
+  via: string;
+  nature: string;
+  dominant: boolean;
+};
+export type CollectionAssociation = {
+  alias: string;
+  type: 'model' | 'collection';
+  collection: string;
+  tableCollectionName: string;
+  via: string;
+  nature: string;
+  dominant: boolean;
+};
+export type Association = CollectionAssociation | ModelAssociation;

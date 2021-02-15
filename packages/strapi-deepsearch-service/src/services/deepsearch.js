@@ -41,9 +41,10 @@ export const count = async (model, params = {}) => {
  * @param {object} model - Strapi contentType model
  * @param {object} params - parameters like: _q, contentType.attribute_contains='searchQuery'
  * @param {(string|object)[]=}populate
+ * @param {array} fields - fields to include in search
  * @returns {Promise<any>}
  */
-export const search = async (model, params, populate) => {
+export const search = async (model, params, populate, fields) => {
   const filters = convertRestQueryParams(_.omit(params, '_q'));
 
   return model
@@ -51,7 +52,7 @@ export const search = async (model, params, populate) => {
       qb.distinct();
       qb.select(`${model.collectionName}.*`);
     })
-    .query(buildDeepSearch({ model, params }))
+    .query(buildDeepSearch({ model, params, fields }))
     .query(buildQuery({ model, filters, shouldJoinComponents: false }))
     .fetchAll({ withRelated: populate })
     .then((results) => results.toJSON());
@@ -60,13 +61,14 @@ export const search = async (model, params, populate) => {
  * Count entries based on filters including querySearch (_q)
  * @param {object} model - Strapi contentType model
  * @param {object} params - parameters like: _q, contentType.attribute_contains='searchQuery'
+ * @param {array} fields - fields to include in search
  * @returns {Promise<number>}
  */
-export const countSearch = async (model, params) => {
+export const countSearch = async (model, params, fields) => {
   const filters = convertRestQueryParams(_.omit(params, '_q'));
   return model
     .query(buildDeepSearchCount({ model }))
-    .query(buildDeepSearch({ model, params }))
+    .query(buildDeepSearch({ model, params, fields }))
     .query(buildQuery({ model, filters, shouldJoinComponents: false }))
     .fetch()
     .then((r) => Number(r.toJSON().count));
