@@ -7,7 +7,7 @@ module.exports = {
       return ctx.throw(400, 'Malformed request body');
     }
 
-    const { fetchData } = global.strapi.plugins[
+    const { searchContentTypes } = global.strapi.plugins[
       'content-search'
     ].services.searchabledata;
 
@@ -15,7 +15,32 @@ module.exports = {
       .filter(([_key, value]) => value.options.searchable)
       .map(([_key]) => _key);
 
-    const payload = await fetchData(searchableContentTypes, ctx.query);
+    const payload = await searchContentTypes(searchableContentTypes, ctx.query);
+    const { transformResponse } = global.strapi.config.plugins[
+      'content-search'
+    ];
+    if (typeof transformResponse === 'function') {
+      return transformResponse(payload);
+    }
+    return payload;
+  },
+  async searchByFields(ctx: Context) {
+    if (
+      !ctx.request.body?.contentTypes ||
+      !ctx.request.body?._q ||
+      ctx.request.body._q === ''
+    ) {
+      return ctx.throw(400, 'Malformed request body');
+    }
+    const { getFieldsToSearch, searchByFields } = global.strapi.plugins[
+      'content-search'
+    ].services.searchabledata;
+    const searchableFields = getFieldsToSearch(ctx.request.body.contentTypes);
+    const payload = await searchByFields(searchableFields, {
+      ...ctx.query,
+      _q: ctx.request.body._q,
+    });
+
     const { transformResponse } = global.strapi.config.plugins[
       'content-search'
     ];

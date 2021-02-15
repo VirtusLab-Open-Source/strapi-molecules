@@ -2,7 +2,7 @@ const { search } = require('../src/controllers/Search');
 const { StrapiBuilder } = require('strapi-builder');
 
 describe('content search test', () => {
-  const fetchData = jest.fn();
+  const searchContentTypes = jest.fn();
 
   test('search: should trigger fetchData function with [searchableComponent] and first string arguments', async () => {
     global.strapi = new StrapiBuilder()
@@ -10,7 +10,7 @@ describe('content search test', () => {
         'content-search': {
           services: {
             searchabledata: {
-              fetchData,
+              searchContentTypes,
             },
           },
         },
@@ -31,7 +31,7 @@ describe('content search test', () => {
       .build();
 
     await search({ query: { _q: 'first' } });
-    expect(fetchData).toBeCalledWith(['searchableComponent'], {
+    expect(searchContentTypes).toBeCalledWith(['searchableComponent'], {
       _q: 'first',
     });
   });
@@ -42,7 +42,7 @@ describe('content search test', () => {
         'content-search': {
           services: {
             searchabledata: {
-              fetchData,
+              searchContentTypes,
             },
           },
         },
@@ -68,7 +68,7 @@ describe('content search test', () => {
       .build();
 
     await search({ query: { _q: 'second' } });
-    expect(fetchData).toBeCalledWith(
+    expect(searchContentTypes).toBeCalledWith(
       [
         'searchableComponent',
         'secondSearchableComponent',
@@ -84,7 +84,7 @@ describe('content search test', () => {
         'content-search': {
           services: {
             searchabledata: {
-              fetchData,
+              searchContentTypes,
             },
           },
         },
@@ -104,7 +104,7 @@ describe('content search test', () => {
       })
       .build();
     await search({ query: { _q: 'third' } });
-    expect(fetchData).toBeCalledWith([], { _q: 'third' });
+    expect(searchContentTypes).toBeCalledWith([], { _q: 'third' });
   });
 });
 

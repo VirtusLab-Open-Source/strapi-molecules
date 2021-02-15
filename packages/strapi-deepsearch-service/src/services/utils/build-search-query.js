@@ -9,7 +9,7 @@ const { isModelAttrSearchable } = require('./component-utils');
  * @param {*} params
  * @param {object} qb - knex query builder instance
  */
-const buildSearchQuery = ({ model, params, qb }) => {
+const buildSearchQuery = ({ model, params, qb, fields }) => {
   const query = params._q;
 
   const associations = model.associations.map((x) => x.alias);
@@ -40,9 +40,12 @@ const buildSearchQuery = ({ model, params, qb }) => {
   if ([...numberTypes, ...stringTypes].includes(model.primaryKeyType)) {
     _searchColumns.push(model.primaryKey);
   }
-  const searchColumns = _searchColumns.filter((attr) =>
-    isModelAttrSearchable(model, attr),
-  );
+  const searchColumns = _searchColumns.filter((attr) => {
+    const shouldSearchField = Array.isArray(fields)
+      ? fields.some((f) => f.name === attr)
+      : true;
+    return isModelAttrSearchable(model, attr) && shouldSearchField;
+  });
   // Search in columns with text using index.
   switch (model.client) {
     case 'pg':

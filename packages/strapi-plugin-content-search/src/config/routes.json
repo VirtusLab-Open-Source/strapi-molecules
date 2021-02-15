@@ -7,6 +7,14 @@
       "config": {
         "policies": []
       }
+    },
+    {
+      "method": "POST",
+      "path": "/",
+      "handler": "Search.searchByFields",
+      "config": {
+        "policies": []
+      }
     }
   ]
 }

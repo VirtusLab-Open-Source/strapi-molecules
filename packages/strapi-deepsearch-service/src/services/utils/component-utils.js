@@ -5,6 +5,10 @@ const isModelComponent = (model, part) => {
   }
   return false;
 };
+const isDynamicZone = (model, part) => {
+  const attribute = model.allAttributes[part];
+  return attribute && attribute.type === 'dynamiczone';
+};
 
 const isModelComponentSearchable = (model, componentName) => {
   const attribute = model.allAttributes[componentName];
@@ -30,6 +34,7 @@ const isModelAttrSearchable = (model, attr) => {
 
 module.exports = {
   isModelComponent,
+  isDynamicZone,
   getComponentByModel,
   isModelComponentSearchable,
   isModelSearchable,
