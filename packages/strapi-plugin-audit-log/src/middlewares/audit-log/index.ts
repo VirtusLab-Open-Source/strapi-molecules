@@ -64,8 +64,11 @@ class AuditLog {
       this.endpoints.some(_ => url.startsWith(`/${_}`));
   }
 
-  getEndpointConfig({ url }: KoaContext) {
-    return this.config.map.find(_ => url.startsWith(`/${_.pluginName}`));
+  getEndpointConfig(ctx: KoaContext) {
+    if (ctx) {
+      const url = ctx.url || ''
+      return this.config.map.find(_ => url.startsWith(`/${_.pluginName}`));
+    }
   }
 
   initialize() {
