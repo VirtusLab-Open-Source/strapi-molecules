@@ -58,10 +58,13 @@ class AuditLog {
     return plugin.services[serviceName] = service;
   }
 
-  condition({ method, url }: KoaContext) {
-    return this.methods.includes(method) &&
-      this.exclude.every(_ => !url.startsWith(`/${_}`)) &&
-      this.endpoints.some(_ => url.startsWith(`/${_}`));
+  condition(ctx: KoaContext) {
+    if (ctx) {
+      const { method, url } = ctx;
+      return this.methods.includes(method) &&
+        this.exclude.every(_ => !url.startsWith(`/${_}`)) &&
+        this.endpoints.some(_ => url.startsWith(`/${_}`));
+    }
   }
 
   getEndpointConfig(ctx: KoaContext) {
@@ -78,7 +81,7 @@ class AuditLog {
         if (typeof originalFunction === 'function') {
           controller[key] = (ctx: KoaContext) => {
             const endpointConfig = this.getEndpointConfig(ctx);
-            if (this.condition(ctx) && endpointConfig) {
+            if (endpointConfig && this.condition(ctx)) {
               ctx.auditLog = getService(endpointConfig, this.strapi, ctx.state.user);
             }
             return originalFunction.call(controller, ctx);
@@ -101,9 +104,9 @@ class AuditLog {
             try {
               // run does not have to return a promise
               (ctx as KoaContext).auditLog?.run(ctx.method, ctx as KoaContext, endpointConfig)
-                ?.catch(error => {
-                  this.strapi.log.error(`Error on create audit log: ${error.message}`, error.stack);
-                });
+                                 ?.catch(error => {
+                                   this.strapi.log.error(`Error on create audit log: ${error.message}`, error.stack);
+                                 });
             } catch (error) {
               this.strapi.log.error(`Error on create audit log: ${error.message}`, error.stack);
             }
