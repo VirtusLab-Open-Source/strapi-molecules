@@ -1,13 +1,23 @@
 import PropTypes from 'prop-types';
-import React, { useState, useMemo, useContext, createContext } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useMemo,
+  useState,
+  useCallback,
+} from 'react';
 import { useIntl } from 'react-intl';
-import { request, PopUpWarning } from 'strapi-helper-plugin';
+import { PopUpWarning, request } from 'strapi-helper-plugin';
+import { useHistory, useLocation } from 'react-router-dom';
 
-import { get, isEmpty, isEqual } from 'lodash';
+import { get, isEmpty, isEqual, noop } from 'lodash';
 
 const CONTENT_MANAGER_PLUGIN_ID = 'content-manager';
 
 const PreviewContext = createContext(undefined);
+
+const getRequestUrlBackup = (path) =>
+  `/${CONTENT_MANAGER_PLUGIN_ID}/explorer/${path}`;
 
 export const PreviewProvider = ({
   children,
@@ -18,7 +28,8 @@ export const PreviewProvider = ({
   slug,
   canUpdate,
   canCreate,
-  getPreviewUrlParams = () => ({}),
+  getPreviewUrlParams = noop,
+  getRequestUrl = getRequestUrlBackup,
 }) => {
   const { formatMessage } = useIntl();
 
@@ -26,8 +37,17 @@ export const PreviewProvider = ({
   const [showWarningPublish, setWarningPublish] = useState(false);
   const [isButtonLoading, setButtonLoading] = useState(false);
 
-  const isPreviewable = get(layout, 'schema.options.previewable', false);
-  const isCloneable = get(layout, 'schema.options.cloneable', false);
+  // for strapi 3.5.x
+  const isPreviewable = get(
+    layout,
+    'schema.options.previewable',
+    get(layout, ['options', 'previewable'], false),
+  );
+  const isCloneable = get(
+    layout,
+    'schema.options.cloneable',
+    get(layout, ['options', 'cloneable'], false),
+  );
 
   const toggleWarningClone = () => setWarningClone((prevState) => !prevState);
   const toggleWarningPublish = () =>
@@ -39,6 +59,20 @@ export const PreviewProvider = ({
       (isCreatingEntry && !isEmpty(modifiedData))
     );
   }, [initialData, isCreatingEntry, modifiedData]);
+
+  const {
+    state: { from },
+  } = useLocation();
+  const { push } = useHistory();
+  const redirect = useCallback(
+    (id) => {
+      push({
+        pathname: `${from}/${id}`,
+        state: { from },
+      });
+    },
+    [from, push],
+  );
 
   const previewHeaderActions = useMemo(() => {
     const headerActions = [];
@@ -92,9 +126,7 @@ export const PreviewProvider = ({
             id: getPreviewPluginTrad('containers.Edit.publish'),
           }),
           color: 'primary',
-          onClick: async () => {
-            toggleWarningPublish();
-          },
+          onClick: toggleWarningPublish,
           type: 'button',
           style: {
             paddingLeft: 15,
@@ -147,7 +179,7 @@ export const PreviewProvider = ({
 
       strapi.notification.success(getPreviewPluginTrad('success.record.clone'));
 
-      window.location.replace(getFrontendEntityUrl(slug, clonedPayload.id));
+      redirect(clonedPayload.id);
     } catch (err) {
       const errorMessage = get(
         err,
@@ -184,7 +216,7 @@ export const PreviewProvider = ({
       strapi.notification.success(
         getPreviewPluginTrad('success.record.publish'),
       );
-      window.location.replace(getFrontendEntityUrl(slug, targetId));
+      redirect(targetId);
     } catch (err) {
       const errorMessage = get(
         err,
@@ -270,11 +302,6 @@ function prepareToPublish(payload) {
 
   return payload;
 }
-
-const getRequestUrl = (path) =>
-  `/${CONTENT_MANAGER_PLUGIN_ID}/explorer/${path}`;
-const getFrontendEntityUrl = (path, id) =>
-  `/admin/plugins/${CONTENT_MANAGER_PLUGIN_ID}/collectionType/${path}/${id}`;
 
 const getPreviewPluginTrad = (id) => `preview.${id}`;
 
