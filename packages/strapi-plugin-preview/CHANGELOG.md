@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-preview@0.5.0...strapi-plugin-preview@0.6.0) (2021-04-06)
+
+
+### Features
+
+* prepare plugin to new strapi version ([#46](https://github.com/VirtusLab/strapi-molecules/issues/46)) ([9cc7447](https://github.com/VirtusLab/strapi-molecules/commit/9cc744732363eb8388e0afc43aa552ecc8375ee4))
+
+
+
+
+
 # [0.5.0](https://github.com/VirtusLab/strapi-molecules/compare/strapi-plugin-preview@0.4.1...strapi-plugin-preview@0.5.0) (2021-01-06)
 
 
