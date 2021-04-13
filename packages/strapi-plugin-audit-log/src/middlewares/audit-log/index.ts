@@ -2,8 +2,12 @@ import { Context, Next } from 'koa';
 import { MiddlewareConfig, Strapi } from 'strapi-types';
 import { createDecorate, getService } from './util';
 import forEach from 'lodash/forEach';
-import { AuditLogMiddleware, KoaContext, ServiceConfig, SupportMethods } from './types';
-
+import {
+  AuditLogMiddleware,
+  KoaContext,
+  ServiceConfig,
+  SupportMethods,
+} from './types';
 
 class AuditLog {
   private readonly _strapi: Strapi;
@@ -20,11 +24,15 @@ class AuditLog {
   }
 
   get config() {
-    return (this.strapi.config.middleware.settings['audit-log'] as MiddlewareConfig<AuditLogMiddleware>) || { map: [] };
+    return (
+      (this.strapi.config.middleware.settings['audit-log'] as MiddlewareConfig<
+        AuditLogMiddleware
+      >) || { map: [] }
+    );
   }
 
   get endpoints() {
-    return (this.config.map || []).map(_ => _.pluginName);
+    return (this.config.map || []).map((_) => _.pluginName);
   }
 
   get methods(): SupportMethods[] {
@@ -43,9 +51,9 @@ class AuditLog {
     return this.plugins[pluginName];
   }
 
-  getController({ pluginName, serviceName }: ServiceConfig) {
+  getController({ pluginName, controllerName }: ServiceConfig) {
     const plugin = this.getPlugin(pluginName);
-    return plugin.controllers[serviceName];
+    return plugin.controllers[controllerName];
   }
 
   getService({ pluginName, serviceName }: ServiceConfig) {
@@ -55,34 +63,40 @@ class AuditLog {
 
   setService({ pluginName, serviceName }: ServiceConfig, service: any) {
     const plugin = this.getPlugin(pluginName);
-    return plugin.services[serviceName] = service;
+    return (plugin.services[serviceName] = service);
   }
 
   condition(ctx: KoaContext) {
     if (ctx) {
       const { method, url } = ctx;
-      return this.methods.includes(method) &&
-        this.exclude.every(_ => !url.startsWith(`/${_}`)) &&
-        this.endpoints.some(_ => url.startsWith(`/${_}`));
+      return (
+        this.methods.includes(method) &&
+        this.exclude.every((_) => !url.startsWith(`/${_}`)) &&
+        this.endpoints.some((_) => url.startsWith(`/${_}`))
+      );
     }
   }
 
   getEndpointConfig(ctx: KoaContext) {
     if (ctx) {
-      const url = ctx.url || ''
-      return this.config.map.find(_ => url.startsWith(`/${_.pluginName}`));
+      const url = ctx.url || '';
+      return this.config.map.find((_) => url.startsWith(`/${_.pluginName}`));
     }
   }
 
   initialize() {
-    this.config.map.forEach(config => {
+    this.config.map.forEach((config) => {
       const controller = this.getController(config);
       forEach(controller, (originalFunction, key) => {
         if (typeof originalFunction === 'function') {
           controller[key] = (ctx: KoaContext) => {
             const endpointConfig = this.getEndpointConfig(ctx);
             if (endpointConfig && this.condition(ctx)) {
-              ctx.auditLog = getService(endpointConfig, this.strapi, ctx.state.user);
+              ctx.auditLog = getService(
+                endpointConfig,
+                this.strapi,
+                ctx.state.user,
+              );
             }
             return originalFunction.call(controller, ctx);
           };
@@ -103,12 +117,19 @@ class AuditLog {
             // handle sync errors
             try {
               // run does not have to return a promise
-              (ctx as KoaContext).auditLog?.run(ctx.method, ctx as KoaContext, endpointConfig)
-                                 ?.catch(error => {
-                                   this.strapi.log.error(`Error on create audit log: ${error.message}`, error.stack);
-                                 });
+              (ctx as KoaContext).auditLog
+                ?.run(ctx.method, ctx as KoaContext, endpointConfig)
+                ?.catch((error) => {
+                  this.strapi.log.error(
+                    `Error on create audit log: ${error.message}`,
+                    error.stack,
+                  );
+                });
             } catch (error) {
-              this.strapi.log.error(`Error on create audit log: ${error.message}`, error.stack);
+              this.strapi.log.error(
+                `Error on create audit log: ${error.message}`,
+                error.stack,
+              );
             }
           }
           if (endpointConfig.decorate) {
