@@ -4,7 +4,6 @@ import camelCase from 'lodash/camelCase';
 import deepDiff from 'deep-diff';
 import { AvailableAction } from '../lib';
 
-
 const PLUGIN_MODEL_NAME = 'plugins::audit-log.audit_logs';
 
 const toCamelCase = (object: any) => {
@@ -20,8 +19,13 @@ const toCamelCase = (object: any) => {
   return object;
 };
 
-
-const create = async (originId: string | number, userId: string, actionType: AvailableAction, originModelName: string, content: string): Promise<void> => {
+const create = async (
+  originId: string | number,
+  userId: string,
+  actionType: AvailableAction,
+  originModelName: string,
+  content: string,
+): Promise<void> => {
   const entityService = global.strapi.entityService;
   if (entityService && entityService.create) {
     return entityService.create(
@@ -32,12 +36,13 @@ const create = async (originId: string | number, userId: string, actionType: Ava
           model_name: originModelName,
           action: actionType,
           created_by: userId,
+          timestamp: new Date().toISOString(),
         },
       },
       { model: PLUGIN_MODEL_NAME },
     );
   }
-  return new Promise(resolve => setTimeout(resolve, 0));
+  return new Promise((resolve) => setTimeout(resolve, 0));
 };
 
 const getVersions = async (model: string, originId: string) => {
@@ -48,7 +53,8 @@ const getVersions = async (model: string, originId: string) => {
         params: { origin_id: originId, model_name: model },
         populate: false,
       },
-      { model: PLUGIN_MODEL_NAME });
+      { model: PLUGIN_MODEL_NAME },
+    );
     return {
       results: results
         .map(omitAll(['content', 'updated_by', 'created_by']))
@@ -60,23 +66,37 @@ const getVersions = async (model: string, originId: string) => {
 
 const getHistory = async (originId: string, model: string, version: string) => {
   const dataModel = global.strapi.query(PLUGIN_MODEL_NAME)?.model;
-  const data = await dataModel?.query((qb: QueryBuilder) => {
-    qb
-      .where({ origin_id: originId, model_name: model })
-      .andWhere('id', '>=', version);
-  })
+  const data = await dataModel
+    ?.query((qb: QueryBuilder) => {
+      qb.where({ origin_id: originId, model_name: model }).andWhere(
+        'id',
+        '>=',
+        version,
+      );
+    })
     .orderBy('id', 'DESC')
     .fetchAll({ withRelated: false });
   return data.toJSON();
 };
 
-const getSnapshots = async (model: string, originId: string, version: string) => {
-  const serviceConfig = global.strapi.config.middleware.settings['audit-log'].map.find((_: any) => _.pluginName === model);
+const getSnapshots = async (
+  model: string,
+  originId: string,
+  version: string,
+) => {
+  const serviceConfig = global.strapi.config.middleware.settings[
+    'audit-log'
+  ].map.find((_: any) => _.pluginName === model);
   const entityService = global.strapi.entityService;
   if (serviceConfig && entityService && entityService.find) {
-    const service = global.strapi.plugins[serviceConfig.pluginName].services[serviceConfig.serviceName];
+    const service =
+      global.strapi.plugins[serviceConfig.pluginName].services[
+        serviceConfig.serviceName
+      ];
     const history = await getHistory(originId, model, version);
-    const entity = await service[serviceConfig.fetchSingle || 'fetch'](originId);
+    const entity = await service[serviceConfig.fetchSingle || 'fetch'](
+      originId,
+    );
     const changes = history.flatMap(({ content }: any) => content);
     changes.map((_: any) => {
       deepDiff.revertChange(entity, entity, _);
@@ -92,7 +112,8 @@ const getSnapshots = async (model: string, originId: string, version: string) =>
         },
         populate: true,
       },
-      { model });
+      { model },
+    );
     entity = entity || {};
     const changes = history.flatMap(({ content }: any) => content);
     changes.map((_: any) => {
@@ -102,7 +123,6 @@ const getSnapshots = async (model: string, originId: string, version: string) =>
   }
   return Promise.resolve({ entity: {} });
 };
-
 
 module.exports = {
   create,

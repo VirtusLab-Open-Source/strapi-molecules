@@ -47,7 +47,7 @@
       "configurable": false
     },
     "timestamp": {
-      "type": "currentTimestamp",
+      "type": "timestamp",
       "configurable": false
     }
   }
