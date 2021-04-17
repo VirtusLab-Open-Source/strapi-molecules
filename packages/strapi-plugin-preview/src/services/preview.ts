@@ -37,9 +37,15 @@ module.exports = {
     contentId: string,
     _query: Record<string, string | number>,
   ) {
-    const previewUrl = global.strapi.config.get('custom.previewUrl') || '';
+    const previewUrl =
+      global.strapi.config.get('plugins.preview.previewUrl') || '';
+    const publicationState = global.strapi.config.get(
+      'plugins.preview.publicationState',
+    );
 
-    return this.replacePreviewParams(contentType, contentId, previewUrl);
+    return `${this.replacePreviewParams(contentType, contentId, previewUrl)}${
+      publicationState ? `?_publicationState=${publicationState}` : ''
+    }`;
   },
 
   replacePreviewParams(contentType: string, contentId: string, url: string) {
