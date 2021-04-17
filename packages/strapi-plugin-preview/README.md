@@ -45,14 +45,15 @@ overwrite original contentType record
 -**Preview your entry** With customised preview URI, You can preview your draft
 (entry)
 
-## Preview URL customization: Custom.js
+## Preview URL customization: plugins.js
 
-in file `/config/custom.js` need to add previewUrl field with two parameters
+in file `/config/plugins.js` need to add previewUrl field with two parameters
 like below:
 
-```json
-{
-  "previewUrl": "http://localhost:8001/preview/:contentType/:id"
+```js
+preview: {
+  publicationState: 'preview',
+  previewUrl: 'http://localhost:8001/preview/:contentType/:id'
 }
 ```
 
@@ -94,7 +95,7 @@ Previewing and Cloning could be mixed, or you can just set one of them.
 - Clone - Go to entry and click Clone (it will add new entry and set relation to
   original entry "cloneOf")
 - Preview - Go to entry and click Preview (it will redirect to URI provided in
-  custom.js configuration with injected contentType and id)
+  plugins.js configuration with injected contentType and id)
 - Publish - if entry has `cloneOf` relation, than You will be able to replace
   original entry with your modified one by clicking "publish" and confirmation
   in modal
