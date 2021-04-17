@@ -8,10 +8,11 @@ module.exports = {
       ctx.params.id,
       ctx.query,
     );
-
-    const { transformResponse } = global.strapi.config.plugins['preview'];
-    if (typeof transformResponse === 'function') {
-      return transformResponse(data, ctx.params.contentType, ctx.params.id);
+    if (global.strapi.config.plugins['preview']) {
+      const { transformResponse } = global.strapi.config.plugins['preview'];
+      if (typeof transformResponse === 'function') {
+        return transformResponse(data, ctx.params.contentType, ctx.params.id);
+      }
     }
 
     return {
