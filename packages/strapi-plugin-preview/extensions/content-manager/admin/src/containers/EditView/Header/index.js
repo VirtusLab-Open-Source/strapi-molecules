@@ -4,17 +4,9 @@ import { Header as PluginHeader } from '@buffetjs/custom';
 import { get, isEqual, isEmpty, toString } from 'lodash';
 import PropTypes from 'prop-types';
 import isEqualFastCompare from 'react-fast-compare';
-import { Button, Text, Padded } from '@buffetjs/core';
-import {
-  PopUpWarning,
-  templateObject,
-  PopUpWarningBody,
-  PopUpWarningFooter,
-  PopUpWarningHeader,
-  PopUpWarningIcon,
-  PopUpWarningModal,
-} from 'strapi-helper-plugin';
+import { Text } from '@buffetjs/core';
 import { usePreview } from 'strapi-plugin-preview';
+import { templateObject, ModalConfirm } from 'strapi-helper-plugin';
 import { getTrad } from '../../../utils';
 import { connect, getDraftRelations, select } from './utils';
 
@@ -28,45 +20,53 @@ const primaryButtonObject = {
 };
 
 const Header = ({
-  canUpdate,
-  canCreate,
-  canPublish,
+  allowedActions: { canUpdate, canCreate, canPublish },
   componentLayouts,
   initialData,
   isCreatingEntry,
   isSingleType,
-  status,
-  layout,
   hasDraftAndPublish,
+  layout,
   modifiedData,
   onPublish,
   onUnpublish,
+  status,
 }) => {
   const { previewHeaderActions } = usePreview();
   const [showWarningUnpublish, setWarningUnpublish] = useState(false);
   const { formatMessage } = useIntl();
   const formatMessageRef = useRef(formatMessage);
   const [draftRelationsCount, setDraftRelationsCount] = useState(0);
-  const [showWarningDraftRelation, setShowWarningDraftRelation] = useState(false);
+  const [showWarningDraftRelation, setShowWarningDraftRelation] = useState(
+    false,
+  );
   const [shouldUnpublish, setShouldUnpublish] = useState(false);
   const [shouldPublish, setShouldPublish] = useState(false);
 
-  const currentContentTypeMainField = useMemo(() => get(layout, ['settings', 'mainField'], 'id'), [
+  const currentContentTypeMainField = useMemo(
+    () => get(layout, ['settings', 'mainField'], 'id'),
+    [layout],
+  );
+
+  const currentContentTypeName = useMemo(() => get(layout, ['info', 'name']), [
     layout,
   ]);
-  const currentContentTypeName = useMemo(() => get(layout, ['schema', 'info', 'name']), [layout]);
 
   const didChangeData = useMemo(() => {
-    return !isEqual(initialData, modifiedData) || (isCreatingEntry && !isEmpty(modifiedData));
+    return (
+      !isEqual(initialData, modifiedData) ||
+      (isCreatingEntry && !isEmpty(modifiedData))
+    );
   }, [initialData, isCreatingEntry, modifiedData]);
   const apiID = useMemo(() => layout.apiID, [layout.apiID]);
 
   /* eslint-disable indent */
   const entryHeaderTitle = isCreatingEntry
     ? formatMessage({
-      id: getTrad('containers.Edit.pluginHeader.title.new'),
-    })
-    : templateObject({ mainField: currentContentTypeMainField }, initialData).mainField;
+        id: getTrad('containers.Edit.pluginHeader.title.new'),
+      })
+    : templateObject({ mainField: currentContentTypeMainField }, initialData)
+        .mainField;
   /* eslint-enable indent */
 
   const headerTitle = useMemo(() => {
@@ -103,21 +103,22 @@ const Header = ({
         },
       ];
     }
-
     if (hasDraftAndPublish && canPublish) {
       const isPublished = !isEmpty(initialData.published_at);
-      const isLoading = isPublished ? status === 'unpublish-pending' : status === 'publish-pending';
+      const isLoading = isPublished
+        ? status === 'unpublish-pending'
+        : status === 'publish-pending';
       const labelID = isPublished ? 'app.utils.unpublish' : 'app.utils.publish';
       /* eslint-disable indent */
       const onClick = isPublished
         ? () => setWarningUnpublish(true)
-        : e => {
-          if (!checkIfHasDraftRelations()) {
-            onPublish(e);
-          } else {
-            setShowWarningDraftRelation(true);
-          }
-        };
+        : (e) => {
+            if (!checkIfHasDraftRelations()) {
+              onPublish(e);
+            } else {
+              setShowWarningDraftRelation(true);
+            }
+          };
       /* eslint-enable indent */
 
       const action = {
@@ -152,15 +153,18 @@ const Header = ({
       title: {
         label: toString(headerTitle),
       },
-      content: `${formatMessageRef.current({ id: getTrad('api.id') })} : ${apiID}`,
+      content: `${formatMessageRef.current({
+        id: getTrad('api.id'),
+      })} : ${apiID}`,
       actions: headerActions,
     };
   }, [headerActions, headerTitle, apiID]);
 
-  const toggleWarningPublish = () => setWarningUnpublish(prevState => !prevState);
+  const toggleWarningPublish = () =>
+    setWarningUnpublish((prevState) => !prevState);
 
   const toggleWarningDraftRelation = useCallback(() => {
-    setShowWarningDraftRelation(prev => !prev);
+    setShowWarningDraftRelation((prev) => !prev);
   }, []);
 
   const handleConfirmPublish = useCallback(() => {
@@ -174,118 +178,97 @@ const Header = ({
   }, []);
 
   const handleCloseModalPublish = useCallback(
-    e => {
+    (e) => {
       if (shouldPublish) {
         onPublish(e);
       }
 
       setShouldUnpublish(false);
     },
-    [onPublish, shouldPublish]
+    [onPublish, shouldPublish],
   );
 
   const handleCloseModalUnpublish = useCallback(
-    e => {
+    (e) => {
       if (shouldUnpublish) {
         onUnpublish(e);
       }
 
       setShouldUnpublish(false);
     },
-    [onUnpublish, shouldUnpublish]
+    [onUnpublish, shouldUnpublish],
   );
 
-  const boldText = formatMessage(
-    {
-      id: getTrad(
-        `popUpwarning.warning.has-draft-relations.message.bold-text.${
-          draftRelationsCount > 1 ? 'plural' : 'singular'
-        }`
-      ),
-    },
-    { count: draftRelationsCount }
-  );
-
-  const buttonCancelLabel = useMemo(
-    () =>
-      formatMessage({
-        id: 'components.popUpWarning.button.cancel',
-      }),
-    [formatMessage]
-  );
-  const buttonConfirmLabel = useMemo(
-    () =>
-      formatMessage({
-        id: getTrad('popUpwarning.warning.has-draft-relations.button-confirm'),
-      }),
-    [formatMessage]
-  );
+  const contentIdSuffix = draftRelationsCount > 1 ? 'plural' : 'singular';
 
   return (
     <>
       <PluginHeader {...headerProps} />
-      <PopUpWarning
-        isOpen={showWarningUnpublish}
-        toggleModal={toggleWarningPublish}
-        content={{
-          message: getTrad('popUpWarning.warning.unpublish'),
-          secondMessage: getTrad('popUpWarning.warning.unpublish-question'),
-        }}
-        popUpWarningType="danger"
-        onConfirm={handleConfirmUnpublish}
-        onClosed={handleCloseModalUnpublish}
-      />
-      <PopUpWarningModal
-        isOpen={showWarningDraftRelation}
-        toggle={toggleWarningDraftRelation}
-        onClosed={handleCloseModalPublish}
-      >
-        <PopUpWarningHeader
-          onClick={toggleWarningDraftRelation}
-          title="components.popUpWarning.title"
-        />
-        <PopUpWarningBody>
-          <PopUpWarningIcon type="danger" />
-          <Text lineHeight="18px">
-            <Text as="span" fontWeight="bold">
-              {boldText}&nbsp;
+      {hasDraftAndPublish && (
+        <>
+          <ModalConfirm
+            isOpen={showWarningUnpublish}
+            toggle={toggleWarningPublish}
+            content={{
+              id: getTrad('popUpWarning.warning.unpublish'),
+              values: {
+                br: () => <br />,
+              },
+            }}
+            type="xwarning"
+            onConfirm={handleConfirmUnpublish}
+            onClosed={handleCloseModalUnpublish}
+          >
+            <Text>
+              {formatMessage({
+                id: getTrad('popUpWarning.warning.unpublish-question'),
+              })}
             </Text>
-            {formatMessage({
-              id: getTrad('popUpwarning.warning.has-draft-relations.first-message'),
-            })}
-          </Text>
-          <Text lineHeight="18px">
-            {formatMessage({
-              id: getTrad('popUpwarning.warning.has-draft-relations.second-message'),
-            })}
-          </Text>
-          <Padded top size="smd">
-            <Text>{formatMessage({ id: getTrad('popUpWarning.warning.publish-question') })}</Text>
-          </Padded>
-        </PopUpWarningBody>
-        <PopUpWarningFooter>
-          <Button
-            color="cancel"
-            type="button"
-            onClick={toggleWarningDraftRelation}
-            label={buttonCancelLabel}
-          />
-          <Button
-            color="success"
-            type="button"
-            onClick={handleConfirmPublish}
-            label={buttonConfirmLabel}
-          />
-        </PopUpWarningFooter>
-      </PopUpWarningModal>
+          </ModalConfirm>
+          <ModalConfirm
+            confirmButtonLabel={{
+              id: getTrad(
+                'popUpwarning.warning.has-draft-relations.button-confirm',
+              ),
+            }}
+            isOpen={showWarningDraftRelation}
+            toggle={toggleWarningDraftRelation}
+            onClosed={handleCloseModalPublish}
+            onConfirm={handleConfirmPublish}
+            type="success"
+            content={{
+              id: getTrad(
+                `popUpwarning.warning.has-draft-relations.message.${contentIdSuffix}`,
+              ),
+              values: {
+                count: draftRelationsCount,
+                b: (chunks) => (
+                  <Text as="span" fontWeight="bold">
+                    {chunks}
+                  </Text>
+                ),
+                br: () => <br />,
+              },
+            }}
+          >
+            <Text>
+              {formatMessage({
+                id: getTrad('popUpWarning.warning.publish-question'),
+              })}
+            </Text>
+          </ModalConfirm>
+        </>
+      )}
     </>
   );
 };
 
 Header.propTypes = {
-  canUpdate: PropTypes.bool.isRequired,
-  canCreate: PropTypes.bool.isRequired,
-  canPublish: PropTypes.bool.isRequired,
+  allowedActions: PropTypes.shape({
+    canUpdate: PropTypes.bool.isRequired,
+    canCreate: PropTypes.bool.isRequired,
+    canPublish: PropTypes.bool.isRequired,
+  }).isRequired,
   componentLayouts: PropTypes.object.isRequired,
   initialData: PropTypes.object.isRequired,
   isCreatingEntry: PropTypes.bool.isRequired,
