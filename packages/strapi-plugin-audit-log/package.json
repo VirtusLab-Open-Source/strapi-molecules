@@ -1,6 +1,6 @@
 {
   "name": "strapi-plugin-audit-log",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Strapi - Audit log plugin",
   "strapi": {
     "name": "Audit log",
