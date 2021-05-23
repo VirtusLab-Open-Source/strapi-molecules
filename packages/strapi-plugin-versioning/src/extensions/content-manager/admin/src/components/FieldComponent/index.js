@@ -1,22 +1,21 @@
 /* eslint-disable  import/no-cycle */
-import React, { memo } from "react";
-import PropTypes from "prop-types";
-import { get, size } from "lodash";
-import { FormattedMessage } from "react-intl";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import isEqual from "react-fast-compare";
-import pluginId from "../../pluginId";
-import useEditView from "../../hooks/useEditView";
-import ComponentInitializer from "../ComponentInitializer";
-import NonRepeatableComponent from "../NonRepeatableComponent";
-import NotAllowedInput from "../NotAllowedInput";
-import RepeatableComponent from "../RepeatableComponent";
-import connect from "./utils/connect";
-import select from "./utils/select";
-import ComponentIcon from "./ComponentIcon";
-import Label from "./Label";
-import Reset from "./ResetComponent";
-import Wrapper from "./Wrapper";
+import React, { memo } from 'react';
+import PropTypes from 'prop-types';
+import { size } from 'lodash';
+import { FormattedMessage } from 'react-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import isEqual from 'react-fast-compare';
+import { NotAllowedInput } from 'strapi-helper-plugin';
+import pluginId from '../../pluginId';
+import ComponentInitializer from '../ComponentInitializer';
+import NonRepeatableComponent from '../NonRepeatableComponent';
+import RepeatableComponent from '../RepeatableComponent';
+import connect from './utils/connect';
+import select from './utils/select';
+import ComponentIcon from './ComponentIcon';
+import Label from './Label';
+import Reset from './ResetComponent';
+import Wrapper from './Wrapper';
 
 const FieldComponent = ({
   componentFriendlyName,
@@ -36,25 +35,14 @@ const FieldComponent = ({
   isReadOnly,
   componentValue,
   removeComponentFromField,
-  dataForCurrentVersion,
-  isVersionCurrent,
 }) => {
-  const { allLayoutData } = useEditView();
-
   const componentValueLength = size(componentValue);
-  const isInitialized = componentValue || isFromDynamicZone;
+  const isInitialized = componentValue !== null || isFromDynamicZone;
   const showResetComponent =
     !isRepeatable &&
     isInitialized &&
     !isFromDynamicZone &&
     hasChildrenAllowedFields;
-  const currentComponentSchema = get(
-    allLayoutData,
-    ["components", componentUid],
-    {},
-  );
-
-  const displayedFields = get(currentComponentSchema, ["layouts", "edit"], []);
 
   if (!hasChildrenAllowedFields && isCreatingEntry) {
     return (
@@ -115,12 +103,8 @@ const FieldComponent = ({
       {!isRepeatable && isInitialized && (
         <NonRepeatableComponent
           componentUid={componentUid}
-          fields={displayedFields}
           isFromDynamicZone={isFromDynamicZone}
           name={name}
-          schema={currentComponentSchema}
-          dataForCurrentVersion={dataForCurrentVersion}
-          isVersionCurrent={isVersionCurrent}
         />
       )}
       {isRepeatable && (
@@ -128,16 +112,11 @@ const FieldComponent = ({
           componentValue={componentValue}
           componentValueLength={componentValueLength}
           componentUid={componentUid}
-          fields={displayedFields}
-          isFromDynamicZone={isFromDynamicZone}
           isNested={isNested}
           isReadOnly={isReadOnly}
           max={max}
           min={min}
           name={name}
-          schema={currentComponentSchema}
-          dataForCurrentVersion={dataForCurrentVersion}
-          isVersionCurrent={isVersionCurrent}
         />
       )}
     </Wrapper>
@@ -149,15 +128,13 @@ FieldComponent.defaultProps = {
   componentFriendlyName: null,
   hasChildrenAllowedFields: false,
   hasChildrenReadableFields: false,
-  icon: "smile",
+  icon: 'smile',
   isFromDynamicZone: false,
   isReadOnly: false,
   isRepeatable: false,
   isNested: false,
   max: Infinity,
   min: -Infinity,
-  dataForCurrentVersion: undefined,
-  isVersionCurrent: true,
 };
 
 FieldComponent.propTypes = {
@@ -177,8 +154,6 @@ FieldComponent.propTypes = {
   min: PropTypes.number,
   name: PropTypes.string.isRequired,
   removeComponentFromField: PropTypes.func.isRequired,
-  dataForCurrentVersion: PropTypes.object,
-  isVersionCurrent: PropTypes.bool,
 };
 
 const Memoized = memo(FieldComponent, isEqual);
