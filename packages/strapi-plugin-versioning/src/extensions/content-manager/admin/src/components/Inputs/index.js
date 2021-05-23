@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from 'react';
+import React, { memo, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { get, omit, take } from 'lodash';
 import isEqual from 'react-fast-compare';
@@ -34,6 +34,8 @@ function Inputs({
   value,
   fieldSchema,
   metadatas,
+  dataForCurrentVersion,
+  isVersionCurrent,
 }) {
   const {
     strapi: { fieldApi },
@@ -93,15 +95,28 @@ function Inputs({
   const inputType = useMemo(() => {
     return getInputType(type);
   }, [type]);
-
-  const inputValue = useMemo(() => {
+  const getInputValue = () => {
+    if (!isVersionCurrent) {
+      return get(dataForCurrentVersion, keys);
+    }
     // Fix for input file multipe
     if (type === 'media' && !value) {
       return [];
     }
 
     return value;
-  }, [type, value]);
+  };
+  const inputValue = getInputValue();
+
+  useEffect(() => {
+    if (isVersionCurrent) {
+      onChange({
+        target: { name: keys, value: inputValue, type: getInputType(type) },
+      });
+    } else {
+      onChange({ target: { name: keys, value, type: getInputType(type) } });
+    }
+  }, [isVersionCurrent]);
 
   const step = useMemo(() => {
     return getStep(type);
@@ -248,6 +263,8 @@ Inputs.defaultProps = {
   onBlur: null,
   queryInfos: {},
   value: null,
+  dataForCurrentVersion: null,
+  isVersionCurrent: true,
 };
 
 Inputs.propTypes = {
@@ -268,6 +285,8 @@ Inputs.propTypes = {
     endPoint: PropTypes.string,
   }),
   value: PropTypes.any,
+  dataForCurrentVersion: PropTypes.object,
+  isVersionCurrent: PropTypes.bool,
 };
 
 const Memoized = memo(Inputs, isEqual);

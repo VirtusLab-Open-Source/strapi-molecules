@@ -1,10 +1,10 @@
-import React, { useCallback, useState, useEffect, useMemo, memo } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FormattedMessage } from 'react-intl';
 import { Link, useLocation } from 'react-router-dom';
 import { findIndex, get, isArray, isEmpty } from 'lodash';
 import { NotAllowedInput, request } from 'strapi-helper-plugin';
-import { Flex, Text, Padded } from '@buffetjs/core';
+import { Flex, Padded, Text } from '@buffetjs/core';
 import pluginId from '../../pluginId';
 import useDataManager from '../../hooks/useDataManager';
 import SelectOne from '../SelectOne';
@@ -34,6 +34,7 @@ function SelectWrapper({
   targetModel,
   placeholder,
   queryInfos,
+  valueToSet,
 }) {
   // Disable the input in case of a polymorphic relation
   const isMorph = useMemo(() => relationType.toLowerCase().includes('morph'), [
@@ -45,10 +46,16 @@ function SelectWrapper({
     moveRelation,
     onChange,
     onRemoveRelation,
+    initialData,
   } = useDataManager();
   const { pathname } = useLocation();
 
-  const value = get(modifiedData, name, null);
+  // const value = get(modifiedData, name, null);
+  const value =
+    valueToSet && valueToSet !== 'current'
+      ? valueToSet
+      : get(modifiedData, name, null);
+  const initialValue = get(initialData, name, null);
   const [state, setState] = useState(initialPaginationState);
   const [options, setOptions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -84,6 +91,17 @@ function SelectWrapper({
     'oneToManyMorph',
     'oneToOneMorph',
   ].includes(relationType);
+  const changeRelationValueForCurrentVersion = () => {
+    if (valueToSet) {
+      valueToSet !== 'current'
+        ? onChange({ target: { name, value: valueToSet } })
+        : onChange({ target: { name, value: initialValue } });
+    }
+  };
+
+  useEffect(() => {
+    changeRelationValueForCurrentVersion();
+  }, [valueToSet]);
 
   const idsToOmit = useMemo(() => {
     if (!value) {
@@ -326,6 +344,7 @@ SelectWrapper.defaultProps = {
   label: '',
   isFieldAllowed: true,
   placeholder: '',
+  valueToSet: null,
 };
 
 SelectWrapper.propTypes = {
@@ -351,6 +370,7 @@ SelectWrapper.propTypes = {
     endPoint: PropTypes.string.isRequired,
     shouldDisplayRelationLink: PropTypes.bool.isRequired,
   }).isRequired,
+  valueToSet: PropTypes.oneOfType([PropTypes.object, PropTypes.array]),
 };
 
 const Memoized = memo(SelectWrapper);

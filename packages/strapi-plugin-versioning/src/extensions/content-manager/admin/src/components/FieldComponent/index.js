@@ -35,6 +35,8 @@ const FieldComponent = ({
   isReadOnly,
   componentValue,
   removeComponentFromField,
+  dataForCurrentVersion,
+  isVersionCurrent,
 }) => {
   const componentValueLength = size(componentValue);
   const isInitialized = componentValue !== null || isFromDynamicZone;
@@ -105,6 +107,8 @@ const FieldComponent = ({
           componentUid={componentUid}
           isFromDynamicZone={isFromDynamicZone}
           name={name}
+          dataForCurrentVersion={dataForCurrentVersion}
+          isVersionCurrent={isVersionCurrent}
         />
       )}
       {isRepeatable && (
@@ -117,6 +121,8 @@ const FieldComponent = ({
           max={max}
           min={min}
           name={name}
+          dataForCurrentVersion={dataForCurrentVersion}
+          isVersionCurrent={isVersionCurrent}
         />
       )}
     </Wrapper>
@@ -135,6 +141,8 @@ FieldComponent.defaultProps = {
   isNested: false,
   max: Infinity,
   min: -Infinity,
+  dataForCurrentVersion: undefined,
+  isVersionCurrent: true,
 };
 
 FieldComponent.propTypes = {
@@ -154,6 +162,8 @@ FieldComponent.propTypes = {
   min: PropTypes.number,
   name: PropTypes.string.isRequired,
   removeComponentFromField: PropTypes.func.isRequired,
+  dataForCurrentVersion: PropTypes.object,
+  isVersionCurrent: PropTypes.bool,
 };
 
 const Memoized = memo(FieldComponent, isEqual);

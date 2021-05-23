@@ -470,6 +470,13 @@ const EditViewDataManagerProvider = ({
     });
   }, []);
 
+  const onChangeVersion = useCallback((version) => {
+    dispatch({
+      type: 'CHANGE_VERSION',
+      payload: version,
+    });
+  }, []);
+
   const overlayBlockerParams = useMemo(
     () => ({
       children: <div />,
@@ -539,7 +546,7 @@ const EditViewDataManagerProvider = ({
               when={!isEqual(modifiedData, initialData)}
               message={formatMessage({ id: 'global.prompt.unsaved' })}
             />
-            <form onSubmit={handleSubmit}>{children}</form>
+            <form onSubmit={handleSubmit}>{children({ onChangeVersion })}</form>
           </>
         )}
       </>

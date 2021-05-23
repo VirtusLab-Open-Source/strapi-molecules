@@ -2,6 +2,14 @@
   "routes": [
     {
       "method": "GET",
+      "path": "/explorer/versions/:model/:id",
+      "handler": "Versions.listEntityVersions",
+      "config": {
+        "policies": []
+      }
+    },
+    {
+      "method": "GET",
       "path": "/content-types",
       "handler": "content-types.findContentTypes",
       "config": {

@@ -236,6 +236,9 @@ const reducer = (state, action) => {
 
         return v;
       });
+    case 'CHANGE_VERSION': {
+      return state.update('modifiedData', () => fromJS(action.payload));
+    }
     default:
       return state;
   }

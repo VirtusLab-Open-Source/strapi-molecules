@@ -1,17 +1,19 @@
-import React, { memo, useCallback, useMemo } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import { get } from 'lodash';
+import { get, isEqual, sortBy } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import {
   BackHeader,
   BaselineAlignment,
+  CheckPermissions,
   LiLink,
   LoadingIndicatorPage,
-  CheckPermissions,
+  request,
+  useGlobalContext,
   useUser,
   useUserPermissions,
-  useGlobalContext,
 } from 'strapi-helper-plugin';
-import { Padded } from '@buffetjs/core';
+import { Button, Padded, Select } from '@buffetjs/core';
 import pluginId from '../../pluginId';
 import pluginPermissions from '../../permissions';
 import Container from '../../components/Container';
@@ -32,6 +34,8 @@ import {
 import { LinkWrapper, SubWrapper } from './components';
 import DeleteLink from './DeleteLink';
 import InformationCard from './InformationCard';
+import getRequestUrl from '../../utils/getRequestUrl';
+import { useLocation } from 'react-router-dom';
 
 /* eslint-disable  react/no-array-index-key */
 const EditView = ({
@@ -53,6 +57,52 @@ const EditView = ({
     isLoading: isLoadingForPermissions,
   } = useUserPermissions(viewPermissions);
   const userPermissions = useUser();
+  const { pathname } = useLocation();
+
+  const entityId = pathname.split('/').pop();
+  const [versions, setVersions] = useState([{ date: 'current' }]);
+  const [selectedVersion, setSelectedVersion] = useState('current');
+
+  const changeLatestDateToCurrent = (versions) => {
+    if (versions.length) {
+      const sortedVersions = [...versions].sort(
+        (previous, next) =>
+          new Date(previous.date).getTime() - new Date(next.date).getTime(),
+      );
+      return sortedVersions.map((sortedVersion, i, arr) => {
+        if (i === arr.length - 1) {
+          sortedVersion = {
+            ...sortedVersion,
+            date: 'current',
+          };
+        }
+        return sortedVersion;
+      });
+    }
+    return [{ date: 'current' }];
+  };
+  useEffect(() => {
+    const getVersions = async () => {
+      try {
+        const versions = await request(
+          getRequestUrl(`explorer/versions/${slug}/${entityId}`),
+          {
+            method: 'GET',
+          },
+        );
+        setVersions(changeLatestDateToCurrent(versions));
+      } catch (err) {
+        strapi.notification.error('content-manager.error.relation.fetch');
+      }
+    };
+    if (entityId != 'create') {
+      getVersions();
+    }
+  }, [slug, entityId]);
+  const generateDataForSelectedOption = () =>
+    versions.length <= 1
+      ? {}
+      : versions.find((version) => version.date === selectedVersion).content;
 
   // Here in case of a 403 response when fetching data we will either redirect to the previous page
   // Or to the homepage if there's no state in the history stack
@@ -77,6 +127,11 @@ const EditView = ({
   const currentContentTypeLayoutData = useMemo(
     () => get(layout, ['contentType'], {}),
     [layout],
+  );
+
+  const currentContentTypeLayoutRelations = useMemo(
+    () => get(currentContentTypeLayoutData, ['layouts', 'editRelations'], []),
+    [currentContentTypeLayoutData],
   );
 
   const DataManagementWrapper = useMemo(
@@ -105,6 +160,75 @@ const EditView = ({
   if (isLoadingForPermissions) {
     return <LoadingIndicatorPage />;
   }
+
+  const isVersionCurrent = () => selectedVersion === 'current';
+  const currentFieldNames = Object.keys(
+    currentContentTypeLayoutData.attributes,
+  );
+  const currentVersionFieldNames = () => {
+    if (selectedVersion === 'current') {
+      return [];
+    }
+    return Object.keys(generateDataForSelectedOption());
+  };
+  console.log('currentContentTypeLayoutData', currentContentTypeLayoutData);
+
+  const isSelectVersionContainsAllCurrentRelations = () => {
+    console.log(
+      'generateDataForSelectedOption()',
+      generateDataForSelectedOption(),
+    );
+    if (generateDataForSelectedOption()) {
+      const selectedVersionAttributeNames = Object.keys(
+        generateDataForSelectedOption(),
+      );
+      return currentContentTypeLayoutRelations.every((el) =>
+        selectedVersionAttributeNames.includes(el),
+      );
+    }
+    return true;
+  };
+
+  const removeUnnecessaryAttributes = (
+    originalArray,
+    unnecessaryAttributes,
+  ) => {
+    return originalArray.filter(
+      (value) => !unnecessaryAttributes.includes(value),
+    );
+  };
+
+  const isRevertButtonDisabled = () => {
+    const unnecessaryAttributes = [
+      'created_at',
+      'created_by',
+      'updated_at',
+      'updated_by',
+    ];
+    const sortedCurrentFieldNames = sortBy(
+      removeUnnecessaryAttributes(currentFieldNames, unnecessaryAttributes),
+    );
+    const sortedVersionsFieldNames = sortBy(
+      removeUnnecessaryAttributes(
+        currentVersionFieldNames(),
+        unnecessaryAttributes,
+      ),
+    );
+    const areFieldsTheSame = isEqual(
+      sortedCurrentFieldNames,
+      sortedVersionsFieldNames,
+    );
+
+    return (
+      isVersionCurrent() ||
+      !areFieldsTheSame ||
+      !isSelectVersionContainsAllCurrentRelations()
+    );
+  };
+  const findSelectedVersionRelationValue = (name) => {
+    const dataForSelectedOption = generateDataForSelectedOption();
+    return dataForSelectedOption[name];
+  };
 
   // TODO: create a hook to handle/provide the permissions this should be done for the i18n feature
   return (
@@ -151,156 +275,221 @@ const EditView = ({
             status={status}
             updateActionAllowedFields={updateActionAllowedFields}
           >
-            <BackHeader onClick={goBack} />
-            <Container className="container-fluid">
-              <Header allowedActions={allowedActions} />
-              <div className="row" style={{ paddingTop: 3 }}>
-                <div
-                  className="col-md-12 col-lg-9"
-                  style={{ marginBottom: 13 }}
-                >
-                  {formattedContentTypeLayout.map((block, blockIndex) => {
-                    if (isDynamicZone(block)) {
-                      const {
-                        0: {
-                          0: { name, fieldSchema, metadatas },
-                        },
-                      } = block;
-                      const baselineAlignementSize =
-                        blockIndex === 0 ? '3px' : '0';
-
-                      return (
-                        <BaselineAlignment
-                          key={blockIndex}
-                          top
-                          size={baselineAlignementSize}
-                        >
-                          <DynamicZone
-                            name={name}
-                            fieldSchema={fieldSchema}
-                            metadatas={metadatas}
-                          />
-                        </BaselineAlignment>
-                      );
-                    }
-
-                    return (
-                      <FormWrapper key={blockIndex}>
-                        {block.map((fieldsBlock, fieldsBlockIndex) => {
-                          return (
-                            <div className="row" key={fieldsBlockIndex}>
-                              {fieldsBlock.map(
-                                (
-                                  { name, size, fieldSchema, metadatas },
-                                  fieldIndex,
-                                ) => {
-                                  const isComponent =
-                                    fieldSchema.type === 'component';
-
-                                  if (isComponent) {
-                                    const {
-                                      component,
-                                      max,
-                                      min,
-                                      repeatable = false,
-                                    } = fieldSchema;
-                                    const componentUid = fieldSchema.component;
-
-                                    return (
-                                      <FieldComponent
-                                        key={componentUid}
-                                        componentUid={component}
-                                        isRepeatable={repeatable}
-                                        label={metadatas.label}
-                                        max={max}
-                                        min={min}
-                                        name={name}
-                                      />
-                                    );
-                                  }
-
-                                  return (
-                                    <div className={`col-${size}`} key={name}>
-                                      <Inputs
-                                        autoFocus={
-                                          blockIndex === 0 &&
-                                          fieldsBlockIndex === 0 &&
-                                          fieldIndex === 0
-                                        }
-                                        fieldSchema={fieldSchema}
-                                        keys={name}
-                                        metadatas={metadatas}
-                                      />
-                                    </div>
-                                  );
-                                },
-                              )}
-                            </div>
-                          );
-                        })}
-                      </FormWrapper>
-                    );
-                  })}
-                </div>
-                <div className="col-md-12 col-lg-3">
-                  <InformationCard />
-                  <Padded size="smd" top />
-                  {currentContentTypeLayoutData.layouts.editRelations.length >
-                    0 && (
-                    <SubWrapper
-                      style={{ padding: '0 20px 1px', marginBottom: '25px' }}
+            {({ onChangeVersion }) => (
+              <>
+                <BackHeader onClick={goBack} />
+                <Container className="container-fluid">
+                  <Header allowedActions={allowedActions} />
+                  <div className="row" style={{ paddingTop: 3 }}>
+                    <div
+                      className="col-md-12 col-lg-9"
+                      style={{ marginBottom: 13 }}
                     >
-                      <div style={{ paddingTop: '22px' }}>
-                        {currentContentTypeLayoutData.layouts.editRelations.map(
-                          ({ name, fieldSchema, metadatas, queryInfos }) => {
-                            return (
-                              <SelectWrapper
-                                {...fieldSchema}
-                                {...metadatas}
-                                queryInfos={queryInfos}
-                                key={name}
+                      {formattedContentTypeLayout.map((block, blockIndex) => {
+                        if (isDynamicZone(block)) {
+                          const {
+                            0: {
+                              0: { name, fieldSchema, metadatas },
+                            },
+                          } = block;
+                          const baselineAlignementSize =
+                            blockIndex === 0 ? '3px' : '0';
+
+                          return (
+                            <BaselineAlignment
+                              key={blockIndex}
+                              top
+                              size={baselineAlignementSize}
+                            >
+                              <DynamicZone
                                 name={name}
-                                relationsType={fieldSchema.relationType}
+                                fieldSchema={fieldSchema}
+                                metadatas={metadatas}
+                                dataForCurrentVersion={generateDataForSelectedOption()}
+                                isVersionCurrent={isVersionCurrent()}
                               />
-                            );
-                          },
-                        )}
-                      </div>
-                    </SubWrapper>
-                  )}
-                  <LinkWrapper>
-                    <ul>
-                      <CheckPermissions permissions={configurationPermissions}>
-                        <LiLink
-                          message={{
-                            id: 'app.links.configure-view',
+                            </BaselineAlignment>
+                          );
+                        }
+
+                        return (
+                          <FormWrapper key={blockIndex}>
+                            {block.map((fieldsBlock, fieldsBlockIndex) => {
+                              return (
+                                <div className="row" key={fieldsBlockIndex}>
+                                  {fieldsBlock.map(
+                                    (
+                                      { name, size, fieldSchema, metadatas },
+                                      fieldIndex,
+                                    ) => {
+                                      const isComponent =
+                                        fieldSchema.type === 'component';
+
+                                      if (isComponent) {
+                                        const {
+                                          component,
+                                          max,
+                                          min,
+                                          repeatable = false,
+                                        } = fieldSchema;
+                                        const componentUid =
+                                          fieldSchema.component;
+
+                                        return (
+                                          <FieldComponent
+                                            key={componentUid}
+                                            componentUid={component}
+                                            isRepeatable={repeatable}
+                                            label={metadatas.label}
+                                            max={max}
+                                            min={min}
+                                            name={name}
+                                            dataForCurrentVersion={generateDataForSelectedOption()}
+                                            isVersionCurrent={isVersionCurrent()}
+                                          />
+                                        );
+                                      }
+
+                                      return (
+                                        <div
+                                          className={`col-${size}`}
+                                          key={name}
+                                        >
+                                          <Inputs
+                                            autoFocus={
+                                              blockIndex === 0 &&
+                                              fieldsBlockIndex === 0 &&
+                                              fieldIndex === 0
+                                            }
+                                            fieldSchema={fieldSchema}
+                                            keys={name}
+                                            metadatas={metadatas}
+                                            dataForCurrentVersion={generateDataForSelectedOption()}
+                                            isVersionCurrent={isVersionCurrent()}
+                                          />
+                                        </div>
+                                      );
+                                    },
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </FormWrapper>
+                        );
+                      })}
+                    </div>
+                    <div className="col-md-12 col-lg-3">
+                      <InformationCard />
+                      <Padded size="smd" top />
+                      {currentContentTypeLayoutData.layouts.editRelations
+                        .length > 0 && (
+                        <SubWrapper
+                          style={{
+                            padding: '0 20px 1px',
+                            marginBottom: '25px',
                           }}
-                          icon="layout"
-                          url={configurationsURL}
-                          onClick={() => {
-                            // emitEvent('willEditContentTypeLayoutFromEditView');
-                          }}
-                        />
-                      </CheckPermissions>
-                      {getInjectedComponents(
-                        'editView',
-                        'right.links',
-                        plugins,
-                        currentEnvironment,
-                        slug,
+                        >
+                          <div style={{ paddingTop: '22px' }}>
+                            {currentContentTypeLayoutData.layouts.editRelations.map(
+                              ({
+                                name,
+                                fieldSchema,
+                                metadatas,
+                                queryInfos,
+                              }) => {
+                                return (
+                                  <SelectWrapper
+                                    {...fieldSchema}
+                                    {...metadatas}
+                                    queryInfos={queryInfos}
+                                    key={name}
+                                    name={name}
+                                    relationsType={fieldSchema.relationType}
+                                    valueToSet={
+                                      isVersionCurrent()
+                                        ? 'current'
+                                        : findSelectedVersionRelationValue(name)
+                                    }
+                                  />
+                                );
+                              },
+                            )}
+                          </div>
+                        </SubWrapper>
                       )}
-                      {allowedActions.canDelete && (
-                        <DeleteLink
-                          isCreatingEntry={isCreatingEntry}
-                          onDelete={onDelete}
-                          onDeleteSucceeded={onDeleteSucceeded}
-                        />
+                      <LinkWrapper>
+                        <ul>
+                          <CheckPermissions
+                            permissions={configurationPermissions}
+                          >
+                            <LiLink
+                              message={{
+                                id: 'app.links.configure-view',
+                              }}
+                              icon="layout"
+                              url={configurationsURL}
+                              onClick={() => {
+                                // emitEvent('willEditContentTypeLayoutFromEditView');
+                              }}
+                            />
+                          </CheckPermissions>
+                          {getInjectedComponents(
+                            'editView',
+                            'right.links',
+                            plugins,
+                            currentEnvironment,
+                            slug,
+                          )}
+                          {allowedActions.canDelete && (
+                            <DeleteLink
+                              isCreatingEntry={isCreatingEntry}
+                              onDelete={onDelete}
+                              onDeleteSucceeded={onDeleteSucceeded}
+                            />
+                          )}
+                        </ul>
+                      </LinkWrapper>
+                      {entityId != 'create' && (
+                        <div className="form-inline well">
+                          <div className="form-group pr-2">
+                            <label className="control-label">
+                              <FormattedMessage
+                                id={`${pluginId}.containers.EditView.versions`}
+                              />
+                            </label>
+                          </div>
+                          <div>
+                            <Select
+                              name="versionSelect"
+                              onChange={({ target: { value } }) => {
+                                setSelectedVersion(value);
+                                if (onChangeVersion) {
+                                  onChangeVersion(
+                                    versions.find(({ date }) => date === value)
+                                      ?.content,
+                                  );
+                                }
+                              }}
+                              options={versions.map((el) => el.date).reverse()}
+                              value={selectedVersion}
+                            />
+                            <Button
+                              color="success"
+                              type="submit"
+                              disabled={isRevertButtonDisabled()}
+                            >
+                              <FormattedMessage
+                                id={`${pluginId}.containers.EditView.revert`}
+                              />
+                            </Button>
+                          </div>
+                        </div>
                       )}
-                    </ul>
-                  </LinkWrapper>
-                </div>
-              </div>
-            </Container>
+                    </div>
+                  </div>
+                </Container>
+              </>
+            )}
           </EditViewDataManagerProvider>
         );
       }}

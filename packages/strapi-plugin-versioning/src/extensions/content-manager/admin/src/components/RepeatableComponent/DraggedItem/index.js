@@ -28,6 +28,8 @@ const DraggedItem = ({
   onClickToggle,
   schema,
   toggleCollapses,
+  dataForCurrentVersion,
+  isVersionCurrent,
   // Retrieved from the select function
   moveComponentField,
   removeRepeatableField,
@@ -42,10 +44,16 @@ const DraggedItem = ({
   const fields = schema.layouts.edit;
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen || !isVersionCurrent) {
       setShowForm(true);
     }
-  }, [isOpen]);
+  }, [isOpen, isVersionCurrent]);
+
+  useEffect(() => {
+    if (!isVersionCurrent) {
+      setShowForm(true);
+    }
+  }, [isVersionCurrent]);
 
   const [, drop] = useDrop({
     accept: ItemTypes.COMPONENT,
@@ -147,7 +155,7 @@ const DraggedItem = ({
           doesPreviousFieldContainErrorsAndIsOpen
         }
         isDragging={isDragging}
-        isOpen={isOpen}
+        isOpen={isVersionCurrent ? isOpen : true}
         isReadOnly={isReadOnly}
         onClickToggle={onClickToggle}
         onClickRemove={() => {
@@ -157,7 +165,7 @@ const DraggedItem = ({
         ref={refs}
       />
       <Collapse
-        isOpen={isOpen}
+        isOpen={isVersionCurrent ? isOpen : true}
         style={{ backgroundColor: '#FAFAFB' }}
         onExited={() => setShowForm(false)}
       >
@@ -202,6 +210,8 @@ const DraggedItem = ({
                               metadatas={metadatas}
                               onBlur={hasErrors ? checkFormErrors : null}
                               queryInfos={queryInfos}
+                              dataForCurrentVersion={dataForCurrentVersion}
+                              isVersionCurrent={isVersionCurrent}
                             />
                           </div>
                         );

@@ -26,6 +26,8 @@ const RepeatableComponent = ({
   max,
   min,
   name,
+  dataForCurrentVersion,
+  isVersionCurrent,
 }) => {
   const [collapseToOpen, setCollapseToOpen] = useState('');
   const [, drop] = useDrop({ accept: ItemTypes.COMPONENT });
@@ -134,6 +136,8 @@ const RepeatableComponent = ({
                 parentName={name}
                 schema={componentLayoutData}
                 toggleCollapses={toggleCollapses}
+                dataForCurrentVersion={dataForCurrentVersion}
+                isVersionCurrent={isVersionCurrent}
               />
             );
           })}
@@ -175,6 +179,8 @@ RepeatableComponent.defaultProps = {
   isNested: false,
   max: Infinity,
   min: -Infinity,
+  dataForCurrentVersion: undefined,
+  isVersionCurrent: true,
 };
 
 RepeatableComponent.propTypes = {
@@ -188,6 +194,8 @@ RepeatableComponent.propTypes = {
   max: PropTypes.number,
   min: PropTypes.number,
   name: PropTypes.string.isRequired,
+  dataForCurrentVersion: PropTypes.object,
+  isVersionCurrent: PropTypes.bool,
 };
 
 const Memoized = memo(RepeatableComponent);
