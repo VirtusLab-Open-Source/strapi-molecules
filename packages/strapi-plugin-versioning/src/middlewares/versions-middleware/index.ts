@@ -15,11 +15,13 @@ module.exports = () => {
           ctx.response.message == 'OK'
         ) {
           const entity = ctx.response.body;
-          const uid = versioningService.findUid(ctx);
-          const updatedData = await global.strapi.db
-            .query(uid)
-            .findOne({ id: entity.id });
-          versioningService.saveDataInDB(updatedData, uid, entity);
+          if (entity.id) {
+            const uid = versioningService.findUid(ctx);
+            const updatedData = await global.strapi.db
+              .query(uid)
+              .findOne({ id: entity.id });
+            versioningService.saveDataInDB(updatedData, uid, entity);
+          }
         }
       });
     },
