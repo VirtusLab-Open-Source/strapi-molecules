@@ -1,19 +1,19 @@
+import React, { memo, useCallback, useMemo, useState } from 'react';
 /* eslint-disable import/no-cycle */
-import React, { memo, useReducer } from "react";
-import { useDrop } from "react-dnd";
-import PropTypes from "prop-types";
-import { get, take } from "lodash";
-import { FormattedMessage } from "react-intl";
-import { ErrorMessage } from "@buffetjs/styles";
-import pluginId from "../../pluginId";
-import ItemTypes from "../../utils/ItemTypes";
-import connect from "./utils/connect";
-import select from "./utils/select";
-import Button from "./AddFieldButton";
-import DraggedItem from "./DraggedItem";
-import EmptyComponent from "./EmptyComponent";
-import init from "./init";
-import reducer, { initialState } from "./reducer";
+import { useDrop } from 'react-dnd';
+import PropTypes from 'prop-types';
+import { get, take } from 'lodash';
+import { FormattedMessage } from 'react-intl';
+import { ErrorMessage } from '@buffetjs/styles';
+import pluginId from '../../pluginId';
+import { getMaxTempKey } from '../../utils';
+import { useContentTypeLayout } from '../../hooks';
+import ItemTypes from '../../utils/ItemTypes';
+import connect from './utils/connect';
+import select from './utils/select';
+import Button from './AddFieldButton';
+import DraggedItem from './DraggedItem';
+import EmptyComponent from './EmptyComponent';
 
 const RepeatableComponent = ({
   addRepeatableComponentToField,
@@ -21,50 +21,71 @@ const RepeatableComponent = ({
   componentUid,
   componentValue,
   componentValueLength,
-  fields,
   isNested,
   isReadOnly,
   max,
   min,
   name,
-  schema,
   dataForCurrentVersion,
   isVersionCurrent,
 }) => {
+  const [collapseToOpen, setCollapseToOpen] = useState('');
   const [, drop] = useDrop({ accept: ItemTypes.COMPONENT });
+  const { getComponentLayout } = useContentTypeLayout();
+  const componentLayoutData = useMemo(() => getComponentLayout(componentUid), [
+    componentUid,
+    getComponentLayout,
+  ]);
+
+  const nextTempKey = useMemo(() => {
+    return getMaxTempKey(componentValue || []) + 1;
+  }, [componentValue]);
 
   const componentErrorKeys = Object.keys(formErrors)
     .filter((errorKey) => {
-      return take(errorKey.split("."), isNested ? 3 : 1).join(".") === name;
+      return take(errorKey.split('.'), isNested ? 3 : 1).join('.') === name;
     })
     .map((errorKey) => {
       return errorKey
-        .split(".")
-        .slice(0, name.split(".").length + 1)
-        .join(".");
+        .split('.')
+        .slice(0, name.split('.').length + 1)
+        .join('.');
     });
 
-  // We need to synchronize the collapses array with the data
-  // The key needed for react in the list will be the one from the collapses data
-  // This way we don't have to mutate the data when it is received and we can use a unique key
-  const [state, dispatch] = useReducer(reducer, initialState, () =>
-    init(initialState, componentValue),
-  );
-  const { collapses } = state.toJS();
-  const toggleCollapses = (index) => {
-    dispatch({
-      type: "TOGGLE_COLLAPSE",
-      index,
-    });
+  const toggleCollapses = () => {
+    setCollapseToOpen('');
   };
   const missingComponentsValue = min - componentValueLength;
   const errorsArray = componentErrorKeys.map((key) =>
-    get(formErrors, [key, "id"], ""),
+    get(formErrors, [key, 'id'], ''),
   );
 
-  const hasMinError =
-    get(errorsArray, [0], "").includes("min") &&
-    !collapses.some((obj) => obj.isOpen === true);
+  const hasMinError = get(errorsArray, [0], '').includes('min');
+
+  const handleClick = useCallback(() => {
+    if (!isReadOnly) {
+      if (componentValueLength < max) {
+        const shouldCheckErrors = hasMinError;
+
+        addRepeatableComponentToField(name, componentUid, shouldCheckErrors);
+
+        setCollapseToOpen(nextTempKey);
+      } else if (componentValueLength >= max) {
+        strapi.notification.info(
+          `${pluginId}.components.notification.info.maximum-requirement`,
+        );
+      }
+    }
+  }, [
+    addRepeatableComponentToField,
+    componentUid,
+    componentValueLength,
+    hasMinError,
+    isReadOnly,
+    max,
+    name,
+    nextTempKey,
+  ]);
 
   return (
     <div>
@@ -78,16 +99,22 @@ const RepeatableComponent = ({
       <div ref={drop}>
         {componentValueLength > 0 &&
           componentValue.map((data, index) => {
+            const key = data.__temp_key__;
+            const isOpen = collapseToOpen === key;
             const componentFieldName = `${name}.${index}`;
+            const previousComponentTempKey = get(componentValue, [
+              index - 1,
+              '__temp_key__',
+            ]);
             const doesPreviousFieldContainErrorsAndIsOpen =
               componentErrorKeys.includes(`${name}.${index - 1}`) &&
               index !== 0 &&
-              get(collapses, [index - 1, "isOpen"], false) === false;
+              collapseToOpen === previousComponentTempKey;
+
             const hasErrors = componentErrorKeys.includes(componentFieldName);
 
             return (
               <DraggedItem
-                fields={fields}
                 componentFieldName={componentFieldName}
                 componentUid={componentUid}
                 doesPreviousFieldContainErrorsAndIsOpen={
@@ -97,27 +124,17 @@ const RepeatableComponent = ({
                 hasMinError={hasMinError}
                 isFirst={index === 0}
                 isReadOnly={isReadOnly}
-                isOpen={get(collapses, [index, "isOpen"], false)}
-                key={get(collapses, [index, "_temp__id"], null)}
+                isOpen={isOpen}
+                key={key}
                 onClickToggle={() => {
-                  // Close all other collapses and open the selected one
-                  toggleCollapses(index);
-                }}
-                removeCollapse={() => {
-                  dispatch({
-                    type: "REMOVE_COLLAPSE",
-                    index,
-                  });
-                }}
-                moveCollapse={(dragIndex, hoverIndex) => {
-                  dispatch({
-                    type: "MOVE_COLLAPSE",
-                    dragIndex,
-                    hoverIndex,
-                  });
+                  if (isOpen) {
+                    setCollapseToOpen('');
+                  } else {
+                    setCollapseToOpen(key);
+                  }
                 }}
                 parentName={name}
-                schema={schema}
+                schema={componentLayoutData}
                 toggleCollapses={toggleCollapses}
                 dataForCurrentVersion={dataForCurrentVersion}
                 isVersionCurrent={isVersionCurrent}
@@ -132,29 +149,11 @@ const RepeatableComponent = ({
         doesPreviousFieldContainErrorsAndIsClosed={
           componentValueLength > 0 &&
           componentErrorKeys.includes(`${name}.${componentValueLength - 1}`) &&
-          collapses[componentValueLength - 1].isOpen === false
+          componentValue[componentValueLength - 1].__temp_key__ !==
+            collapseToOpen
         }
         type="button"
-        onClick={() => {
-          if (!isReadOnly) {
-            if (componentValueLength < max) {
-              const shouldCheckErrors = hasMinError;
-
-              addRepeatableComponentToField(
-                name,
-                componentUid,
-                shouldCheckErrors,
-              );
-              dispatch({
-                type: "ADD_NEW_FIELD",
-              });
-            } else if (componentValueLength >= max) {
-              strapi.notification.info(
-                `${pluginId}.components.notification.info.maximum-requirement`,
-              );
-            }
-          }
-        }}
+        onClick={handleClick}
       >
         <i className="fa fa-plus" />
         <FormattedMessage id={`${pluginId}.containers.EditView.add.new`} />
@@ -163,7 +162,7 @@ const RepeatableComponent = ({
         <ErrorMessage>
           <FormattedMessage
             id={`${pluginId}.components.DynamicZone.missing${
-              missingComponentsValue > 1 ? ".plural" : ".singular"
+              missingComponentsValue > 1 ? '.plural' : '.singular'
             }`}
             values={{ count: missingComponentsValue }}
           />
@@ -176,7 +175,6 @@ const RepeatableComponent = ({
 RepeatableComponent.defaultProps = {
   componentValue: null,
   componentValueLength: 0,
-  fields: [],
   formErrors: {},
   isNested: false,
   max: Infinity,
@@ -190,14 +188,12 @@ RepeatableComponent.propTypes = {
   componentUid: PropTypes.string.isRequired,
   componentValue: PropTypes.oneOfType([PropTypes.array, PropTypes.object]),
   componentValueLength: PropTypes.number,
-  fields: PropTypes.array,
   formErrors: PropTypes.object,
   isNested: PropTypes.bool,
   isReadOnly: PropTypes.bool.isRequired,
   max: PropTypes.number,
   min: PropTypes.number,
   name: PropTypes.string.isRequired,
-  schema: PropTypes.object.isRequired,
   dataForCurrentVersion: PropTypes.object,
   isVersionCurrent: PropTypes.bool,
 };

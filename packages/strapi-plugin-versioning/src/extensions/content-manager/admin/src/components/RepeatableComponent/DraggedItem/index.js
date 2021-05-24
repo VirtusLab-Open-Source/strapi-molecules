@@ -1,17 +1,15 @@
 /* eslint-disable import/no-cycle */
-import React, { memo, useEffect, useRef, useState } from "react";
-import PropTypes from "prop-types";
-import { get } from "lodash";
-import { Collapse } from "reactstrap";
-import { useDrag, useDrop } from "react-dnd";
-import { getEmptyImage } from "react-dnd-html5-backend";
-import useEditView from "../../../hooks/useEditView";
-import ItemTypes from "../../../utils/ItemTypes";
-import Inputs from "../../Inputs";
-import FieldComponent from "../../FieldComponent";
-import Banner from "../Banner";
-import FormWrapper from "../FormWrapper";
-import { connect, select } from "./utils";
+import React, { memo, useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
+import { Collapse } from 'reactstrap';
+import { useDrag, useDrop } from 'react-dnd';
+import { getEmptyImage } from 'react-dnd-html5-backend';
+import ItemTypes from '../../../utils/ItemTypes';
+import Inputs from '../../Inputs';
+import FieldComponent from '../../FieldComponent';
+import Banner from '../Banner';
+import FormWrapper from '../FormWrapper';
+import { connect, select } from './utils';
 
 /* eslint-disable react/no-array-index-key */
 
@@ -21,22 +19,17 @@ import { connect, select } from "./utils";
 
 const DraggedItem = ({
   componentFieldName,
-  componentUid,
   doesPreviousFieldContainErrorsAndIsOpen,
-  fields,
   hasErrors,
   hasMinError,
   isFirst,
   isReadOnly,
   isOpen,
-  moveCollapse,
   onClickToggle,
-  removeCollapse,
   schema,
   toggleCollapses,
   dataForCurrentVersion,
   isVersionCurrent,
-
   // Retrieved from the select function
   moveComponentField,
   removeRepeatableField,
@@ -44,16 +37,17 @@ const DraggedItem = ({
   checkFormErrors,
   displayedValue,
 }) => {
-  const { setIsDraggingComponent, unsetIsDraggingComponent } = useEditView();
   const dragRef = useRef(null);
   const dropRef = useRef(null);
   const [showForm, setShowForm] = useState(false);
+
+  const fields = schema.layouts.edit;
 
   useEffect(() => {
     if (isOpen || !isVersionCurrent) {
       setShowForm(true);
     }
-  }, [isOpen]);
+  }, [isOpen, isVersionCurrent]);
 
   useEffect(() => {
     if (!isVersionCurrent) {
@@ -73,12 +67,12 @@ const DraggedItem = ({
 
       const dragPath = item.originalPath;
       const hoverPath = componentFieldName;
-      const fullPathToComponentArray = dragPath.split(".");
+      const fullPathToComponentArray = dragPath.split('.');
       const dragIndexString = fullPathToComponentArray
         .slice()
         .splice(-1)
-        .join("");
-      const hoverIndexString = hoverPath.split(".").splice(-1).join("");
+        .join('');
+      const hoverIndexString = hoverPath.split('.').splice(-1).join('');
       const pathToComponentArray = fullPathToComponentArray.slice(
         0,
         fullPathToComponentArray.length - 1,
@@ -114,12 +108,7 @@ const DraggedItem = ({
       }
       // Time to actually perform the action in the data
       moveComponentField(pathToComponentArray, dragIndex, hoverIndex);
-      // Time to actually perform the action in the synchronized collapses
-      moveCollapse(dragIndex, hoverIndex);
-      // Note: we're mutating the monitor item here!
-      // Generally it's better to avoid mutations,
-      // but it's good here for the sake of performance
-      // to avoid expensive index searches.
+
       item.originalPath = hoverPath;
     },
   });
@@ -132,12 +121,8 @@ const DraggedItem = ({
     begin: () => {
       // Close all collapses
       toggleCollapses(-1);
-      // Prevent the relations select from firing requests
-      setIsDraggingComponent();
     },
     end: () => {
-      // Enable the relations select to fire requests
-      unsetIsDraggingComponent();
       // Update the errors
       triggerFormValidation();
     },
@@ -149,11 +134,6 @@ const DraggedItem = ({
   useEffect(() => {
     preview(getEmptyImage(), { captureDraggingState: false });
   }, [preview]);
-
-  const getField = (fieldName) =>
-    get(schema, ["schema", "attributes", fieldName], {});
-  const getMeta = (fieldName) =>
-    get(schema, ["metadatas", fieldName, "edit"], {});
 
   // Create the refs
   // We need 1 for the drop target
@@ -180,64 +160,63 @@ const DraggedItem = ({
         onClickToggle={onClickToggle}
         onClickRemove={() => {
           removeRepeatableField(componentFieldName);
-          removeCollapse();
+          toggleCollapses();
         }}
         ref={refs}
       />
       <Collapse
         isOpen={isVersionCurrent ? isOpen : true}
-        style={{ backgroundColor: "#FAFAFB" }}
+        style={{ backgroundColor: '#FAFAFB' }}
         onExited={() => setShowForm(false)}
       >
         {!isDragging && (
           <FormWrapper
             hasErrors={hasErrors}
-            isOpen={isVersionCurrent ? isOpen : true}
+            isOpen={isOpen}
             isReadOnly={isReadOnly}
           >
             {showForm &&
               fields.map((fieldRow, key) => {
                 return (
                   <div className="row" key={key}>
-                    {fieldRow.map((field) => {
-                      const currentField = getField(field.name);
-                      const isComponent =
-                        get(currentField, "type", "") === "component";
-                      const keys = `${componentFieldName}.${field.name}`;
+                    {fieldRow.map(
+                      ({ name, fieldSchema, metadatas, queryInfos, size }) => {
+                        const isComponent = fieldSchema.type === 'component';
+                        const keys = `${componentFieldName}.${name}`;
 
-                      if (isComponent) {
-                        const componentUid = currentField.component;
-                        const metas = getMeta(field.name);
+                        if (isComponent) {
+                          const componentUid = fieldSchema.component;
+
+                          return (
+                            <FieldComponent
+                              componentUid={componentUid}
+                              isRepeatable={fieldSchema.repeatable}
+                              key={name}
+                              label={metadatas.label}
+                              isNested
+                              name={keys}
+                              max={fieldSchema.max}
+                              min={fieldSchema.min}
+                            />
+                          );
+                        }
 
                         return (
-                          <FieldComponent
-                            componentUid={componentUid}
-                            isRepeatable={currentField.repeatable}
-                            key={field.name}
-                            label={metas.label}
-                            isNested
-                            name={keys}
-                            max={currentField.max}
-                            min={currentField.min}
-                          />
+                          <div key={name} className={`col-${size}`}>
+                            <Inputs
+                              autoFocus={false}
+                              fieldSchema={fieldSchema}
+                              keys={keys}
+                              metadatas={metadatas}
+                              onBlur={hasErrors ? checkFormErrors : null}
+                              queryInfos={queryInfos}
+                              dataForCurrentVersion={dataForCurrentVersion}
+                              isVersionCurrent={isVersionCurrent}
+                            />
+                          </div>
                         );
-                      }
-
-                      return (
-                        <div key={field.name} className={`col-${field.size}`}>
-                          <Inputs
-                            autoFocus={false}
-                            componentUid={componentUid}
-                            keys={keys}
-                            layout={schema}
-                            name={field.name}
-                            onBlur={hasErrors ? checkFormErrors : null}
-                            dataForCurrentVersion={dataForCurrentVersion}
-                            isVersionCurrent={isVersionCurrent}
-                          />
-                        </div>
-                      );
-                    })}
+                      },
+                    )}
                   </div>
                 );
               })}
@@ -250,30 +229,22 @@ const DraggedItem = ({
 
 DraggedItem.defaultProps = {
   doesPreviousFieldContainErrorsAndIsOpen: false,
-  fields: [],
   hasErrors: false,
   hasMinError: false,
   isFirst: false,
   isOpen: false,
-  moveCollapse: () => {},
   toggleCollapses: () => {},
-  dataForCurrentVersion: undefined,
-  isVersionCurrent: true,
 };
 
 DraggedItem.propTypes = {
   componentFieldName: PropTypes.string.isRequired,
-  componentUid: PropTypes.string.isRequired,
   doesPreviousFieldContainErrorsAndIsOpen: PropTypes.bool,
-  fields: PropTypes.array,
   hasErrors: PropTypes.bool,
   hasMinError: PropTypes.bool,
   isFirst: PropTypes.bool,
   isOpen: PropTypes.bool,
   isReadOnly: PropTypes.bool.isRequired,
-  moveCollapse: PropTypes.func,
   onClickToggle: PropTypes.func.isRequired,
-  removeCollapse: PropTypes.func.isRequired,
   schema: PropTypes.object.isRequired,
   toggleCollapses: PropTypes.func,
   moveComponentField: PropTypes.func.isRequired,
@@ -281,8 +252,6 @@ DraggedItem.propTypes = {
   triggerFormValidation: PropTypes.func.isRequired,
   checkFormErrors: PropTypes.func.isRequired,
   displayedValue: PropTypes.string.isRequired,
-  dataForCurrentVersion: PropTypes.object,
-  isVersionCurrent: PropTypes.bool,
 };
 
 const Memoized = memo(DraggedItem);
