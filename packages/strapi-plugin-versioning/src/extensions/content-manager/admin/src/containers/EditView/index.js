@@ -7,11 +7,8 @@ import {
   BaselineAlignment,
   CheckPermissions,
   LiLink,
-  LoadingIndicatorPage,
   request,
   useGlobalContext,
-  useUser,
-  useUserPermissions,
 } from 'strapi-helper-plugin';
 import { Button, Padded, Select } from '@buffetjs/core';
 import pluginId from '../../pluginId';
@@ -22,7 +19,7 @@ import FormWrapper from '../../components/FormWrapper';
 import FieldComponent from '../../components/FieldComponent';
 import Inputs from '../../components/Inputs';
 import SelectWrapper from '../../components/SelectWrapper';
-import { generatePermissionsObject, getInjectedComponents } from '../../utils';
+import { getInjectedComponents } from '../../utils';
 import CollectionTypeFormWrapper from '../CollectionTypeFormWrapper';
 import EditViewDataManagerProvider from '../EditViewDataManagerProvider';
 import SingleTypeFormWrapper from '../SingleTypeFormWrapper';
@@ -39,6 +36,7 @@ import { useLocation } from 'react-router-dom';
 
 /* eslint-disable  react/no-array-index-key */
 const EditView = ({
+  allowedActions,
   isSingleType,
   goBack,
   layout,
@@ -46,17 +44,9 @@ const EditView = ({
   state,
   id,
   origin,
+  userPermissions,
 }) => {
   const { currentEnvironment, plugins } = useGlobalContext();
-  // Permissions
-  const viewPermissions = useMemo(() => generatePermissionsObject(slug), [
-    slug,
-  ]);
-  const {
-    allowedActions,
-    isLoading: isLoadingForPermissions,
-  } = useUserPermissions(viewPermissions);
-  const userPermissions = useUser();
   const { pathname } = useLocation();
 
   const entityId = pathname.split('/').pop();
@@ -90,6 +80,7 @@ const EditView = ({
             method: 'GET',
           },
         );
+        console.log('versions', versions);
         setVersions(changeLatestDateToCurrent(versions));
       } catch (err) {
         strapi.notification.error('content-manager.error.relation.fetch');
@@ -153,13 +144,9 @@ const EditView = ({
 
     return createAttributesLayout(
       currentContentTypeLayoutData.layouts.edit,
-      currentContentTypeLayoutData.attributes,
+      currentContentTypeLayoutData.attributes
     );
   }, [currentContentTypeLayoutData]);
-
-  if (isLoadingForPermissions) {
-    return <LoadingIndicatorPage />;
-  }
 
   const isVersionCurrent = () => selectedVersion === 'current';
   const currentFieldNames = Object.keys(
@@ -171,7 +158,6 @@ const EditView = ({
     }
     return Object.keys(generateDataForSelectedOption());
   };
-  console.log('currentContentTypeLayoutData', currentContentTypeLayoutData);
 
   const isSelectVersionContainsAllCurrentRelations = () => {
     console.log(
@@ -251,6 +237,7 @@ const EditView = ({
         onPublish,
         onPut,
         onUnpublish,
+        redirectionLink,
         status,
       }) => {
         return (
@@ -260,7 +247,7 @@ const EditView = ({
             createActionAllowedFields={createActionAllowedFields}
             componentsDataStructure={componentsDataStructure}
             contentTypeDataStructure={contentTypeDataStructure}
-            from={from}
+            from={redirectionLink}
             initialValues={data}
             isCreatingEntry={isCreatingEntry}
             isLoadingForData={isLoadingForData}
@@ -281,32 +268,23 @@ const EditView = ({
                 <Container className="container-fluid">
                   <Header allowedActions={allowedActions} />
                   <div className="row" style={{ paddingTop: 3 }}>
-                    <div
-                      className="col-md-12 col-lg-9"
-                      style={{ marginBottom: 13 }}
-                    >
+                    <div className="col-md-12 col-lg-9" style={{ marginBottom: 13 }}>
                       {formattedContentTypeLayout.map((block, blockIndex) => {
                         if (isDynamicZone(block)) {
                           const {
                             0: {
-                              0: { name, fieldSchema, metadatas },
+                              0: { name, fieldSchema, metadatas, labelIcon },
                             },
                           } = block;
-                          const baselineAlignementSize =
-                            blockIndex === 0 ? '3px' : '0';
+                          const baselineAlignementSize = blockIndex === 0 ? '3px' : '0';
 
                           return (
-                            <BaselineAlignment
-                              key={blockIndex}
-                              top
-                              size={baselineAlignementSize}
-                            >
+                            <BaselineAlignment key={blockIndex} top size={baselineAlignementSize}>
                               <DynamicZone
                                 name={name}
                                 fieldSchema={fieldSchema}
+                                labelIcon={labelIcon}
                                 metadatas={metadatas}
-                                dataForCurrentVersion={generateDataForSelectedOption()}
-                                isVersionCurrent={isVersionCurrent()}
                               />
                             </BaselineAlignment>
                           );
@@ -318,43 +296,29 @@ const EditView = ({
                               return (
                                 <div className="row" key={fieldsBlockIndex}>
                                   {fieldsBlock.map(
-                                    (
-                                      { name, size, fieldSchema, metadatas },
-                                      fieldIndex,
-                                    ) => {
-                                      const isComponent =
-                                        fieldSchema.type === 'component';
+                                    ({ name, size, fieldSchema, labelIcon, metadatas }, fieldIndex) => {
+                                      const isComponent = fieldSchema.type === 'component';
 
                                       if (isComponent) {
-                                        const {
-                                          component,
-                                          max,
-                                          min,
-                                          repeatable = false,
-                                        } = fieldSchema;
-                                        const componentUid =
-                                          fieldSchema.component;
+                                        const { component, max, min, repeatable = false } = fieldSchema;
+                                        const componentUid = fieldSchema.component;
 
                                         return (
                                           <FieldComponent
                                             key={componentUid}
                                             componentUid={component}
+                                            labelIcon={labelIcon}
                                             isRepeatable={repeatable}
                                             label={metadatas.label}
                                             max={max}
                                             min={min}
                                             name={name}
-                                            dataForCurrentVersion={generateDataForSelectedOption()}
-                                            isVersionCurrent={isVersionCurrent()}
                                           />
                                         );
                                       }
 
                                       return (
-                                        <div
-                                          className={`col-${size}`}
-                                          key={name}
-                                        >
+                                        <div className={`col-${size}`} key={name}>
                                           <Inputs
                                             autoFocus={
                                               blockIndex === 0 &&
@@ -363,9 +327,8 @@ const EditView = ({
                                             }
                                             fieldSchema={fieldSchema}
                                             keys={name}
+                                            labelIcon={labelIcon}
                                             metadatas={metadatas}
-                                            dataForCurrentVersion={generateDataForSelectedOption()}
-                                            isVersionCurrent={isVersionCurrent()}
                                           />
                                         </div>
                                       );
@@ -381,35 +344,20 @@ const EditView = ({
                     <div className="col-md-12 col-lg-3">
                       <InformationCard />
                       <Padded size="smd" top />
-                      {currentContentTypeLayoutData.layouts.editRelations
-                        .length > 0 && (
-                        <SubWrapper
-                          style={{
-                            padding: '0 20px 1px',
-                            marginBottom: '25px',
-                          }}
-                        >
+                      {currentContentTypeLayoutData.layouts.editRelations.length > 0 && (
+                        <SubWrapper style={{ padding: '0 20px 1px', marginBottom: '25px' }}>
                           <div style={{ paddingTop: '22px' }}>
                             {currentContentTypeLayoutData.layouts.editRelations.map(
-                              ({
-                                name,
-                                fieldSchema,
-                                metadatas,
-                                queryInfos,
-                              }) => {
+                              ({ name, fieldSchema, labelIcon, metadatas, queryInfos }) => {
                                 return (
                                   <SelectWrapper
                                     {...fieldSchema}
                                     {...metadatas}
-                                    queryInfos={queryInfos}
                                     key={name}
+                                    labelIcon={labelIcon}
                                     name={name}
                                     relationsType={fieldSchema.relationType}
-                                    valueToSet={
-                                      isVersionCurrent()
-                                        ? 'current'
-                                        : findSelectedVersionRelationValue(name)
-                                    }
+                                    queryInfos={queryInfos}
                                   />
                                 );
                               },
@@ -419,9 +367,7 @@ const EditView = ({
                       )}
                       <LinkWrapper>
                         <ul>
-                          <CheckPermissions
-                            permissions={configurationPermissions}
-                          >
+                          <CheckPermissions permissions={configurationPermissions}>
                             <LiLink
                               message={{
                                 id: 'app.links.configure-view',
@@ -449,7 +395,7 @@ const EditView = ({
                           )}
                         </ul>
                       </LinkWrapper>
-                      {entityId != 'create' && (
+                      {entityId !== 'create' && (
                         <div className="form-inline well">
                           <div className="form-group pr-2">
                             <label className="control-label">

@@ -23,17 +23,18 @@ import {
 function Inputs({
   allowedFields,
   autoFocus,
+  fieldSchema,
+  formErrors,
   isCreatingEntry,
   keys,
+  labelIcon,
+  metadatas,
   onBlur,
-  formErrors,
   onChange,
   readableFields,
   shouldNotRunValidations,
   queryInfos,
   value,
-  fieldSchema,
-  metadatas,
   dataForCurrentVersion,
   isVersionCurrent,
 }) {
@@ -42,6 +43,10 @@ function Inputs({
   } = useStrapi();
   const { contentType: currentContentTypeLayout } = useContentTypeLayout();
   const { formatMessage } = useIntl();
+
+  const labelIconformatted = labelIcon
+    ? { icon: labelIcon.icon, title: formatMessage(labelIcon.title) }
+    : labelIcon;
 
   const disabled = useMemo(() => !get(metadatas, 'editable', true), [
     metadatas,
@@ -206,7 +211,13 @@ function Inputs({
   }
 
   if (!shouldDisplayNotAllowedInput) {
-    return <NotAllowedInput label={metadatas.label} />;
+    return (
+      <NotAllowedInput
+        label={metadatas.label}
+        labelIcon={labelIconformatted}
+        error={errorMessage}
+      />
+    );
   }
 
   if (type === 'relation') {
@@ -215,6 +226,7 @@ function Inputs({
         <SelectWrapper
           {...metadatas}
           {...fieldSchema}
+          labelIcon={labelIcon}
           isUserAllowedToEditField={isUserAllowedToEditField}
           isUserAllowedToReadField={isUserAllowedToReadField}
           name={keys}
@@ -233,6 +245,7 @@ function Inputs({
       disabled={shouldDisableField}
       error={errorMessage}
       inputDescription={description}
+      labelIcon={labelIconformatted}
       description={description}
       contentTypeUID={currentContentTypeLayout.uid}
       customInputs={{
@@ -258,8 +271,8 @@ function Inputs({
 
 Inputs.defaultProps = {
   autoFocus: false,
-
   formErrors: {},
+  labelIcon: null,
   onBlur: null,
   queryInfos: {},
   value: null,
@@ -271,9 +284,16 @@ Inputs.propTypes = {
   allowedFields: PropTypes.array.isRequired,
   autoFocus: PropTypes.bool,
   fieldSchema: PropTypes.object.isRequired,
+  formErrors: PropTypes.object,
   keys: PropTypes.string.isRequired,
   isCreatingEntry: PropTypes.bool.isRequired,
-  formErrors: PropTypes.object,
+  labelIcon: PropTypes.shape({
+    icon: PropTypes.node.isRequired,
+    title: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      defaultMessage: PropTypes.string.isRequired,
+    }).isRequired,
+  }),
   metadatas: PropTypes.object.isRequired,
   onBlur: PropTypes.func,
   onChange: PropTypes.func.isRequired,
