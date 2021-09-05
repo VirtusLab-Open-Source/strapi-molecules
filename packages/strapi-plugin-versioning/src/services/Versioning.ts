@@ -1,5 +1,8 @@
 import { Context } from 'koa';
-import { isObject, noop } from 'lodash';
+import {
+  isObject,
+  noop,
+} from 'lodash';
 
 type Entity = any;
 type Data = Array<Entity>;
@@ -51,11 +54,23 @@ const getVersionsForAllConentTypes = async () => {
   return knexQueryBuilder;
 };
 
-const getVersionsForEntity = (contentType: string, id: string) => {
+const getVersionsForEntity = async (contentType: string, id: string) => {
+  const model = global.strapi.query(contentType);
   const knexQueryBuilder = global.strapi.connections.default('versions');
   knexQueryBuilder
-    .select()
-    .where({ content_type: contentType, entity_id: id })
+    .select();
+  if (model) {
+    const { model: { kind } } = model;
+    if (kind === 'singleType') {
+      const { id: singleTypeId } = await model.findOne({});
+      knexQueryBuilder
+        .where({ content_type: contentType, entity_id: singleTypeId });
+    } else {
+      knexQueryBuilder
+        .where({ content_type: contentType, entity_id: id });
+    }
+  }
+  knexQueryBuilder
     .returning('*')
     .toString();
   return knexQueryBuilder;
