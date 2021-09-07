@@ -5,7 +5,7 @@
       "esnext",
       "dom"
     ],
-    "target": "es5",
+    "target": "es2018",
     "module": "commonjs",
     "jsx": "react",
     "moduleResolution": "node",
