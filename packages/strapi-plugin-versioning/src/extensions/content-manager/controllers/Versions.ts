@@ -12,6 +12,14 @@ type Version = {
   id: number;
 };
 
+const saveParse = (entity: string) => {
+  try {
+    return JSON.parse(entity);
+  } catch (e) {
+    return entity;
+  }
+};
+
 module.exports = {
   async listEntityVersions(ctx: Context): Promise<Version[]> {
     const { model, id } = ctx.params;
@@ -21,7 +29,7 @@ module.exports = {
       id,
     );
     return versionsForCurrentContentType.map((el) => ({
-      content: JSON.parse(el.entity),
+      content: saveParse(el.entity),
       date: el.date,
       id: el.id,
     }));
