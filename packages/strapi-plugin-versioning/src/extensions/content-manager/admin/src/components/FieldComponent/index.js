@@ -1,22 +1,21 @@
 /* eslint-disable  import/no-cycle */
-import React, { memo } from "react";
-import PropTypes from "prop-types";
-import { get, size } from "lodash";
-import { FormattedMessage } from "react-intl";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import isEqual from "react-fast-compare";
-import pluginId from "../../pluginId";
-import useEditView from "../../hooks/useEditView";
-import ComponentInitializer from "../ComponentInitializer";
-import NonRepeatableComponent from "../NonRepeatableComponent";
-import NotAllowedInput from "../NotAllowedInput";
-import RepeatableComponent from "../RepeatableComponent";
-import connect from "./utils/connect";
-import select from "./utils/select";
-import ComponentIcon from "./ComponentIcon";
-import Label from "./Label";
-import Reset from "./ResetComponent";
-import Wrapper from "./Wrapper";
+import React, { memo } from 'react';
+import PropTypes from 'prop-types';
+import { size } from 'lodash';
+import { FormattedMessage, useIntl } from 'react-intl';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import isEqual from 'react-fast-compare';
+import { NotAllowedInput, LabelIconWrapper } from 'strapi-helper-plugin';
+import pluginId from '../../pluginId';
+import ComponentInitializer from '../ComponentInitializer';
+import NonRepeatableComponent from '../NonRepeatableComponent';
+import RepeatableComponent from '../RepeatableComponent';
+import connect from './utils/connect';
+import select from './utils/select';
+import ComponentIcon from './ComponentIcon';
+import Label from './Label';
+import Reset from './ResetComponent';
+import Wrapper from './Wrapper';
 
 const FieldComponent = ({
   componentFriendlyName,
@@ -27,6 +26,7 @@ const FieldComponent = ({
   isRepeatable,
   isNested,
   label,
+  labelIcon,
   max,
   min,
   name,
@@ -39,27 +39,23 @@ const FieldComponent = ({
   dataForCurrentVersion,
   isVersionCurrent,
 }) => {
-  const { allLayoutData } = useEditView();
-
+  const { formatMessage } = useIntl();
   const componentValueLength = size(componentValue);
-  const isInitialized = componentValue || isFromDynamicZone;
+  const isInitialized = componentValue !== null || isFromDynamicZone;
   const showResetComponent =
     !isRepeatable &&
     isInitialized &&
     !isFromDynamicZone &&
     hasChildrenAllowedFields;
-  const currentComponentSchema = get(
-    allLayoutData,
-    ["components", componentUid],
-    {},
-  );
 
-  const displayedFields = get(currentComponentSchema, ["layouts", "edit"], []);
+  const formattedLabelIcon = labelIcon
+    ? { icon: labelIcon.icon, title: formatMessage(labelIcon.title) }
+    : null;
 
   if (!hasChildrenAllowedFields && isCreatingEntry) {
     return (
       <div className="col-12">
-        <NotAllowedInput label={label} />
+        <NotAllowedInput label={label} labelIcon={formattedLabelIcon} />
       </div>
     );
   }
@@ -71,7 +67,7 @@ const FieldComponent = ({
   ) {
     return (
       <div className="col-12">
-        <NotAllowedInput label={label} />
+        <NotAllowedInput label={label} labelIcon={formattedLabelIcon} />
       </div>
     );
   }
@@ -89,8 +85,15 @@ const FieldComponent = ({
         </ComponentIcon>
       )}
       <Label>
-        {label}&nbsp;
-        {isRepeatable && `(${componentValueLength})`}
+        <span>
+          {label}&nbsp;
+          {isRepeatable && `(${componentValueLength})`}
+        </span>
+        {formattedLabelIcon && (
+          <LabelIconWrapper title={formattedLabelIcon.title}>
+            {formattedLabelIcon.icon}
+          </LabelIconWrapper>
+        )}
       </Label>
       {showResetComponent && (
         <Reset
@@ -115,10 +118,8 @@ const FieldComponent = ({
       {!isRepeatable && isInitialized && (
         <NonRepeatableComponent
           componentUid={componentUid}
-          fields={displayedFields}
           isFromDynamicZone={isFromDynamicZone}
           name={name}
-          schema={currentComponentSchema}
           dataForCurrentVersion={dataForCurrentVersion}
           isVersionCurrent={isVersionCurrent}
         />
@@ -128,14 +129,11 @@ const FieldComponent = ({
           componentValue={componentValue}
           componentValueLength={componentValueLength}
           componentUid={componentUid}
-          fields={displayedFields}
-          isFromDynamicZone={isFromDynamicZone}
           isNested={isNested}
           isReadOnly={isReadOnly}
           max={max}
           min={min}
           name={name}
-          schema={currentComponentSchema}
           dataForCurrentVersion={dataForCurrentVersion}
           isVersionCurrent={isVersionCurrent}
         />
@@ -149,11 +147,12 @@ FieldComponent.defaultProps = {
   componentFriendlyName: null,
   hasChildrenAllowedFields: false,
   hasChildrenReadableFields: false,
-  icon: "smile",
+  icon: 'smile',
   isFromDynamicZone: false,
   isReadOnly: false,
   isRepeatable: false,
   isNested: false,
+  labelIcon: null,
   max: Infinity,
   min: -Infinity,
   dataForCurrentVersion: undefined,
@@ -173,6 +172,13 @@ FieldComponent.propTypes = {
   isRepeatable: PropTypes.bool,
   isNested: PropTypes.bool,
   label: PropTypes.string.isRequired,
+  labelIcon: PropTypes.shape({
+    icon: PropTypes.node.isRequired,
+    title: PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      defaultMessage: PropTypes.string.isRequired,
+    }),
+  }),
   max: PropTypes.number,
   min: PropTypes.number,
   name: PropTypes.string.isRequired,

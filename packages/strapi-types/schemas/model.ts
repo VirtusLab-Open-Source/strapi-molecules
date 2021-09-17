@@ -44,6 +44,7 @@ export type Attribute =
 
 export type Model = BookshelfModel<any> & {
   collectionName: string;
+  kind: 'singleType' | 'collectionType'
   modelName: string;
   databaseName: string;
   primaryKey: string;

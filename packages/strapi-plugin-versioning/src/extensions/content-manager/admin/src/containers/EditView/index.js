@@ -1,69 +1,57 @@
-import React, {
-  memo,
-  useCallback,
-  useMemo,
-  useEffect,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import PropTypes from "prop-types";
-import { get, isEqual, sortBy } from "lodash";
-import { FormattedMessage } from "react-intl";
-import { Select, Button } from "@buffetjs/core";
-import { useHistory, useLocation, useRouteMatch } from "react-router-dom";
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import PropTypes from 'prop-types';
+import { get, isEqual, sortBy } from 'lodash';
+import { FormattedMessage } from 'react-intl';
 import {
   BackHeader,
-  LiLink,
+  BaselineAlignment,
   CheckPermissions,
-  useUserPermissions,
+  LiLink,
   request,
-} from "strapi-helper-plugin";
-import pluginId from "../../pluginId";
-import pluginPermissions from "../../permissions";
-import { generatePermissionsObject } from "../../utils";
-import Container from "../../components/Container";
-import DynamicZone from "../../components/DynamicZone";
-import FormWrapper from "../../components/FormWrapper";
-import FieldComponent from "../../components/FieldComponent";
-import Inputs from "../../components/Inputs";
-import SelectWrapper from "../../components/SelectWrapper";
-import getInjectedComponents from "../../utils/getComponents";
-import EditViewDataManagerProvider from "../EditViewDataManagerProvider";
-import EditViewProvider from "../EditViewProvider";
-import Header from "./Header";
-import createAttributesLayout from "./utils/createAttributesLayout";
-import { LinkWrapper, SubWrapper } from "./components";
-import init from "./init";
-import reducer, { initialState } from "./reducer";
-import getRequestUrl from "../../utils/getRequestUrl";
+  useGlobalContext,
+} from 'strapi-helper-plugin';
+import { Button, Padded, Select } from '@buffetjs/core';
+import pluginId from '../../pluginId';
+import pluginPermissions from '../../permissions';
+import Container from '../../components/Container';
+import DynamicZone from '../../components/DynamicZone';
+import FormWrapper from '../../components/FormWrapper';
+import FieldComponent from '../../components/FieldComponent';
+import Inputs from '../../components/Inputs';
+import SelectWrapper from '../../components/SelectWrapper';
+import { getInjectedComponents } from '../../utils';
+import CollectionTypeFormWrapper from '../CollectionTypeFormWrapper';
+import EditViewDataManagerProvider from '../EditViewDataManagerProvider';
+import SingleTypeFormWrapper from '../SingleTypeFormWrapper';
+import Header from './Header';
+import {
+  createAttributesLayout,
+  getFieldsActionMatchingPermissions,
+} from './utils';
+import { LinkWrapper, SubWrapper } from './components';
+import DeleteLink from './DeleteLink';
+import InformationCard from './InformationCard';
+import getRequestUrl from '../../utils/getRequestUrl';
+import { useLocation } from 'react-router-dom';
 
 /* eslint-disable  react/no-array-index-key */
-
 const EditView = ({
-  components,
-  currentEnvironment,
-  deleteLayout,
-  layouts,
-  plugins,
+  allowedActions,
+  isSingleType,
+  goBack,
+  layout,
   slug,
+  state,
+  id,
+  origin,
+  userPermissions,
 }) => {
-  const formatLayoutRef = useRef();
-  formatLayoutRef.current = createAttributesLayout;
-  const { goBack } = useHistory();
-  // Retrieve the search and the pathname
+  const { currentEnvironment, plugins } = useGlobalContext();
   const { pathname } = useLocation();
-  const {
-    params: { contentType },
-  } = useRouteMatch("/plugins/content-manager/:contentType");
-  const viewPermissions = useMemo(() => generatePermissionsObject(slug), [
-    slug,
-  ]);
-  const { allowedActions } = useUserPermissions(viewPermissions);
 
-  const entityId = pathname.split("/").pop();
-  const [versions, setVersions] = useState([{ date: "current" }]);
-  const [selectedVersion, setSelectedVersion] = useState("current");
+  const entityId = pathname.split('/').pop();
+  const [versions, setVersions] = useState([{ date: 'current' }]);
+  const [selectedVersion, setSelectedVersion] = useState('current');
 
   const changeLatestDateToCurrent = (versions) => {
     if (versions.length) {
@@ -71,145 +59,115 @@ const EditView = ({
         (previous, next) =>
           new Date(previous.date).getTime() - new Date(next.date).getTime(),
       );
-
       return sortedVersions.map((sortedVersion, i, arr) => {
         if (i === arr.length - 1) {
           sortedVersion = {
             ...sortedVersion,
-            date: "current",
+            date: 'current',
           };
         }
         return sortedVersion;
       });
     }
-    return [{ date: "current" }];
+    return [{ date: 'current' }];
   };
-
   useEffect(() => {
     const getVersions = async () => {
       try {
         const versions = await request(
           getRequestUrl(`explorer/versions/${slug}/${entityId}`),
           {
-            method: "GET",
+            method: 'GET',
           },
         );
+        console.log('versions', versions);
         setVersions(changeLatestDateToCurrent(versions));
       } catch (err) {
-        strapi.notification.error("content-manager.error.relation.fetch");
+        strapi.notification.error('content-manager.error.relation.fetch');
       }
     };
-    if (entityId != "create") {
+    if (entityId != 'create') {
       getVersions();
     }
   }, [slug, entityId]);
-
   const generateDataForSelectedOption = () =>
     versions.length <= 1
       ? {}
       : versions.find((version) => version.date === selectedVersion).content;
 
-  const isSingleType = useMemo(() => contentType === "singleType", [
-    contentType,
-  ]);
-  const [
-    { formattedContentTypeLayout, isDraggingComponent },
-    dispatch,
-  ] = useReducer(reducer, initialState, () => init(initialState));
-  const allLayoutData = useMemo(() => get(layouts, [slug], {}), [
-    layouts,
-    slug,
-  ]);
+  // Here in case of a 403 response when fetching data we will either redirect to the previous page
+  // Or to the homepage if there's no state in the history stack
+  const from = get(state, 'from', '/');
+
+  const {
+    createActionAllowedFields,
+    readActionAllowedFields,
+    updateActionAllowedFields,
+  } = useMemo(() => {
+    return getFieldsActionMatchingPermissions(userPermissions, slug);
+  }, [userPermissions, slug]);
+  const configurationPermissions = useMemo(() => {
+    return isSingleType
+      ? pluginPermissions.singleTypesConfigurations
+      : pluginPermissions.collectionTypesConfigurations;
+  }, [isSingleType]);
+
+  const configurationsURL = `/plugins/${pluginId}/${
+    isSingleType ? 'singleType' : 'collectionType'
+  }/${slug}/configurations/edit`;
   const currentContentTypeLayoutData = useMemo(
-    () => get(allLayoutData, ["contentType"], {}),
-    [allLayoutData],
+    () => get(layout, ['contentType'], {}),
+    [layout],
   );
-  const currentContentTypeLayout = useMemo(
-    () => get(currentContentTypeLayoutData, ["layouts", "edit"], []),
-    [currentContentTypeLayoutData],
-  );
+
   const currentContentTypeLayoutRelations = useMemo(
-    () => get(currentContentTypeLayoutData, ["layouts", "editRelations"], []),
-    [currentContentTypeLayoutData],
-  );
-  const currentContentTypeSchema = useMemo(
-    () => get(currentContentTypeLayoutData, ["schema"], {}),
+    () => get(currentContentTypeLayoutData, ['layouts', 'editRelations'], []),
     [currentContentTypeLayoutData],
   );
 
-  const getFieldMetas = useCallback(
-    (fieldName) => {
-      return get(
-        currentContentTypeLayoutData,
-        ["metadatas", fieldName, "edit"],
-        {},
-      );
-    },
-    [currentContentTypeLayoutData],
-  );
-  const getField = useCallback(
-    (fieldName) => {
-      return get(currentContentTypeSchema, ["attributes", fieldName], {});
-    },
-    [currentContentTypeSchema],
-  );
-  const getFieldType = useCallback(
-    (fieldName) => {
-      return get(getField(fieldName), ["type"], "");
-    },
-    [getField],
-  );
-  const getFieldComponentUid = useCallback(
-    (fieldName) => {
-      return get(getField(fieldName), ["component"], "");
-    },
-    [getField],
+  const DataManagementWrapper = useMemo(
+    () => (isSingleType ? SingleTypeFormWrapper : CollectionTypeFormWrapper),
+    [isSingleType],
   );
 
   // Check if a block is a dynamic zone
-  const isDynamicZone = useCallback(
-    (block) => {
-      return block.every((subBlock) => {
-        return subBlock.every(
-          (obj) => getFieldType(obj.name) === "dynamiczone",
-        );
-      });
-    },
-    [getFieldType],
-  );
-
-  useEffect(() => {
-    // Force state to be cleared when navigation from one entry to another
-    dispatch({ type: "RESET_PROPS" });
-    dispatch({
-      type: "SET_LAYOUT_DATA",
-      formattedContentTypeLayout: formatLayoutRef.current(
-        currentContentTypeLayout,
-        currentContentTypeSchema.attributes,
-      ),
+  const isDynamicZone = useCallback((block) => {
+    return block.every((subBlock) => {
+      return subBlock.every((obj) => obj.fieldSchema.type === 'dynamiczone');
     });
+  }, []);
 
-    return () => deleteLayout(slug);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentContentTypeLayout, currentContentTypeSchema.attributes]);
-
-  const isVersionCurrent = () => selectedVersion === "current";
-  const currentFieldNames = Object.keys(currentContentTypeSchema.attributes);
-
-  const currentVersionFieldNames = () => {
-    if (selectedVersion === "current") {
+  const formattedContentTypeLayout = useMemo(() => {
+    if (!currentContentTypeLayoutData.layouts) {
       return [];
     }
 
+    return createAttributesLayout(
+      currentContentTypeLayoutData.layouts.edit,
+      currentContentTypeLayoutData.attributes
+    );
+  }, [currentContentTypeLayoutData]);
+
+  const isVersionCurrent = () => selectedVersion === 'current';
+  const currentFieldNames = Object.keys(
+    currentContentTypeLayoutData.attributes,
+  );
+  const currentVersionFieldNames = () => {
+    if (selectedVersion === 'current') {
+      return [];
+    }
     return Object.keys(generateDataForSelectedOption());
   };
 
   const isSelectVersionContainsAllCurrentRelations = () => {
+    console.log(
+      'generateDataForSelectedOption()',
+      generateDataForSelectedOption(),
+    );
     if (generateDataForSelectedOption()) {
       const selectedVersionAttributeNames = Object.keys(
         generateDataForSelectedOption(),
       );
-
       return currentContentTypeLayoutRelations.every((el) =>
         selectedVersionAttributeNames.includes(el),
       );
@@ -228,10 +186,10 @@ const EditView = ({
 
   const isRevertButtonDisabled = () => {
     const unnecessaryAttributes = [
-      "created_at",
-      "created_by",
-      "updated_at",
-      "updated_by",
+      'created_at',
+      'created_by',
+      'updated_at',
+      'updated_by',
     ];
     const sortedCurrentFieldNames = sortBy(
       removeUnnecessaryAttributes(currentFieldNames, unnecessaryAttributes),
@@ -253,246 +211,261 @@ const EditView = ({
       !isSelectVersionContainsAllCurrentRelations()
     );
   };
-
   const findSelectedVersionRelationValue = (name) => {
     const dataForSelectedOption = generateDataForSelectedOption();
     return dataForSelectedOption[name];
   };
 
+  // TODO: create a hook to handle/provide the permissions this should be done for the i18n feature
   return (
-    <EditViewProvider
-      allowedActions={allowedActions}
-      allLayoutData={allLayoutData}
-      components={components}
-      layout={currentContentTypeLayoutData}
-      isDraggingComponent={isDraggingComponent}
-      isSingleType={isSingleType}
-      setIsDraggingComponent={() => {
-        dispatch({
-          type: "SET_IS_DRAGGING_COMPONENT",
-        });
-      }}
-      unsetIsDraggingComponent={() => {
-        dispatch({
-          type: "UNSET_IS_DRAGGING_COMPONENT",
-        });
-      }}
+    <DataManagementWrapper
+      allLayoutData={layout}
+      from={from}
+      slug={slug}
+      id={id}
+      origin={origin}
     >
-      <EditViewDataManagerProvider
-        allLayoutData={allLayoutData}
-        redirectToPreviousPage={goBack}
-        isSingleType={isSingleType}
-        slug={slug}
-      >
-        <BackHeader onClick={goBack} />
-        <Container className="container-fluid">
-          <Header />
-          <div className="row" style={{ paddingTop: 3 }}>
-            <div className="col-md-12 col-lg-9" style={{ marginBottom: 13 }}>
-              {formattedContentTypeLayout.map((block, blockIndex) => {
-                if (isDynamicZone(block)) {
-                  const {
-                    0: {
-                      0: { name },
-                    },
-                  } = block;
-                  const { max, min } = getField(name);
+      {({
+        componentsDataStructure,
+        contentTypeDataStructure,
+        data,
+        isCreatingEntry,
+        isLoadingForData,
+        onDelete,
+        onDeleteSucceeded,
+        onPost,
+        onPublish,
+        onPut,
+        onUnpublish,
+        redirectionLink,
+        status,
+      }) => {
+        return (
+          <EditViewDataManagerProvider
+            allowedActions={allowedActions}
+            allLayoutData={layout}
+            createActionAllowedFields={createActionAllowedFields}
+            componentsDataStructure={componentsDataStructure}
+            contentTypeDataStructure={contentTypeDataStructure}
+            from={redirectionLink}
+            initialValues={data}
+            isCreatingEntry={isCreatingEntry}
+            isLoadingForData={isLoadingForData}
+            isSingleType={isSingleType}
+            onPost={onPost}
+            onPublish={onPublish}
+            onPut={onPut}
+            onUnpublish={onUnpublish}
+            readActionAllowedFields={readActionAllowedFields}
+            redirectToPreviousPage={goBack}
+            slug={slug}
+            status={status}
+            updateActionAllowedFields={updateActionAllowedFields}
+          >
+            {({ onChangeVersion }) => (
+              <>
+                <BackHeader onClick={goBack} />
+                <Container className="container-fluid">
+                  <Header allowedActions={allowedActions} />
+                  <div className="row" style={{ paddingTop: 3 }}>
+                    <div className="col-md-12 col-lg-9" style={{ marginBottom: 13 }}>
+                      {formattedContentTypeLayout.map((block, blockIndex) => {
+                        if (isDynamicZone(block)) {
+                          const {
+                            0: {
+                              0: { name, fieldSchema, metadatas, labelIcon },
+                            },
+                          } = block;
+                          const baselineAlignementSize = blockIndex === 0 ? '3px' : '0';
 
-                  return (
-                    <DynamicZone
-                      key={blockIndex}
-                      name={name}
-                      max={max}
-                      min={min}
-                      dataForCurrentVersion={generateDataForSelectedOption()}
-                      isVersionCurrent={isVersionCurrent()}
-                    />
-                  );
-                }
+                          return (
+                            <BaselineAlignment key={blockIndex} top size={baselineAlignementSize}>
+                              <DynamicZone
+                                name={name}
+                                fieldSchema={fieldSchema}
+                                labelIcon={labelIcon}
+                                metadatas={metadatas}
+                              />
+                            </BaselineAlignment>
+                          );
+                        }
 
-                return (
-                  <FormWrapper key={blockIndex}>
-                    {block.map((fieldsBlock, fieldsBlockIndex) => {
-                      return (
-                        <div className="row" key={fieldsBlockIndex}>
-                          {fieldsBlock.map(({ name, size }, fieldIndex) => {
-                            const isComponent =
-                              getFieldType(name) === "component";
-
-                            if (isComponent) {
-                              const componentUid = getFieldComponentUid(name);
-                              const isRepeatable = get(
-                                getField(name),
-                                "repeatable",
-                                false,
-                              );
-                              const { max, min } = getField(name);
-
-                              const label = get(
-                                getFieldMetas(name),
-                                "label",
-                                componentUid,
-                              );
-
+                        return (
+                          <FormWrapper key={blockIndex}>
+                            {block.map((fieldsBlock, fieldsBlockIndex) => {
                               return (
-                                <FieldComponent
-                                  key={componentUid}
-                                  componentUid={componentUid}
-                                  isRepeatable={isRepeatable}
-                                  label={label}
-                                  max={max}
-                                  min={min}
-                                  name={name}
-                                  dataForCurrentVersion={generateDataForSelectedOption()}
-                                  isVersionCurrent={isVersionCurrent()}
-                                />
+                                <div className="row" key={fieldsBlockIndex}>
+                                  {fieldsBlock.map(
+                                    ({ name, size, fieldSchema, labelIcon, metadatas }, fieldIndex) => {
+                                      const isComponent = fieldSchema.type === 'component';
+
+                                      if (isComponent) {
+                                        const { component, max, min, repeatable = false } = fieldSchema;
+                                        const componentUid = fieldSchema.component;
+
+                                        return (
+                                          <FieldComponent
+                                            key={componentUid}
+                                            componentUid={component}
+                                            labelIcon={labelIcon}
+                                            isRepeatable={repeatable}
+                                            label={metadatas.label}
+                                            max={max}
+                                            min={min}
+                                            name={name}
+                                          />
+                                        );
+                                      }
+
+                                      return (
+                                        <div className={`col-${size}`} key={name}>
+                                          <Inputs
+                                            autoFocus={
+                                              blockIndex === 0 &&
+                                              fieldsBlockIndex === 0 &&
+                                              fieldIndex === 0
+                                            }
+                                            fieldSchema={fieldSchema}
+                                            keys={name}
+                                            labelIcon={labelIcon}
+                                            metadatas={metadatas}
+                                          />
+                                        </div>
+                                      );
+                                    },
+                                  )}
+                                </div>
                               );
-                            }
-
-                            return (
-                              <div className={`col-${size}`} key={name}>
-                                <Inputs
-                                  autoFocus={
-                                    blockIndex === 0 &&
-                                    fieldsBlockIndex === 0 &&
-                                    fieldIndex === 0
-                                  }
-                                  keys={name}
-                                  layout={currentContentTypeLayoutData}
-                                  name={name}
-                                  dataForCurrentVersion={generateDataForSelectedOption()}
-                                  isVersionCurrent={isVersionCurrent()}
-                                />
-                              </div>
-                            );
-                          })}
+                            })}
+                          </FormWrapper>
+                        );
+                      })}
+                    </div>
+                    <div className="col-md-12 col-lg-3">
+                      <InformationCard />
+                      <Padded size="smd" top />
+                      {currentContentTypeLayoutData.layouts.editRelations.length > 0 && (
+                        <SubWrapper style={{ padding: '0 20px 1px', marginBottom: '25px' }}>
+                          <div style={{ paddingTop: '22px' }}>
+                            {currentContentTypeLayoutData.layouts.editRelations.map(
+                              ({ name, fieldSchema, labelIcon, metadatas, queryInfos }) => {
+                                return (
+                                  <SelectWrapper
+                                    {...fieldSchema}
+                                    {...metadatas}
+                                    key={name}
+                                    labelIcon={labelIcon}
+                                    name={name}
+                                    relationsType={fieldSchema.relationType}
+                                    queryInfos={queryInfos}
+                                  />
+                                );
+                              },
+                            )}
+                          </div>
+                        </SubWrapper>
+                      )}
+                      <LinkWrapper>
+                        <ul>
+                          <CheckPermissions permissions={configurationPermissions}>
+                            <LiLink
+                              message={{
+                                id: 'app.links.configure-view',
+                              }}
+                              icon="layout"
+                              url={configurationsURL}
+                              onClick={() => {
+                                // emitEvent('willEditContentTypeLayoutFromEditView');
+                              }}
+                            />
+                          </CheckPermissions>
+                          {getInjectedComponents(
+                            'editView',
+                            'right.links',
+                            plugins,
+                            currentEnvironment,
+                            slug,
+                          )}
+                          {allowedActions.canDelete && (
+                            <DeleteLink
+                              isCreatingEntry={isCreatingEntry}
+                              onDelete={onDelete}
+                              onDeleteSucceeded={onDeleteSucceeded}
+                            />
+                          )}
+                        </ul>
+                      </LinkWrapper>
+                      {entityId !== 'create' && (
+                        <div className="form-inline well">
+                          <div className="form-group pr-2">
+                            <label className="control-label">
+                              <FormattedMessage
+                                id={`${pluginId}.containers.EditView.versions`}
+                              />
+                            </label>
+                          </div>
+                          <div>
+                            <Select
+                              name="versionSelect"
+                              onChange={({ target: { value } }) => {
+                                setSelectedVersion(value);
+                                if (onChangeVersion) {
+                                  onChangeVersion(
+                                    versions.find(({ date }) => date === value)
+                                      ?.content,
+                                  );
+                                }
+                              }}
+                              options={versions.map((el) => el.date).reverse()}
+                              value={selectedVersion}
+                            />
+                            <Button
+                              color="success"
+                              type="submit"
+                              disabled={isRevertButtonDisabled()}
+                            >
+                              <FormattedMessage
+                                id={`${pluginId}.containers.EditView.revert`}
+                              />
+                            </Button>
+                          </div>
                         </div>
-                      );
-                    })}
-                  </FormWrapper>
-                );
-              })}
-            </div>
-
-            <div className="col-md-12 col-lg-3">
-              {currentContentTypeLayoutRelations.length > 0 && (
-                <SubWrapper
-                  style={{ padding: "0 20px 1px", marginBottom: "25px" }}
-                >
-                  <div style={{ paddingTop: "22px" }}>
-                    {currentContentTypeLayoutRelations.map((relationName) => {
-                      const relation = get(
-                        currentContentTypeLayoutData,
-                        ["schema", "attributes", relationName],
-                        {},
-                      );
-                      const relationMetas = get(
-                        currentContentTypeLayoutData,
-                        ["metadatas", relationName, "edit"],
-                        {},
-                      );
-
-                      return (
-                        <SelectWrapper
-                          {...relation}
-                          {...relationMetas}
-                          key={relationName}
-                          name={relationName}
-                          relationsType={relation.relationType}
-                          valueToSet={
-                            isVersionCurrent()
-                              ? "current"
-                              : findSelectedVersionRelationValue(relationName)
-                          }
-                        />
-                      );
-                    })}
+                      )}
+                    </div>
                   </div>
-                </SubWrapper>
-              )}
-              <LinkWrapper>
-                <ul>
-                  <CheckPermissions
-                    permissions={
-                      isSingleType
-                        ? pluginPermissions.singleTypesConfigurations
-                        : pluginPermissions.collectionTypesConfigurations
-                    }
-                  >
-                    <LiLink
-                      message={{
-                        id: "app.links.configure-view",
-                      }}
-                      icon="layout"
-                      key={`${pluginId}.link`}
-                      url={`${
-                        isSingleType ? `${pathname}/` : ""
-                      }ctm-configurations/edit-settings/content-types`}
-                      onClick={() => {
-                        // emitEvent('willEditContentTypeLayoutFromEditView');
-                      }}
-                    />
-                  </CheckPermissions>
-                  {getInjectedComponents(
-                    "editView",
-                    "right.links",
-                    plugins,
-                    currentEnvironment,
-                    slug,
-                  )}
-                </ul>
-              </LinkWrapper>
-              {entityId != "create" && (
-                <div className="form-inline well">
-                  <div className="form-group pr-2">
-                    <label className="control-label">
-                      <FormattedMessage
-                        id={`${pluginId}.containers.EditView.versions`}
-                      />
-                    </label>
-                  </div>
-                  <div>
-                    <Select
-                      name="versionSelect"
-                      onChange={({ target: { value } }) => {
-                        setSelectedVersion(value);
-                      }}
-                      options={versions.map((el) => el.date).reverse()}
-                      value={selectedVersion}
-                    />
-                    <Button
-                      color="success"
-                      type="submit"
-                      disabled={isRevertButtonDisabled()}
-                    >
-                      <FormattedMessage
-                        id={`${pluginId}.containers.EditView.revert`}
-                      />
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </Container>
-      </EditViewDataManagerProvider>
-    </EditViewProvider>
+                </Container>
+              </>
+            )}
+          </EditViewDataManagerProvider>
+        );
+      }}
+    </DataManagementWrapper>
   );
 };
 
 EditView.defaultProps = {
-  currentEnvironment: "production",
-  emitEvent: () => {},
-  plugins: {},
+  id: null,
+  isSingleType: false,
+  origin: null,
+  state: {},
 };
 
 EditView.propTypes = {
-  components: PropTypes.array.isRequired,
-  currentEnvironment: PropTypes.string,
-  deleteLayout: PropTypes.func.isRequired,
-  emitEvent: PropTypes.func,
-  layouts: PropTypes.object.isRequired,
-  plugins: PropTypes.object,
+  layout: PropTypes.shape({
+    components: PropTypes.object.isRequired,
+    contentType: PropTypes.shape({
+      uid: PropTypes.string.isRequired,
+      settings: PropTypes.object.isRequired,
+      metadatas: PropTypes.object.isRequired,
+      options: PropTypes.object.isRequired,
+      attributes: PropTypes.object.isRequired,
+    }).isRequired,
+  }).isRequired,
+  id: PropTypes.string,
+  isSingleType: PropTypes.bool,
+  goBack: PropTypes.func.isRequired,
+  origin: PropTypes.string,
+  state: PropTypes.object,
   slug: PropTypes.string.isRequired,
 };
 

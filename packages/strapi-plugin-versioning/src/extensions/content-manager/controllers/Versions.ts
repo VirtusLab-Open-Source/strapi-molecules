@@ -1,4 +1,4 @@
-import { Context } from "koa";
+import { Context } from 'koa';
 
 type Content = {
   created_at: string;
@@ -12,23 +12,24 @@ type Version = {
   id: number;
 };
 
+const saveParse = (entity: string) => {
+  try {
+    return JSON.parse(entity);
+  } catch (e) {
+    return entity;
+  }
+};
+
 module.exports = {
   async listEntityVersions(ctx: Context): Promise<Version[]> {
     const { model, id } = ctx.params;
-    const versionsForAllContentTypes: Content[] = await global.strapi.plugins[
-      "versioning"
-    ].services.versioning.getVersionsForAllConentTypes();
-
-    const versionsForCurrentContentType = versionsForAllContentTypes.filter(
-      (version) => version.content_type == model,
+    const service = global.strapi.plugins['versioning'].services.versioning;
+    const versionsForCurrentContentType: Content[] = await service.getVersionsForEntity(
+      model,
+      id,
     );
-
-    const versionsForCurrentId = versionsForCurrentContentType.filter(
-      (version) => version.entity_id === parseInt(id),
-    );
-
-    return versionsForCurrentId.map((el) => ({
-      content: el.entity,
+    return versionsForCurrentContentType.map((el) => ({
+      content: saveParse(el.entity),
       date: el.date,
       id: el.id,
     }));
